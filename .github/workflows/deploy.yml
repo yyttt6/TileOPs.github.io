@@ -3,6 +3,10 @@ name: Deploy docs
 on:
   push:
     branches: [main]
+  # Ascend fork: a fork starts with Actions disabled, so the push that would
+  # have deployed can land before Actions is switched on and then never fire.
+  # A manual trigger means the fork can always re-deploy without an empty commit.
+  workflow_dispatch:
 
 permissions:
   contents: write
