@@ -56,9 +56,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 TILEOPS = os.path.join(REPO, "TileOPs")
 MANIFEST_DIR = os.path.join(TILEOPS, "src", "tileops", "manifest")
-_GH = "https://github.com/tile-ai/TileOPs"
+_GH = "https://github.com/yyttt6/TileOPs"           # Ascend fork; data source only
 # Where the nightly publishes: one commit per run, the newest rendered here.
-_NB = "https://github.com/tile-ai/TileOPs-nightly/tree/snapshots"
+_NB = "https://github.com/yyttt6/TileOPs/tree/nightly-bench"  # Ascend fork; data source only
 
 # How an op stands against the fastest real alternative on its workloads. The
 # colour of the ratio is the verdict, so no separate status glyph is needed.
@@ -78,6 +78,11 @@ _KNOWN_TAGS = _TORCH_NATIVE | {
     "marlin-fp16", "marlin-fp32", "torch-cublas", "torch-cudnn", "torch-cufft",
     "torch-scaled-mm", "torch-sdpa",
     "torch-ref", "torch-fp32-ref",
+    # Ascend fork: the three TileOPs-on-Ascend providers. Not baselines in the
+    # upstream sense -- they are the implementation under test -- but they arrive
+    # through the same property-prefix mechanism, so classify them deliberately
+    # instead of letting them fall into "lib" with a warning every run.
+    "hand", "tilelang", "mlir",
 }
 
 
