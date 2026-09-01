@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fetch the latest nightly benchmark snapshot from tile-ai/TileOPs-nightly and
+# Fetch the latest nightly benchmark snapshot from yyttt6/TileOPs (Ascend fork) and
 # regenerate docs/benchmarks/index.md.
 #
 # index.md is a build artifact, not source: the committed file is a placeholder.
@@ -15,8 +15,12 @@ set -euo pipefail
 
 # One commit per run on `snapshots`; the newest is what this renders, and
 # `git log snapshots` is where an older one is read back from.
-snapshots="https://github.com/tile-ai/TileOPs-nightly"
-base="https://raw.githubusercontent.com/tile-ai/TileOPs-nightly/snapshots"
+# --- Ascend fork -------------------------------------------------------------
+# Upstream publishes snapshots to its own tile-ai/TileOPs-nightly repo. This
+# fork reads them from a branch of yyttt6/TileOPs instead, so no extra repo has
+# to exist. Only the data source changes; the page format is untouched.
+snapshots="https://github.com/yyttt6/TileOPs"
+base="https://raw.githubusercontent.com/yyttt6/TileOPs/nightly-bench"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
