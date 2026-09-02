@@ -23,6 +23,17 @@ GOLDEN = os.path.join(REPO, "tests", "golden")
 # whenever a sentence is edited, and the sentence is already in the diff.
 PROSE = {"reading.md"}
 
+# The default locale writes `<slug>.md`; every other one writes `<slug>.<loc>.md`
+# beside it, which is the layout mkdocs-static-i18n reads. Only the default
+# locale is held byte for byte — a translation is copy, and a golden for it would
+# be a second copy of the locale table.
+LOCALE_SUFFIXES = tuple(suf for lang, suf in g.LANG_SUFFIX.items()
+                        if lang != g.DEFAULT_LANG)
+
+
+def default_locale(pages: dict) -> dict:
+    return {n: t for n, t in pages.items() if not n.endswith(LOCALE_SUFFIXES)}
+
 
 def render(out_dir: str, manifest_dir: str = os.path.join(FIXTURES, "manifest")):
     """Run the renderer as the deploy runs it, and return what it wrote.
@@ -53,7 +64,8 @@ def rendered(tmp_path_factory):
 # --- The pages --------------------------------------------------------------
 
 def test_pages_match_the_committed_output(rendered):
-    pages = {n: t for n, t in rendered[0].items() if n not in PROSE}
+    pages = {n: t for n, t in default_locale(rendered[0]).items()
+             if n not in PROSE}
     assert sorted(pages) == sorted(os.listdir(GOLDEN))
     for name, text in pages.items():
         expected = open(os.path.join(GOLDEN, name), encoding="utf-8").read()
@@ -61,6 +73,56 @@ def test_pages_match_the_committed_output(rendered):
             f"{name} changed. Read the diff — it is the change, stated in the "
             f"product — then run: python tests/refresh_golden.py")
 
+
+# --- The locales -----------------------------------------------------------
+
+def test_every_page_is_written_in_every_locale(rendered):
+    """A page the renderer stops writing in one locale does not fail the build:
+    i18n serves the default-language page in its place. So assert it here.
+    """
+    pages = rendered[0]
+    stems = {n.removesuffix(".md") for n in default_locale(pages)}
+    for lang, suffix in g.LANG_SUFFIX.items():
+        got = {n for n in pages if n.endswith(suffix)
+               and not n.endswith(tuple(s for s in LOCALE_SUFFIXES
+                                        if s != suffix))}
+        assert got == {s + suffix for s in stems}, f"{lang} is missing a page"
+
+
+def test_every_locale_declares_the_same_keys():
+    """A key dropped while translating would fall back silently."""
+    keys = set(g.STRINGS[g.DEFAULT_LANG])
+    for lang, table in g.STRINGS.items():
+        assert set(table) == keys, f"{lang} declares a different key set"
+
+
+def test_the_locale_table_carries_no_dead_copy():
+    """Every key is read by a page builder. A key nothing reads is copy someone
+    would translate for a page that never shows it.
+    """
+    src = open(os.path.join(REPO, "scripts", "gen_bench_pages.py"),
+               encoding="utf-8").read()
+    # Twice for the two locale tables, at least once more for the use.
+    unused = sorted(k for k in g.STRINGS[g.DEFAULT_LANG]
+                    if src.count(f'"{k}"') < len(g.STRINGS) + 1)
+    assert not unused, f"declared but never rendered: {unused}"
+
+
+def test_an_untranslated_locale_renders_the_default_text(rendered):
+    """While a locale's values are still the English placeholders, its pages are
+    the English pages. This holds until the translation lands, and then it is
+    the translation that breaks it — delete the assertion, not the translation.
+    """
+    pages = rendered[0]
+    for lang, suffix in g.LANG_SUFFIX.items():
+        if any(v != g.STRINGS[g.DEFAULT_LANG][k]
+               for k, v in g.STRINGS[lang].items()):
+            continue
+        for name, text in default_locale(pages).items():
+            assert pages[name.removesuffix(".md") + suffix] == text
+
+
+# --- The rules the pages do not show ---------------------------------------
 
 def test_rendering_is_deterministic(tmp_path):
     # Two runs over one snapshot, so an ordering that depends on a set or on

@@ -103,15 +103,16 @@ FAMILY_TITLE = {
     "quantization": "Quantization", "positional": "Positional Encoding",
     "fft": "FFT", "mhc": "MHC", "topk": "Top-k", "other": "Other",
 }
-# (slug, page title, families in display order)
+# (slug, locale key of the page title, families in display order)
 DATA_PAGES = [
-    ("attention", "Attention", ["attention"]),
-    ("linear-attention", "Linear Attention & SSM", ["linear_attention", "scan"]),
-    ("gemm-moe", "GEMM, MoE & Quantization",
+    ("attention", "page.attention.title", ["attention"]),
+    ("linear-attention", "page.linear-attention.title",
+     ["linear_attention", "scan"]),
+    ("gemm-moe", "page.gemm-moe.title",
      ["linear_algebra", "moe", "quantization"]),
-    ("elementwise-reduction", "Elementwise & Reduction",
+    ("elementwise-reduction", "page.elementwise-reduction.title",
      ["elementwise", "reduction"]),
-    ("norm-conv-pool", "Norm, Conv, Pool & Other",
+    ("norm-conv-pool", "page.norm-conv-pool.title",
      ["normalization", "convolution", "pool", "positional", "fft", "mhc",
       "topk", "other"]),
 ]
@@ -432,6 +433,390 @@ def op_summary(metrics: list[dict]) -> dict:
     return s
 
 
+# --- User-visible strings --------------------------------------------------
+# Every string a reader sees, by locale. Only copy lives here: an op name, a
+# family name, a dtype, a baseline tag and a measured number all come out of
+# the snapshot, and the markdown that frames a string -- the `##`, the `- `,
+# the table pipes, the link targets -- is built by the page builders, so a
+# translation cannot break the page structure.
+#
+# The `zh` values are placeholders: the English text, verbatim. Translating
+# this section is a data edit and touches no code.
+STRINGS = {
+    # The strings the pages have always carried.
+    "en": {
+        # --- Shared
+        "link.reading": "How these numbers are taken",
+        # --- The data tables' two header rows
+        "table.head.workload": "Workload",
+        "table.head.ratio": "Ratio",
+        "table.head.device_time": "Device time",
+        "table.head.alternatives": "Alternatives",
+        "table.head.throughput": "Throughput",
+        "table.head.sol": "SOL",
+        "table.head.bound": "Bound",
+        "table.sub.ratio": "alt / ours",
+        "table.sub.device_time": "ms",
+        "table.sub.alt_name": "name",
+        "table.sub.alt_time": "ms",
+        "table.sub.throughput": "TFLOP/s",
+        "table.sub.sol": "of ceiling",
+        "table.sub.bound": "by",
+        # --- The data pages' titles, in DATA_PAGES order
+        "page.attention.title": "Attention",
+        "page.linear-attention.title": "Linear Attention & SSM",
+        "page.gemm-moe.title": "GEMM, MoE & Quantization",
+        "page.elementwise-reduction.title": "Elementwise & Reduction",
+        "page.norm-conv-pool.title": "Norm, Conv, Pool & Other",
+        # --- A data page's own prose
+        "data.tally": "**{n_ops} ops, {n_workloads} workloads** — {tally}.",
+        "data.tally_single": "**{n_ops} ops, {n_workloads} workloads.**",
+        "data.intro": (
+            "One table per op, one row per workload. `Ratio` is the fastest other "
+            "implementation's device time divided by ours, so <span "
+            "class=\"perf-ahead\">green</span> is faster than it, <span "
+            "class=\"perf-par\">plain</span> is level with it, <span "
+            "class=\"perf-behind\">red</span> is slower. Times are in ms. "
+            "{reading_link}."
+        ),
+        # --- The environment block
+        "env.heading": "Environment",
+        "env.missing.title": "The run did not publish its environment",
+        "env.missing.body": (
+            "Without it a number on these pages cannot be tied to the machine and "
+            "the stack that produced it. The nightly's publish step fills this in "
+            "through [`meta.json`]({url})."
+        ),
+        "env.not_published": "Not published by this run: {keys}.",
+        # --- The method block
+        "method.heading": "Method",
+        "method.one_process": (
+            "**One process, common inputs.** Every implementation of an op is "
+            "timed on the same tensors in the same process, in forward and then "
+            "reversed order so drift does not land on whichever ran last."
+        ),
+        "method.budget": (
+            "**A fixed warmup and measurement budget** per implementation, "
+            "reported as the median over however many samples fit in it, with L2 "
+            "cleared between iterations."
+        ),
+        "method.excluded": "**Compilation and workspace setup excluded.**",
+        "method.device_time": (
+            "**Device time is what is compared** — the union of the intervals the "
+            "device spent executing the call's kernels, collected through CUPTI. "
+            "A run that cannot collect device activity fails rather than falling "
+            "back to a different clock."
+        ),
+        # --- The overview page
+        "index.title": "Benchmarks",
+        "index.snapshot.title": "Nightly snapshot",
+        "index.snapshot.line": (
+            "**GPU** {gpu} · **commit** [`{sha}`]({commit_url}) · **run date** "
+            "{date} · **{n_ops} ops**, {n_workloads} workloads"
+        ),
+        "index.snapshot.run_link": "· [nightly run]({url})",
+        "index.snapshot.rendered": (
+            "Page rendered {rendered} from the [latest snapshot]({url})."
+        ),
+        "index.coverage.heading": "Coverage",
+        "index.coverage.rated": (
+            "**{rated} of {total} ops** are measured against a real alternative — "
+            "a tuned library kernel or a native PyTorch op — on the identical "
+            "workload. The rest run against an eager reference only, which is not "
+            "a bar worth reporting a win against."
+        ),
+        "index.coverage.absent": (
+            "**Absent from every table**: {n_failed} workloads errored and "
+            "{n_skipped} were skipped in this run."
+        ),
+        "index.data.heading": "Data",
+        "index.data.col_page": "Page",
+        "index.data.col_ops": "Ops",
+        "index.data.col_workloads": "Workloads",
+        # --- The reading page: opening
+        "reading.title": "How these numbers are taken",
+        "reading.intro": (
+            "Every data page answers one question: **how does TileOPs compare to "
+            "the fastest alternative implementation of the same op, on the same "
+            "workload?** Each op gets one table, with one row per workload. "
+            "Nothing is averaged across workloads: every number on the page "
+            "belongs to a single shape and dtype."
+        ),
+        # --- The reading page: the colour is the verdict
+        "reading.colour.heading": "The colour is the verdict",
+        "reading.colour.col_meaning": "Meaning",
+        "reading.colour.behind": "Slower than the alternative — below {lo}×.",
+        "reading.colour.par": (
+            "Level with it — {lo}–{hi}×, inside measurement noise."
+        ),
+        "reading.colour.ahead": "Faster than it — {hi}× and above.",
+        "reading.colour.unrated": (
+            "No fast alternative to compare against — only a functional reference "
+            "(a name ending in `-{ref}`). The number means little."
+        ),
+        "reading.colour.none": "No alternative at all ran on this workload.",
+        "reading.colour.note": (
+            "A ratio is the alternative's device time divided by ours, so **above "
+            "1 means TileOPs is faster**."
+        ),
+        # --- The reading page: the columns table
+        "reading.columns.heading": "Columns",
+        "reading.columns.col_column": "Column",
+        "reading.columns.col_meaning": "Meaning",
+        "reading.columns.workload": (
+            "`W1`, `W2`, … — the key above each table spells each one out: the "
+            "benchmark's own id for it, the dtype it ran at, and every input "
+            "tensor as `name: shape, dtype`. Tensors sharing a shape are named "
+            "together, and each carries its own dtype, so a `mask` in `bool` says "
+            "so where it is read. After the tensors come the dimensions the op is "
+            "sized by rather than shaped by (`m`, `n`, `k` for a GEMM, "
+            "`num_experts` for MoE routing), then dimmed, the parameters the call "
+            "did not leave at the signature's default. A quantity the others "
+            "already fix — `max_seqlen_q` is `max(q_lens)` — is not repeated."
+        ),
+        "reading.columns.ratio": (
+            "`alt / ours` — the fastest alternative's device time divided by "
+            "ours, the one number the colour grades."
+        ),
+        "reading.columns.device_time": (
+            "Milliseconds the device spent executing the call's kernels — the "
+            "union of their intervals. Every comparison on these pages uses it."
+        ),
+        "reading.columns.alternatives": (
+            "One line per other implementation measured on this workload, fastest "
+            "first, with its own device time in ms. A tuned library kernel "
+            "(`fla`, `mamba`, `fa3`, `triton`, …), a native PyTorch op "
+            "(`{torch}`), or a name ending in `-{ref}` — an eager composition of "
+            "PyTorch ops, which is not a bar worth reporting a win against. "
+            "Divide any of them by our device time to get the ratio against that "
+            "one."
+        ),
+        "reading.columns.throughput": (
+            "TFLOP/s: required FLOPs / device time. The count is analytic — the "
+            "op's `eval_roofline` formula evaluated on the workload's own shapes, "
+            "not a hardware counter — so it counts the work the problem demands, "
+            "not the instructions the kernel issued. Padding, recompute or a "
+            "masked-out tile is therefore invisible here, and the figure is only "
+            "comparable between implementations of the same op on the same "
+            "workload."
+        ),
+        "reading.columns.sol": (
+            "Share of the algorithmic speed-of-light: the fastest time physics "
+            "allows for the workload, divided by our device time. The `Ratio` "
+            "column says whether someone is faster today; SOL says how much "
+            "faster anyone could ever be. Details below."
+        ),
+        "reading.columns.bound": (
+            "The resource that sets the workload's floor: `mem` (HBM traffic), "
+            "`comp` (compute throughput), or `lat` — the workload is too small "
+            "for the model to judge, and its SOL number greys out with it."
+        ),
+        "reading.timing_note": (
+            "How that device time is measured — what it counts, what it leaves "
+            "out, and where it refuses to produce a number — is in [Benchmark "
+            "Timing](../timing.md)."
+        ),
+        "reading.test_marks": (
+            "Each op's heading carries its workload count and its test outcome (✅ "
+            "passed · ❌ failed · ⏭️ all skipped · `{empty}` no test matched)."
+        ),
+        # --- The reading page: speed of light
+        "reading.sol.heading": "Speed of light",
+        "reading.sol.intro": (
+            "**SOL** is *algorithmic* speed-of-light efficiency: `max(bytes / "
+            "bandwidth, FLOPs / compute roof) / device time`, priced against the "
+            "machine's *calibrated* ceilings — the bandwidth and compute rates "
+            "microbenchmarks actually reach on this GPU, not the spec sheet. 100% "
+            "means no implementation of this algorithm on this hardware can be "
+            "faster."
+        ),
+        "reading.sol.three": "Three statements delimit what a reading means:",
+        "reading.sol.bytes": (
+            "**Bytes are the algorithm's minimum traffic** — each input read "
+            "once, each output written once — not the DRAM traffic the kernel "
+            "generated. A kernel that moves data twice scores low; that is the "
+            "point."
+        ),
+        "reading.sol.flops": (
+            "**FLOPs follow the TileOPs counting convention** (a transcendental "
+            "counts as one), not per-instruction hardware cost; the metric does "
+            "not certify a special-function-bound kernel as at its limit."
+        ),
+        "reading.sol.roof": (
+            "**The compute roof is the unit an optimal implementation would use** "
+            "— declared per op, never inferred from the running kernel, so a "
+            "kernel on the wrong unit is measured against the right ceiling."
+        ),
+        "reading.sol.col_sol": "SOL",
+        "reading.sol.col_bound": "Bound",
+        "reading.sol.col_meaning": "Meaning",
+        "reading.sol.green_equal": "from {pct}",
+        "reading.sol.green_differ": (
+            "memory-bound from {mem}, compute-bound from {comp}"
+        ),
+        "reading.sol.green_unknown": (
+            "from the at-ceiling line the roofline spec sets"
+        ),
+        "reading.sol.row_ceiling": (
+            "At the achievable ceiling ({green}). The ceiling is an envelope over "
+            "access mixes, and a kernel's own mix caps below it, so the line "
+            "leaves room for every mix. Optimizing further buys at most the "
+            "remainder."
+        ),
+        "reading.sol.row_headroom": "Headroom remains.",
+        "reading.sol.row_lat": (
+            "The workload is too small for the model to judge — launch overhead "
+            "dominates the measurement, not the roofline — so the number is shown "
+            "but not graded."
+        ),
+        "reading.sol.row_anomaly": (
+            "Above the calibrated ceiling: the formula or the calibration is "
+            "wrong. Never read it as a fast kernel."
+        ),
+        "reading.sol.row_empty": (
+            "An input is missing: no roofline formula, a non-CUPTI timing, or no "
+            "GPU profile for the device."
+        ),
+        "reading.sol.spec_note": (
+            "The model, its thresholds and the formula-audit machinery are "
+            "specified in TileOPs [`docs/design/roofline.md`]({url}); the page "
+            "imports that implementation rather than re-deriving it."
+        ),
+        # --- The reading page: closing
+        "reading.shapes.heading": "Where the shapes come from",
+        "reading.shapes.body": (
+            "The snapshot records what each workload measured, not what it ran "
+            "on: the shapes are read from the TileOPs [spec manifest]({url}), "
+            "joined to a row by the label and dtype the benchmark id is built "
+            "from. A workload the manifest does not declare — a benchmark written "
+            "by hand rather than driven by a spec — shows that id alone, with no "
+            "shapes under it."
+        ),
+        "reading.empty.heading": "Empty cells",
+        "reading.empty.body": (
+            "`{empty}` means an input to that metric was not recorded, never that "
+            "the value is zero: the op reported no FLOP count for that workload, "
+            "or no alternative ran on it."
+        ),
+    },
+    # Placeholders: English verbatim until translated.
+    "zh": {
+        # Written by the PM, not machine-translated. Three keys deliberately state
+        # what the Ascend fork actually does instead of translating the upstream CUDA
+        # prose, which is false for this data -- method.device_time, method.budget and
+        # reading.columns.device_time: the numbers are a host clock, not CUPTI device
+        # time, and L2 is not cleared between iterations. PROJECT_STATE 13.79 has the
+        # measured size of that gap (host 148 vs device 315 G elem/s at 256M).
+        "link.reading": "这些数字是怎么来的",
+        "table.head.workload": "工作负载",
+        "table.head.ratio": "比值",
+        "table.head.device_time": "耗时",
+        "table.head.alternatives": "对照实现",
+        "table.head.throughput": "吞吐",
+        "table.head.sol": "SOL",
+        "table.head.bound": "瓶颈",
+        "table.sub.ratio": "对照 / 我们",
+        "table.sub.device_time": "ms",
+        "table.sub.alt_name": "名称",
+        "table.sub.alt_time": "ms",
+        "table.sub.throughput": "TFLOP/s",
+        "table.sub.sol": "占天花板",
+        "table.sub.bound": "受限于",
+        "page.attention.title": "Attention",
+        "page.linear-attention.title": "Linear Attention 与 SSM",
+        "page.gemm-moe.title": "GEMM、MoE 与量化",
+        "page.elementwise-reduction.title": "Elementwise 与归约",
+        "page.norm-conv-pool.title": "Norm、Conv、Pool 及其它",
+        "data.tally": "**{n_ops} 个算子，{n_workloads} 个工作负载** —— {tally}。",
+        "data.tally_single": "**{n_ops} 个算子，{n_workloads} 个工作负载。**",
+        "data.intro": "每个算子一张表，每个工作负载一行。`比值` 是最快的其它实现的耗时除以我们的耗时，所以 <span class=\"perf-ahead\">绿色</span> 表示我们更快，<span class=\"perf-par\">无色</span> 表示持平，<span class=\"perf-behind\">红色</span> 表示我们更慢。时间单位是 ms。{reading_link}。",
+        "env.heading": "运行环境",
+        "env.missing.title": "本次运行没有发布它的环境信息",
+        "env.missing.body": "没有它，本页任何一个数字都无法和产出它的机器与软件栈对应起来。night-bench 的发布步骤通过 [`meta.json`]({url}) 填写这一段。",
+        "env.not_published": "本次运行未发布：{keys}。",
+        "method.heading": "测量方法",
+        "method.one_process": "**同一个进程、同一批输入。** 一个算子的所有实现都在同一个进程里、用同一批张量计时，先正序再逆序各跑一遍 —— 这样漂移不会只落在最后跑的那个实现上。",
+        "method.budget": "**每个实现有固定的 warmup 与测量预算**，报告的是预算内跑完的若干次采样的**中位数**。⚠️ **本 Ascend 分支没有在迭代之间清 L2**（`l2_flushed: false`），所以能放进 cache 的工作负载会读到高于稳态的速率。",
+        "method.excluded": "**编译和 workspace 准备的时间不计入。**",
+        "method.device_time": "**被比较的是端到端耗时。** ⚠️ **本 Ascend 分支用的是 host 挂钟** —— `torch.npu.synchronize()` 前后各一次 `perf_counter`；graph 口径是同一个计时器套在 `NPUGraph.replay` 外面。**这不是 device 侧的 kernel 时间**：上游 CUDA 版通过 CUPTI 采集 device 活动区间，Ascend 侧还没有接入等价机制。msprof 实测过这个差距 —— 256M 纯拷贝在 device 侧是 315 G elem/s，而 host 计时只算出 148，**一半以上的测量时间是 host 开销**。所以本页的比值是**同口径对比**（我们和对照实现都吃同样的 host 开销），但**不能当成 kernel 效率读**。",
+        "index.title": "Benchmark",
+        "index.snapshot.title": "Night-bench 快照",
+        "index.snapshot.line": "**硬件** {gpu} · **提交** [`{sha}`]({commit_url}) · **运行日期** {date} · **{n_ops} 个算子**，{n_workloads} 个工作负载",
+        "index.snapshot.run_link": " · [本次运行]({url})",
+        "index.snapshot.rendered": "页面渲染于 {rendered}，数据取自[最新快照]({url})。",
+        "index.coverage.heading": "覆盖情况",
+        "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的 —— 调优过的库 kernel，或 PyTorch 原生算子。其余只与 eager 参考实现比较，**赢过它不值得作为成绩报告**。",
+        "index.coverage.absent": "**所有表格里都没出现的**：本次运行有 {n_failed} 个工作负载报错、{n_skipped} 个被跳过。",
+        "index.data.heading": "数据页",
+        "index.data.col_page": "页面",
+        "index.data.col_ops": "算子数",
+        "index.data.col_workloads": "工作负载数",
+        "reading.title": "这些数字是怎么来的",
+        "reading.intro": "每个数据页只回答一个问题：**在同一个工作负载上，TileOPs 与同一算子最快的其它实现相比如何？** 每个算子一张表，每个工作负载一行。**不做跨工作负载的平均** —— 页面上每一个数字都只属于一个具体的 shape 和 dtype。",
+        "reading.colour.heading": "颜色就是结论",
+        "reading.colour.col_meaning": "含义",
+        "reading.colour.behind": "比对照实现慢 —— 低于 {lo}×。",
+        "reading.colour.par": "与它持平 —— {lo}–{hi}×，落在测量噪声内。",
+        "reading.colour.ahead": "比它快 —— {hi}× 及以上。",
+        "reading.colour.unrated": "没有快的对照实现可比 —— 只有一个功能参考实现（名字以 `-{ref}` 结尾）。**这个数字意义不大。**",
+        "reading.colour.none": "这个工作负载上没有任何对照实现跑过。",
+        "reading.colour.note": "比值 = 对照实现的耗时 ÷ 我们的耗时，所以**大于 1 表示 TileOPs 更快**。",
+        "reading.columns.heading": "各列含义",
+        "reading.columns.col_column": "列",
+        "reading.columns.col_meaning": "含义",
+        "reading.columns.workload": "`W1`、`W2`、… —— 每张表上方的图例会把每一个展开：benchmark 自己给它的 id、它跑的 dtype，以及每个输入张量（写成 `名称: shape, dtype`）。形状相同的张量并列在一起，但**各自带自己的 dtype**，所以一个 `bool` 的 `mask` 会在被读到的地方就标明。张量之后是那些**决定算子规模但不决定形状**的维度（GEMM 的 `m`/`n`/`k`，MoE 路由的 `num_experts`），再往后是灰色的、调用时**没有沿用签名默认值**的参数。已经能由其它量确定的不再重复 —— 例如 `max_seqlen_q` 就是 `max(q_lens)`。",
+        "reading.columns.ratio": "`对照 / 我们` —— 最快的对照实现的耗时除以我们的耗时。**颜色评的就是这一个数。**",
+        "reading.columns.device_time": "本次调用的耗时，单位毫秒。本页所有比较都用它。⚠️ **在 Ascend 分支上这是 host 挂钟，不是 device 侧 kernel 时间** —— 见「测量方法」一节。",
+        "reading.columns.alternatives": "这个工作负载上测过的每个其它实现一行，最快的在前，各自带自己的耗时（ms）。可能是调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` …）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的实现 —— 那是若干 PyTorch 算子的 eager 拼装，**赢过它不值得作为成绩报告**。把其中任意一个除以我们的耗时，就得到对它的比值。",
+        "reading.columns.throughput": "TFLOP/s：所需 FLOPs ÷ 耗时。这个 FLOP 数是**解析算出来的** —— 用算子的 `eval_roofline` 公式代入该工作负载自己的 shape，**不是硬件计数器** —— 所以它算的是**问题本身要求的工作量**，不是 kernel 实际发出的指令。padding、重算、被 mask 掉的 tile 在这里都看不见；这个数**只在同一算子、同一工作负载的不同实现之间可比**。",
+        "reading.columns.sol": "占算法光速（speed-of-light）的比例：该工作负载在物理上最快可能的时间 ÷ 我们的耗时。`比值` 那一列说的是**今天有没有人比我们快**；SOL 说的是**任何人最多还能快多少**。详见下文。",
+        "reading.columns.bound": "决定这个工作负载下限的资源：`mem`（HBM 搬运）、`comp`（计算吞吐），或 `lat` —— 工作负载太小，模型无法判定，它的 SOL 数字也会随之置灰。",
+        "reading.timing_note": "这个耗时具体怎么测的 —— 算进了什么、漏掉了什么、什么情况下它拒绝给出数字 —— 见 [Benchmark 怎么计时](../timing.md)。",
+        "reading.test_marks": "每个算子的标题上带着它的工作负载数和测试结果（✅ 通过 · ❌ 失败 · ⏭️ 全部跳过 · `{empty}` 没有匹配到测试）。",
+        "reading.sol.heading": "光速（Speed of light）",
+        "reading.sol.intro": "**SOL** 是**算法**意义上的光速效率：`max(字节数 / 带宽, FLOPs / 计算屋顶) / 耗时`，其中的天花板用的是这台机器**标定过**的值 —— 微基准在这块硬件上**实际达到**的带宽和计算速率，不是规格书上的数。100% 意味着这个算法在这块硬件上不可能有更快的实现。",
+        "reading.sol.three": "三句话界定一个 SOL 读数的含义：",
+        "reading.sol.bytes": "**字节数是算法的最小搬运量** —— 每个输入读一次、每个输出写一次 —— **不是** kernel 实际产生的 DRAM 流量。一个把数据搬两遍的 kernel 会得低分；**这正是它该得低分的地方**。",
+        "reading.sol.flops": "**FLOPs 按 TileOPs 的计数约定**（一个超越函数算一次），不是按指令的硬件代价。所以这个指标**不会**把一个受特殊函数单元限制的 kernel 认证为已到极限。",
+        "reading.sol.roof": "**计算屋顶取的是「最优实现会用哪个单元」** —— 每个算子显式声明，**绝不从正在跑的 kernel 反推**。所以一个跑在错误单元上的 kernel，衡量它的仍然是那个正确的天花板。",
+        "reading.sol.col_sol": "SOL",
+        "reading.sol.col_bound": "瓶颈",
+        "reading.sol.col_meaning": "含义",
+        "reading.sol.green_equal": "自 {pct} 起",
+        "reading.sol.green_differ": "访存受限自 {mem} 起，计算受限自 {comp} 起",
+        "reading.sol.green_unknown": "以 roofline 规格设定的「已到天花板」线为界",
+        "reading.sol.row_ceiling": "已到可达天花板（{green}）。这条天花板是对各种访存组合取的**包络**，而一个 kernel 自己的组合会低于包络，所以这条线给每种组合都留了余量。再优化最多也只能拿到剩下那一点。",
+        "reading.sol.row_headroom": "还有余量。",
+        "reading.sol.row_lat": "工作负载太小，模型无法判定 —— **主导测量的是启动开销，不是 roofline** —— 所以数字照给，但不评级。",
+        "reading.sol.row_anomaly": "高于标定的天花板：说明**公式或标定有一个是错的**。**绝不能读成「这是个快 kernel」。**",
+        "reading.sol.row_empty": "缺少某个输入：没有 roofline 公式、计时方式非 CUPTI，或者这个设备没有硬件档案。",
+        "reading.sol.spec_note": "这个模型、它的阈值以及公式审计机制，规定在 TileOPs 的 [`docs/design/roofline.md`]({url}) 里；本页直接导入那份实现，而不是自己重新推导一遍。",
+        "reading.shapes.heading": "shape 是从哪来的",
+        "reading.shapes.body": "快照记录的是每个工作负载**测了什么**，而不是它**跑在什么上面**：shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行。**manifest 没有声明的工作负载** —— 也就是手写的、不由 spec 驱动的 benchmark —— 只显示那个 id，下面没有 shape。",
+        "reading.empty.heading": "空单元格",
+        "reading.empty.body": "`{empty}` 表示**这个指标的某个输入没有被记录**，**绝不表示值是零**：可能是该算子在这个工作负载上没有报告 FLOP 数，或者根本没有对照实现在它上面跑过。",
+    },
+}
+
+# The default locale a missing or untranslated key falls back to.
+DEFAULT_LANG = "en"
+# The locales the renderer writes, and the file suffix each one takes. The
+# suffix is what mkdocs-static-i18n reads in `docs_structure: suffix` mode.
+LANG_SUFFIX = {"en": ".md", "zh": ".zh.md"}
+
+
+def _S(lang: str, key: str, **fmt) -> str:
+    """One user-visible string, in `lang`, with its values substituted.
+
+    An untranslated key falls back to the default locale rather than
+    rendering a blank or a key name: a page with one string still to
+    translate stays readable.
+    """
+    table = STRINGS.get(lang) or STRINGS[DEFAULT_LANG]
+    text = table.get(key) or STRINGS[DEFAULT_LANG][key]
+    return text.format(**fmt) if fmt else text
+
+
 # --- Markdown helpers ------------------------------------------------------
 
 
@@ -550,34 +935,35 @@ def _bound_cell(sol: dict | None) -> str:
 # Every number belongs to one workload: a median over shapes orders of magnitude
 # apart matches no reproducible run. HTML because Markdown cannot span a heading
 # across columns; no class, because the CSS keys off `table:not([class])`.
-DETAIL_HEADER = (
-    "<table>",
-    "<thead>",
-    "<tr>",
-    # These three say what the row is; the rule after them divides that from
-    # what it measured. Each spans both header rows, so the rule has no gap.
-    '<th rowspan="2" class="colsep">Workload</th>',
-    "<th>Ratio</th>",
-    "<th>Device time</th>",
-    '<th colspan="2">Alternatives</th>',
-    "<th>Throughput</th>",
-    "<th>SOL</th>",
-    "<th>Bound</th>",
-    "</tr>",
-    # The second row carries what a header word cannot: the unit, and which way
-    # the ratio divides. Every numeric column states its own on the same line.
-    "<tr>",
-    '<th class="subhead">alt / ours</th>',
-    '<th class="subhead">ms</th>',
-    '<th class="subhead">name</th>',
-    '<th class="subhead">ms</th>',
-    '<th class="subhead">TFLOP/s</th>',
-    '<th class="subhead">of ceiling</th>',
-    '<th class="subhead">by</th>',
-    "</tr>",
-    "</thead>",
-    "<tbody>",
-)
+def detail_header(lang: str = DEFAULT_LANG) -> tuple[str, ...]:
+    return (
+        "<table>",
+        "<thead>",
+        "<tr>",
+        # These three say what the row is; the rule after them divides that from
+        # what it measured. Each spans both header rows, so the rule has no gap.
+        f'<th rowspan="2" class="colsep">{_S(lang, "table.head.workload")}</th>',
+        f'<th>{_S(lang, "table.head.ratio")}</th>',
+        f'<th>{_S(lang, "table.head.device_time")}</th>',
+        f'<th colspan="2">{_S(lang, "table.head.alternatives")}</th>',
+        f'<th>{_S(lang, "table.head.throughput")}</th>',
+        f'<th>{_S(lang, "table.head.sol")}</th>',
+        f'<th>{_S(lang, "table.head.bound")}</th>',
+        "</tr>",
+        # The second row carries what a header word cannot: the unit, and which way
+        # the ratio divides. Every numeric column states its own on the same line.
+        "<tr>",
+        f'<th class="subhead">{_S(lang, "table.sub.ratio")}</th>',
+        f'<th class="subhead">{_S(lang, "table.sub.device_time")}</th>',
+        f'<th class="subhead">{_S(lang, "table.sub.alt_name")}</th>',
+        f'<th class="subhead">{_S(lang, "table.sub.alt_time")}</th>',
+        f'<th class="subhead">{_S(lang, "table.sub.throughput")}</th>',
+        f'<th class="subhead">{_S(lang, "table.sub.sol")}</th>',
+        f'<th class="subhead">{_S(lang, "table.sub.bound")}</th>',
+        "</tr>",
+        "</thead>",
+        "<tbody>",
+    )
 
 
 DETAIL_FOOTER = ("</tbody>", "</table>")
@@ -799,7 +1185,7 @@ ENV_ORDER = ["image", "gpu", "driver", "cuda", "torch", "tilelang", "timer"]
 _ENV_HIDE = {"warmup_ms", "repeat_ms"}
 
 
-def env_block(meta: dict, timing: str | None) -> list[str]:
+def env_block(meta: dict, timing: str | None, lang: str = DEFAULT_LANG) -> list[str]:
     """The stack the numbers were produced on, from the published meta.json."""
     # A nested value is an inventory, not a fact for this table.
     env = {k: v for k, v in (meta.get("environment") or {}).items()
@@ -807,13 +1193,11 @@ def env_block(meta: dict, timing: str | None) -> list[str]:
     packages = meta.get("packages") or (meta.get("environment") or {}).get("packages") or {}
     if timing and "timer" not in env:
         env["timer"] = timing
-    lines = ["## Environment", ""]
+    lines = [f'## {_S(lang, "env.heading")}', ""]
     if not env:
         lines += [
-            '!!! warning "The run did not publish its environment"', "",
-            "    Without it a number on these pages cannot be tied to the "
-            "machine and the stack that produced it. The nightly's publish "
-            f"step fills this in through [`meta.json`]({_NB}).", "",
+            f'!!! warning "{_S(lang, "env.missing.title")}"', "",
+            "    " + _S(lang, "env.missing.body", url=_NB), "",
         ]
     else:
         keys = ([k for k in ENV_ORDER if k in env]
@@ -824,229 +1208,176 @@ def env_block(meta: dict, timing: str | None) -> list[str]:
         missing = [k for k in ("image", "driver", "cuda", "torch", "tilelang")
                    if k not in env and k not in packages]
         if missing:
-            lines += ["", "Not published by this run: "
-                      + ", ".join(f"`{k}`" for k in missing) + "."]
+            lines += ["", _S(lang, "env.not_published",
+                             keys=", ".join(f"`{k}`" for k in missing))]
     # The installed-package inventory is not published here: a few hundred rows,
     # and the versions that matter are in the table above. The snapshot carries
     # it for anyone reproducing a run.
     return lines + [""]
 
 
-def method_block() -> list[str]:
+def method_block(lang: str = DEFAULT_LANG) -> list[str]:
     """How the numbers were taken. Fixed policy of the benchmark layer.
 
     Kept to what changes how a number should be read. The reasoning behind the
     compared quantity lives on the reading page, not here.
     """
     return [
-        "## Method", "",
-        "- **One process, common inputs.** Every implementation of an op is "
-        "timed on the same tensors in the same process, in forward and then "
-        "reversed order so drift does not land on whichever ran last.",
-        "- **A fixed warmup and measurement budget** per implementation, "
-        "reported as the median over however many samples fit in it, with L2 "
-        "cleared between iterations.",
-        "- **Compilation and workspace setup excluded.**",
-        "- **Device time is what is compared** — the union of the intervals the "
-        "device spent executing the call's kernels, collected through CUPTI. A "
-        "run that cannot collect device activity fails rather than falling back "
-        "to a different clock.",
+        f'## {_S(lang, "method.heading")}', "",
+        *("- " + _S(lang, k) for k in ("method.one_process", "method.budget",
+                                       "method.excluded",
+                                       "method.device_time")),
         "",
     ]
 
 
 def index_page(args, meta: dict, rows: list[tuple],
                by_page: dict, timing: str | None,
-               n_workloads: int, n_failed: int, n_skipped: int) -> str:
+               n_workloads: int, n_failed: int, n_skipped: int,
+               lang: str = DEFAULT_LANG) -> str:
     run_id = meta.get("run_id")
     head = [
-        "# Benchmarks", "",
-        '!!! info "Nightly snapshot"', "",
-        f"    **GPU** {args.gpu} · **commit** "
-        f"[`{args.commit[:12]}`]({_GH}/commit/{args.commit}) · "
-        f"**run date** {args.date} · **{len(rows)} ops**, {n_workloads} workloads",
+        f'# {_S(lang, "index.title")}', "",
+        f'!!! info "{_S(lang, "index.snapshot.title")}"', "",
+        "    " + _S(lang, "index.snapshot.line",
+                    gpu=args.gpu, sha=args.commit[:12],
+                    commit_url=f"{_GH}/commit/{args.commit}", date=args.date,
+                    n_ops=len(rows), n_workloads=n_workloads),
     ]
     if run_id:
-        head.append(f"    · [nightly run]({_GH}/actions/runs/{run_id})")
+        head.append("    " + _S(lang, "index.snapshot.run_link",
+                                url=f"{_GH}/actions/runs/{run_id}"))
     if args.rendered:
-        head += ["", f"    Page rendered {args.rendered} from the "
-                 f"[latest snapshot]({_NB})."]
+        head += ["", "    " + _S(lang, "index.snapshot.rendered",
+                                 rendered=args.rendered, url=_NB)]
     head.append("")
 
-    lines = head + env_block(meta, timing) + method_block()
+    lines = head + env_block(meta, timing, lang) + method_block(lang)
 
     # What the run covers and how far to trust it — the qualifications a reader
     # needs before reading any single number off a data page.
     by = Counter(s["status"] for _, _, s, _, _ in rows)
     rated = len(rows) - by[UNRATED]
-    lines += ["## Coverage", "",
-              f"- **{rated} of {len(rows)} ops** are measured against a real "
-              "alternative — a tuned library kernel or a native PyTorch op — on "
-              "the identical workload. The rest run against an eager reference "
-              "only, which is not a bar worth reporting a win against."]
+    lines += [f'## {_S(lang, "index.coverage.heading")}', "",
+              "- " + _S(lang, "index.coverage.rated",
+                        rated=rated, total=len(rows))]
     if n_failed or n_skipped:
-        lines.append(f"- **Absent from every table**: {n_failed} workloads "
-                     f"errored and {n_skipped} were skipped in this run.")
-    lines += ["", "[How these numbers are taken](reading.md)", ""]
+        lines.append("- " + _S(lang, "index.coverage.absent",
+                               n_failed=n_failed, n_skipped=n_skipped))
+    lines += ["", f'[{_S(lang, "link.reading")}](reading.md)', ""]
 
     # Entry table into the data pages. Coverage only: the per-page verdict
     # tallies belong on the page that shows the rows behind them.
-    lines += ["## Data", "",
-              "| Page | Ops | Workloads |", "| --- | --- | --- |"]
-    for slug, title, _ in DATA_PAGES:
+    lines += [f'## {_S(lang, "index.data.heading")}', "",
+              f'| {_S(lang, "index.data.col_page")} '
+              f'| {_S(lang, "index.data.col_ops")} '
+              f'| {_S(lang, "index.data.col_workloads")} |',
+              "| --- | --- | --- |"]
+    for slug, title_key, _ in DATA_PAGES:
         page_rows = by_page.get(slug, [])
         if not page_rows:
             continue
         n_w = sum(s["workloads"] for _, _, s, _, _ in page_rows)
-        lines.append(f"| [{title}]({slug}.md) | {len(page_rows)} | {n_w} |")
+        lines.append(f"| [{_S(lang, title_key)}]({slug}.md) "
+                     f"| {len(page_rows)} | {n_w} |")
     return "\n".join(lines) + "\n"
 
 
-def reading_page(sol_engine=(None, None)) -> str:
+def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG) -> str:
     lo, hi = PAR_BAND
     mod = sol_engine[0]
     # The at-ceiling lines belong to the roofline tool; quote them from it so
     # this page can never disagree with the nightly report.
     if mod is not None and mod.SOL_GREEN_MEMORY == mod.SOL_GREEN_COMPUTE:
-        green_txt = f"from {mod.SOL_GREEN_MEMORY:.0%}"
+        green_txt = _S(lang, "reading.sol.green_equal",
+                       pct=f"{mod.SOL_GREEN_MEMORY:.0%}")
     elif mod is not None:
-        green_txt = (f"memory-bound from {mod.SOL_GREEN_MEMORY:.0%}, "
-                     f"compute-bound from {mod.SOL_GREEN_COMPUTE:.0%}")
+        green_txt = _S(lang, "reading.sol.green_differ",
+                       mem=f"{mod.SOL_GREEN_MEMORY:.0%}",
+                       comp=f"{mod.SOL_GREEN_COMPUTE:.0%}")
     else:
-        green_txt = "from the at-ceiling line the roofline spec sets"
+        green_txt = _S(lang, "reading.sol.green_unknown")
     lines = [
-        "# How these numbers are taken", "",
-        "Every data page answers one question: **how does TileOPs compare to the "
-        "fastest alternative implementation of the same op, on the same "
-        "workload?** Each op gets one table, with one row per workload. Nothing "
-        "is averaged across workloads: every number on the page belongs to a "
-        "single shape and dtype.", "",
-        "## The colour is the verdict", "",
-        "| | Meaning |",
+        f'# {_S(lang, "reading.title")}', "",
+        _S(lang, "reading.intro"), "",
+        f'## {_S(lang, "reading.colour.heading")}', "",
+        f'| | {_S(lang, "reading.colour.col_meaning")} |',
         "| --- | --- |",
-        f'| <span class="perf-behind">0.74×</span> | Slower than the '
-        f"alternative — below {lo:.2f}×. |",
-        f'| <span class="perf-par">1.02×</span> | Level with it — '
-        f"{lo:.2f}–{hi:.2f}×, inside measurement noise. |",
-        f'| <span class="perf-ahead">1.42×</span> | Faster than it — '
-        f"{hi:.2f}× and above. |",
-        f'| <span class="perf-unrated">18.06×</span> | No fast alternative to '
-        f"compare against — only a functional reference (a name ending in "
-        f"`-{TIER_REF}`). The number means little. |",
-        f'| <span class="perf-none">{NA}</span> | No alternative at all ran on '
-        "this workload. |",
+        '| <span class="perf-behind">0.74×</span> | '
+        + _S(lang, "reading.colour.behind", lo=f"{lo:.2f}") + " |",
+        '| <span class="perf-par">1.02×</span> | '
+        + _S(lang, "reading.colour.par", lo=f"{lo:.2f}", hi=f"{hi:.2f}") + " |",
+        '| <span class="perf-ahead">1.42×</span> | '
+        + _S(lang, "reading.colour.ahead", hi=f"{hi:.2f}") + " |",
+        '| <span class="perf-unrated">18.06×</span> | '
+        + _S(lang, "reading.colour.unrated", ref=TIER_REF) + " |",
+        f'| <span class="perf-none">{NA}</span> | '
+        + _S(lang, "reading.colour.none") + " |",
         "",
-        "A ratio is the alternative's device time divided by ours, so **above 1 "
-        "means TileOPs is faster**.", "",
-        "## Columns", "",
-        "| Column | Meaning |",
+        _S(lang, "reading.colour.note"), "",
+        f'## {_S(lang, "reading.columns.heading")}', "",
+        f'| {_S(lang, "reading.columns.col_column")} '
+        f'| {_S(lang, "reading.columns.col_meaning")} |',
         "| --- | --- |",
-        "| **Workload** | `W1`, `W2`, … — the key above each table spells each "
-        "one out: the benchmark's own id for it, the dtype it ran at, and every "
-        "input tensor as `name: shape, dtype`. Tensors sharing a shape are "
-        "named together, and each carries its own dtype, so a `mask` in `bool` "
-        "says so where it is read. After the tensors come the dimensions the op "
-        "is sized by rather than shaped by (`m`, `n`, `k` for a GEMM, "
-        "`num_experts` for MoE routing), then dimmed, the parameters the call "
-        "did not leave at the signature's default. A quantity the others "
-        "already fix — `max_seqlen_q` is `max(q_lens)` — is not repeated. |",
-        "| **Ratio** | `alt / ours` — the fastest alternative's device time "
-        "divided by ours, the one number the colour grades. |",
-        "| **Device time** | Milliseconds the device spent executing the call's "
-        "kernels — the union of their intervals. Every comparison on these "
-        "pages uses it. |",
-        "| **Alternatives** | One line per other implementation measured on this "
-        "workload, fastest first, with its own device time in ms. A tuned "
-        f"library kernel (`fla`, `mamba`, `fa3`, `triton`, …), a native PyTorch "
-        f"op (`{TIER_TORCH}`), or a name ending in `-{TIER_REF}` — an eager "
-        "composition of PyTorch ops, which is not a bar worth reporting a win "
-        "against. Divide any of them by our device time to get the ratio "
-        "against that one. |",
-        "| **Throughput** | TFLOP/s: required FLOPs / device time. The count is "
-        "analytic — the op's `eval_roofline` formula evaluated on the workload's "
-        "own shapes, not a hardware counter — so it counts the work the problem "
-        "demands, not the instructions the kernel issued. Padding, recompute or "
-        "a masked-out tile is therefore invisible here, and the figure is only "
-        "comparable between implementations of the same op on the same "
-        "workload. |",
-        "| **SOL** | Share of the algorithmic speed-of-light: the fastest time "
-        "physics allows for the workload, divided by our device time. The "
-        "`Ratio` column says whether someone is faster today; SOL says how much "
-        "faster anyone could ever be. Details below. |",
-        "| **Bound** | The resource that sets the workload's floor: `mem` (HBM "
-        "traffic), `comp` (compute throughput), or `lat` — the workload is too "
-        "small for the model to judge, and its SOL number greys out with it. |",
+        f'| **{_S(lang, "table.head.workload")}** | '
+        + _S(lang, "reading.columns.workload") + " |",
+        f'| **{_S(lang, "table.head.ratio")}** | '
+        + _S(lang, "reading.columns.ratio") + " |",
+        f'| **{_S(lang, "table.head.device_time")}** | '
+        + _S(lang, "reading.columns.device_time") + " |",
+        f'| **{_S(lang, "table.head.alternatives")}** | '
+        + _S(lang, "reading.columns.alternatives",
+             torch=TIER_TORCH, ref=TIER_REF) + " |",
+        f'| **{_S(lang, "table.head.throughput")}** | '
+        + _S(lang, "reading.columns.throughput") + " |",
+        f'| **{_S(lang, "table.head.sol")}** | '
+        + _S(lang, "reading.columns.sol") + " |",
+        f'| **{_S(lang, "table.head.bound")}** | '
+        + _S(lang, "reading.columns.bound") + " |",
         "",
-        "How that device time is measured — what it counts, what it leaves out, "
-        "and where it refuses to produce a number — is in "
-        "[Benchmark Timing](../timing.md).",
+        _S(lang, "reading.timing_note"),
         "",
-        "Each op's heading carries its workload count and its test outcome "
-        "(✅ passed · ❌ failed · ⏭️ all skipped · "
-        f"`{EMPTY}` no test matched).",
+        _S(lang, "reading.test_marks", empty=EMPTY),
         "",
-        "## Speed of light", "",
-        "**SOL** is *algorithmic* speed-of-light efficiency: "
-        "`max(bytes / bandwidth, FLOPs / compute roof) / device time`, priced "
-        "against the machine's *calibrated* ceilings — the bandwidth and "
-        "compute rates microbenchmarks actually reach on this GPU, not the "
-        "spec sheet. 100% means no implementation of this algorithm on this "
-        "hardware can be faster.", "",
-        "Three statements delimit what a reading means:", "",
-        "1. **Bytes are the algorithm's minimum traffic** — each input read "
-        "once, each output written once — not the DRAM traffic the kernel "
-        "generated. A kernel that moves data twice scores low; that is the "
-        "point.",
-        "2. **FLOPs follow the TileOPs counting convention** (a transcendental "
-        "counts as one), not per-instruction hardware cost; the metric does "
-        "not certify a special-function-bound kernel as at its limit.",
-        "3. **The compute roof is the unit an optimal implementation would "
-        "use** — declared per op, never inferred from the running kernel, so a "
-        "kernel on the wrong unit is measured against the right ceiling.",
+        f'## {_S(lang, "reading.sol.heading")}', "",
+        _S(lang, "reading.sol.intro"), "",
+        _S(lang, "reading.sol.three"), "",
+        *(f"{i}. " + _S(lang, k) for i, k in
+          enumerate(("reading.sol.bytes", "reading.sol.flops",
+                     "reading.sol.roof"), 1)),
         "",
-        "| SOL | Bound | Meaning |",
+        f'| {_S(lang, "reading.sol.col_sol")} '
+        f'| {_S(lang, "reading.sol.col_bound")} '
+        f'| {_S(lang, "reading.sol.col_meaning")} |',
         "| --- | --- | --- |",
-        f'| <span class="perf-ahead">92%</span> | mem | At the achievable '
-        f"ceiling ({green_txt}). The ceiling is an envelope over access "
-        "mixes, and a kernel's own mix caps below it, so the line leaves "
-        "room for every mix. Optimizing further buys at most the "
-        "remainder. |",
-        "| 63% | mem | Headroom remains. |",
+        '| <span class="perf-ahead">92%</span> | mem | '
+        + _S(lang, "reading.sol.row_ceiling", green=green_txt) + " |",
+        '| 63% | mem | ' + _S(lang, "reading.sol.row_headroom") + " |",
         '| <span class="perf-unrated">41%</span> | '
-        '<span class="perf-unrated">lat</span> | The workload is too '
-        "small for the model to judge — launch overhead dominates the "
-        "measurement, not the roofline — so the number is shown but not "
-        "graded. |",
-        '| <span class="perf-unrated">⚠ 108%</span> | mem | Above the '
-        "calibrated ceiling: the formula or the calibration is wrong. Never "
-        "read it as a fast kernel. |",
-        f"| `{EMPTY}` | `{EMPTY}` | An input is missing: no roofline formula, "
-        "a non-CUPTI timing, or no GPU profile for the device. |",
+        '<span class="perf-unrated">lat</span> | '
+        + _S(lang, "reading.sol.row_lat") + " |",
+        '| <span class="perf-unrated">⚠ 108%</span> | mem | '
+        + _S(lang, "reading.sol.row_anomaly") + " |",
+        f"| `{EMPTY}` | `{EMPTY}` | "
+        + _S(lang, "reading.sol.row_empty") + " |",
         "",
-        "The model, its thresholds and the formula-audit machinery are "
-        "specified in TileOPs "
-        f"[`docs/design/roofline.md`]({_GH}/blob/main/docs/design/roofline.md); "
-        "the page imports that implementation rather than re-deriving it.",
+        _S(lang, "reading.sol.spec_note",
+           url=f"{_GH}/blob/main/docs/design/roofline.md"),
         "",
-        "## Where the shapes come from", "",
-        "The snapshot records what each workload measured, not what it ran on: "
-        "the shapes are read from the TileOPs [spec manifest]"
-        f"({_GH}/tree/main/src/tileops/manifest), joined to a row by the label "
-        "and dtype the benchmark id is built from. A workload the manifest does "
-        "not declare — a benchmark written by hand rather than driven by a spec "
-        "— shows that id alone, with no shapes under it.",
+        f'## {_S(lang, "reading.shapes.heading")}', "",
+        _S(lang, "reading.shapes.body",
+           url=f"{_GH}/tree/main/src/tileops/manifest"),
         "",
-        "## Empty cells", "",
-        f"`{EMPTY}` means an input to that metric was not recorded, never that "
-        "the value is zero: the op reported no FLOP count for that workload, or "
-        "no alternative ran on it.",
+        f'## {_S(lang, "reading.empty.heading")}', "",
+        _S(lang, "reading.empty.body", empty=EMPTY),
         "",
     ]
     return "\n".join(lines) + "\n"
 
 
 def data_page(title: str, fams: list[str], rows_by_fam: dict,
-              metrics_by_op: dict, workloads_of: dict, ref: str) -> str:
+              metrics_by_op: dict, workloads_of: dict, ref: str,
+              lang: str = DEFAULT_LANG) -> str:
     # Widest lead first, then level, then behind, then the unrated. Every op is
     # listed either way; this only decides what a reader meets first.
     rank = {AHEAD: 0, PAR: 1, BEHIND: 2, UNRATED: 3}
@@ -1057,15 +1388,13 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
     tally = " · ".join(
         f"{FAMILY_TITLE.get(f, f)} {len(rows_by_fam[f])}" for f in present)
     lines = [f"# {title}", "",
-             f"**{n_ops} ops, {n_workloads} workloads** — {tally}."
+             _S(lang, "data.tally", n_ops=n_ops, n_workloads=n_workloads,
+                tally=tally)
              if len(present) > 1 else
-             f"**{n_ops} ops, {n_workloads} workloads.**", "",
-             "One table per op, one row per workload. `Ratio` is the fastest "
-             "other implementation's device time divided by ours, so "
-             '<span class="perf-ahead">green</span> is faster than it, '
-             '<span class="perf-par">plain</span> is level with it, '
-             '<span class="perf-behind">red</span> is slower. Times are in ms. '
-             "[How these numbers are taken](reading.md).", ""]
+             _S(lang, "data.tally_single", n_ops=n_ops,
+                n_workloads=n_workloads), "",
+             _S(lang, "data.intro",
+                reading_link=f'[{_S(lang, "link.reading")}](reading.md)'), ""]
     for fam in fams:
         rows = rows_by_fam.get(fam)
         if not rows:
@@ -1090,7 +1419,7 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
                       "", *workload_key(coded),
                       # No `markdown="1"`, and no blank line until `</div>`: a
                       # blank line would end the raw-HTML block mid-table.
-                      '<div class="datatable">', *DETAIL_HEADER]
+                      '<div class="datatable">', *detail_header(lang)]
             for (code, _), (_, m) in zip(coded, ordered, strict=True):
                 lines.append(detail_row(code, m))
             lines += [*DETAIL_FOOTER, "</div>", ""]
@@ -1193,21 +1522,28 @@ def main():
         ratio_drift += collect_ratio_drift(workloads_of[op], metrics_by_op[op])
     out_dir = args.out_dir or os.path.join(REPO, "docs", "benchmarks")
     os.makedirs(out_dir, exist_ok=True)
-    pages = {
-        "index.md": index_page(args, meta, all_rows, by_page,
-                               timing, len(workloads), len(failures),
-                               len(skips)),
-        "reading.md": reading_page(sol_engine),
-    }
-    for slug, title, fams in DATA_PAGES:
-        if any(rows_by_fam.get(f) for f in fams):
-            pages[f"{slug}.md"] = data_page(title, fams, rows_by_fam,
-                                            metrics_by_op, workloads_of, ref)
+    # One file per page per locale: `<slug>.md` for the default language and
+    # `<slug>.zh.md` beside it, which is the layout mkdocs-static-i18n reads in
+    # `docs_structure: suffix` mode. A locale still carrying English
+    # placeholders renders as English, which is what the fallback would have
+    # served anyway.
+    pages = {}
+    for lang, suffix in LANG_SUFFIX.items():
+        pages[f"index{suffix}"] = index_page(
+            args, meta, all_rows, by_page, timing, len(workloads),
+            len(failures), len(skips), lang=lang)
+        pages[f"reading{suffix}"] = reading_page(sol_engine, lang=lang)
+        for slug, title_key, fams in DATA_PAGES:
+            if any(rows_by_fam.get(f) for f in fams):
+                pages[f"{slug}{suffix}"] = data_page(
+                    _S(lang, title_key), fams, rows_by_fam, metrics_by_op,
+                    workloads_of, ref, lang=lang)
     for name, text in pages.items():
         with open(os.path.join(out_dir, name), "w", encoding="utf-8") as f:
             f.write(text)
 
-    print(f"wrote {len(pages)} pages to {out_dir}: {len(all_rows)} ops, "
+    print(f"wrote {len(pages)} pages to {out_dir} in "
+          f"{len(LANG_SUFFIX)} locales: {len(all_rows)} ops, "
           f"{len(workloads)} workloads, {len(failures)} failed, "
           f"{len(skips)} skipped")
     if ratio_drift:

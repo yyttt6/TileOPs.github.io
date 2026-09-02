@@ -82,12 +82,20 @@ _BENCH_ORDER = [
 ]
 
 
+# `<name>.zh.md` beside `<name>.md` is one page in two locales, not two pages:
+# i18n picks between them per build. The nav lists the default-language name
+# only, so a translated page must not be matched here — listed, it would appear
+# in the nav a second time, under whatever its H1 says.
+_LOCALE_PAGE = re.compile(r"\.[a-z]{2}(?:[-_][A-Za-z]{2,4})?\.md$")
+
+
 def on_config(config):
     """Expand the Benchmarks nav entry to the generated pages."""
     bench_dir = os.path.join(config["docs_dir"], "benchmarks")
     if not os.path.isdir(bench_dir):
         return config
-    present = {f for f in os.listdir(bench_dir) if f.endswith(".md")}
+    present = {f for f in os.listdir(bench_dir)
+               if f.endswith(".md") and not _LOCALE_PAGE.search(f)}
     ordered = [f for f in _BENCH_ORDER if f in present]
     ordered += sorted(present - set(ordered))
     entries = [f"benchmarks/{f}" for f in ordered]
