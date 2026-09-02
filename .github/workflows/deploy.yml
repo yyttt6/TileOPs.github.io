@@ -24,7 +24,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
-          repository: tile-ai/TileOPs
+          # Ascend fork: upstream deletes/renames Ops on its own schedule, and
+          # docs/api/*.md still lists them, so tracking upstream HEAD turns any
+          # upstream refactor into a build abort here -- caeb6c78 (2026-09-02,
+          # "Remove legacy contiguous GQA and MHA Ops") did exactly that, and it
+          # surfaced on an unrelated push. This fork's checkout moves when we
+          # move it. See PROJECT_STATE 13.84.
+          repository: yyttt6/TileOPs
           path: TileOPs
           fetch-depth: 1
           sparse-checkout: |
