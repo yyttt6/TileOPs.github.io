@@ -503,7 +503,8 @@ STRINGS = {
         "method.excluded": "**Compilation and workspace setup excluded.**",
         "method.device_time": (
             "**Device time is what is compared** — the union of the intervals the "
-            "device spent executing the call's kernels, collected through CUPTI. "
+            "device spent executing the call's kernels, collected through "
+            "torch_npu.profiler. "
             "A run that cannot collect device activity fails rather than falling "
             "back to a different clock."
         ),
@@ -674,7 +675,8 @@ STRINGS = {
             "wrong. Never read it as a fast kernel."
         ),
         "reading.sol.row_empty": (
-            "An input is missing: no roofline formula, a non-CUPTI timing, or no "
+            "An input is missing: no roofline formula, a timing not collected "
+            "on the device, or no "
             "GPU profile for the device."
         ),
         "reading.sol.spec_note": (
@@ -704,9 +706,9 @@ STRINGS = {
         # Written by the PM, not machine-translated. Three keys deliberately state
         # what the Ascend fork actually does instead of translating the upstream CUDA
         # prose, which is false for this data -- method.device_time, method.budget and
-        # reading.columns.device_time: the numbers are a host clock, not CUPTI device
-        # time, and L2 is not cleared between iterations. PROJECT_STATE 13.79 has the
-        # measured size of that gap (host 148 vs device 315 G elem/s at 256M).
+        # reading.columns.device_time -- rewritten 2026-09-03 once D032 landed: the
+        # numbers really are device kernel time now and L2 really is cleared, so the
+        # earlier "this fork does neither" wording had become the misleading one.
         "link.reading": "这些数字是怎么来的",
         "table.head.workload": "工作负载",
         "table.head.ratio": "比值",
@@ -736,9 +738,9 @@ STRINGS = {
         "env.not_published": "本次运行未发布：{keys}。",
         "method.heading": "测量方法",
         "method.one_process": "**同一个进程、同一批输入。** 一个算子的所有实现都在同一个进程里、用同一批张量计时，先正序再逆序各跑一遍 —— 这样漂移不会只落在最后跑的那个实现上。",
-        "method.budget": "**每个实现有固定的 warmup 与测量预算**，报告的是预算内跑完的若干次采样的**中位数**。⚠️ **本 Ascend 分支没有在迭代之间清 L2**（`l2_flushed: false`），所以能放进 cache 的工作负载会读到高于稳态的速率。",
+        "method.budget": "**每个实现有固定的 warmup 与测量预算**，报告的是预算内跑完的若干次采样的**中位数**，并在**每次迭代之间清 L2** —— 这块硬件的 L2 是 192 MiB，用一个 384 MiB 的 buffer 驱逐它，所以能放进 cache 的工作负载不会读到高于稳态的速率。",
         "method.excluded": "**编译和 workspace 准备的时间不计入。**",
-        "method.device_time": "**被比较的是端到端耗时。** ⚠️ **本 Ascend 分支用的是 host 挂钟** —— `torch.npu.synchronize()` 前后各一次 `perf_counter`；graph 口径是同一个计时器套在 `NPUGraph.replay` 外面。**这不是 device 侧的 kernel 时间**：上游 CUDA 版通过 CUPTI 采集 device 活动区间，Ascend 侧还没有接入等价机制。msprof 实测过这个差距 —— 256M 纯拷贝在 device 侧是 315 G elem/s，而 host 计时只算出 148，**一半以上的测量时间是 host 开销**。所以本页的比值是**同口径对比**（我们和对照实现都吃同样的 host 开销），但**不能当成 kernel 效率读**。",
+        "method.device_time": "**被比较的是 device 时间** —— 一次调用在 device 上执行它各个 kernel 的**区间并集**，通过 `torch_npu.profiler` 采集。取不到 device 活动的运行会**失败**，而不是退回另一个时钟。每个工作负载另外保留一份 host 挂钟读数作端到端参考，但**比值用的是 device 时间**：这台机器上 host 与 device 之差是每次测量、两侧各约 40–50 µs 的常数，用 host 计时会把便宜工作负载的比值**推向 1.0**（我们输时遮丑、赢时削峰）。",
         "index.title": "Benchmark",
         "index.snapshot.title": "Night-bench 快照",
         "index.snapshot.line": "**硬件** {gpu} · **提交** [`{sha}`]({commit_url}) · **运行日期** {date} · **{n_ops} 个算子**，{n_workloads} 个工作负载",
@@ -766,7 +768,7 @@ STRINGS = {
         "reading.columns.col_meaning": "含义",
         "reading.columns.workload": "`W1`、`W2`、… —— 每张表上方的图例会把每一个展开：benchmark 自己给它的 id、它跑的 dtype，以及每个输入张量（写成 `名称: shape, dtype`）。形状相同的张量并列在一起，但**各自带自己的 dtype**，所以一个 `bool` 的 `mask` 会在被读到的地方就标明。张量之后是那些**决定算子规模但不决定形状**的维度（GEMM 的 `m`/`n`/`k`，MoE 路由的 `num_experts`），再往后是灰色的、调用时**没有沿用签名默认值**的参数。已经能由其它量确定的不再重复 —— 例如 `max_seqlen_q` 就是 `max(q_lens)`。",
         "reading.columns.ratio": "`对照 / 我们` —— 最快的对照实现的耗时除以我们的耗时。**颜色评的就是这一个数。**",
-        "reading.columns.device_time": "本次调用的耗时，单位毫秒。本页所有比较都用它。⚠️ **在 Ascend 分支上这是 host 挂钟，不是 device 侧 kernel 时间** —— 见「测量方法」一节。",
+        "reading.columns.device_time": "本次调用在 device 上执行它各个 kernel 的**区间并集**，单位毫秒。本页所有比较都用它。每个工作负载另存了一份 host 挂钟读数作端到端参考 —— 两者之差约 40–50 µs，所以**便宜的工作负载用 host 计时会把比值推向 1.0**。详见「测量方法」一节。",
         "reading.columns.alternatives": "这个工作负载上测过的每个其它实现一行，最快的在前，各自带自己的耗时（ms）。可能是调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` …）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的实现 —— 那是若干 PyTorch 算子的 eager 拼装，**赢过它不值得作为成绩报告**。把其中任意一个除以我们的耗时，就得到对它的比值。",
         "reading.columns.throughput": "TFLOP/s：所需 FLOPs ÷ 耗时。这个 FLOP 数是**解析算出来的** —— 用算子的 `eval_roofline` 公式代入该工作负载自己的 shape，**不是硬件计数器** —— 所以它算的是**问题本身要求的工作量**，不是 kernel 实际发出的指令。padding、重算、被 mask 掉的 tile 在这里都看不见；这个数**只在同一算子、同一工作负载的不同实现之间可比**。",
         "reading.columns.sol": "占算法光速（speed-of-light）的比例：该工作负载在物理上最快可能的时间 ÷ 我们的耗时。`比值` 那一列说的是**今天有没有人比我们快**；SOL 说的是**任何人最多还能快多少**。详见下文。",
@@ -789,7 +791,7 @@ STRINGS = {
         "reading.sol.row_headroom": "还有余量。",
         "reading.sol.row_lat": "工作负载太小，模型无法判定 —— **主导测量的是启动开销，不是 roofline** —— 所以数字照给，但不评级。",
         "reading.sol.row_anomaly": "高于标定的天花板：说明**公式或标定有一个是错的**。**绝不能读成「这是个快 kernel」。**",
-        "reading.sol.row_empty": "缺少某个输入：没有 roofline 公式、计时方式非 CUPTI，或者这个设备没有硬件档案。",
+        "reading.sol.row_empty": "缺少某个输入：没有 roofline 公式、计时方式不是 device 侧采集，或者这个设备没有硬件档案。",
         "reading.sol.spec_note": "这个模型、它的阈值以及公式审计机制，规定在 TileOPs 的 [`docs/design/roofline.md`]({url}) 里；本页直接导入那份实现，而不是自己重新推导一遍。",
         "reading.shapes.heading": "shape 是从哪来的",
         "reading.shapes.body": "快照记录的是每个工作负载**测了什么**，而不是它**跑在什么上面**：shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行。**manifest 没有声明的工作负载** —— 也就是手写的、不由 spec 驱动的 benchmark —— 只显示那个 id，下面没有 shape。",
