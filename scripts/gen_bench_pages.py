@@ -44,6 +44,7 @@ import argparse
 import html
 import json
 import os
+import re
 import statistics
 import sys
 import xml.etree.ElementTree as ET
@@ -83,6 +84,13 @@ _KNOWN_TAGS = _TORCH_NATIVE | {
     # through the same property-prefix mechanism, so classify them deliberately
     # instead of letting them fall into "lib" with a warning every run.
     "hand", "tilelang", "mlir",
+    # The comparison group itself, when the snapshot publishes only one: see
+    # `_LEGACY_TAG`. It reaches the page as a library-tier rival, because a
+    # member of a D036 pool is a real implementation of the op on the identical
+    # workload -- a CANN kernel or torch_npu's own dispatch -- and not the eager
+    # composition of primitives that `-ref` means upstream. Which of the two it
+    # was is the provenance tier, badged per line, never folded into this one.
+    "baseline",
 }
 
 
@@ -94,15 +102,86 @@ def tier_of(tag: str) -> str:
     return TIER_LIB
 
 
+# --- Baseline provenance (a second, independent axis) ----------------------
+# The tier above says how a comparison *reads*. This one says where the kernel
+# on the other side *came from*, which the Ascend snapshot records per workload
+# as `baseline_tier`. The two must not be conflated: `handwritten` is a
+# statement about provenance, backed by kernel-source evidence, and carries no
+# claim about speed. A hand-written kernel losing to a vendor one is the
+# ordinary case here, not an error -- see the reading page.
+PROV_HANDWRITTEN, PROV_VENDOR = "handwritten", "vendor"
+# The css class each one is badged with. An unrecognised value keeps the neutral
+# badge and its own text, so a tier added on the harness side is shown as
+# written rather than silently painted as one of these two.
+PROV_CLASS = {PROV_HANDWRITTEN: "tier-hw", PROV_VENDOR: "tier-vendor"}
+# The reading page's explanation of the two, as an explicit anchor: the badges
+# link there, and a heading slug generated from Chinese text would not be the
+# same string in both locales.
+PROV_ANCHOR = "baseline-tiers"
+# Written into a raw-HTML cell, so it is the built URL and not the source path
+# markdown would have rewritten. A data page is served at `benchmarks/<slug>/`
+# and the reading page at `benchmarks/reading/`, in every locale, so one
+# relative target is correct for both.
+PROV_HREF = f"../reading/#{PROV_ANCHOR}"
+# Kept as literal keys rather than built from the tier name, so the locale
+# tables can be checked for a key nothing renders.
+PROV_LABEL_KEY = {PROV_HANDWRITTEN: "tier.handwritten",
+                  PROV_VENDOR: "tier.vendor"}
+
+# The tag the implementation under test publishes its metrics under. Upstream
+# writes `tileops_*`; the Ascend fork writes the provider that ran, since one
+# run has exactly one provider. First match wins, so a snapshot carrying both
+# spellings is read the upstream way.
+_OURS_TAGS = ("tileops", "tilelang", "hand", "mlir")
+
+
+def ours_of(impls: dict) -> dict:
+    """The metrics of the implementation under test, or {} if none ran."""
+    for tag in _OURS_TAGS:
+        if tag in impls:
+            return impls[tag]
+    return {}
+
+
 # --- Op families and the pages they group into -----------------------------
+# The section heading each family gets, by locale. Not in `STRINGS`, because
+# these are keyed by a family slug that comes out of the data rather than by a
+# key a page builder names: `family_title` is what reads them, and it falls back
+# to the default locale and then to the slug itself, so a family added on the
+# TileOPs side reaches the page under its own name either way.
+#
+# The names that are the term of art in both languages -- `Attention`, `GEMM`,
+# `MoE`, `FFT` -- stay as they are; translating them would leave a reader
+# hunting for the English word the rest of the page uses.
 FAMILY_TITLE = {
-    "attention": "Attention", "linear_attention": "Linear Attention / SSM",
-    "scan": "Scan", "normalization": "Normalization", "moe": "Mixture of Experts",
-    "linear_algebra": "Linear Algebra (GEMM)", "reduction": "Reduction",
-    "elementwise": "Elementwise", "convolution": "Convolution", "pool": "Pooling",
-    "quantization": "Quantization", "positional": "Positional Encoding",
-    "fft": "FFT", "mhc": "MHC", "topk": "Top-k", "other": "Other",
+    "en": {
+        "attention": "Attention", "linear_attention": "Linear Attention / SSM",
+        "scan": "Scan", "normalization": "Normalization",
+        "moe": "Mixture of Experts",
+        "linear_algebra": "Linear Algebra (GEMM)", "reduction": "Reduction",
+        "elementwise": "Elementwise", "convolution": "Convolution",
+        "pool": "Pooling", "quantization": "Quantization",
+        "positional": "Positional Encoding",
+        "fft": "FFT", "mhc": "MHC", "topk": "Top-k", "other": "Other",
+    },
+    "zh": {
+        "attention": "Attention", "linear_attention": "Linear Attention 与 SSM",
+        "scan": "扫描（Scan）", "normalization": "归一化",
+        "moe": "混合专家（MoE）",
+        "linear_algebra": "线性代数（GEMM）", "reduction": "归约",
+        "elementwise": "逐元素运算", "convolution": "卷积",
+        "pool": "池化", "quantization": "量化",
+        "positional": "位置编码",
+        "fft": "FFT", "mhc": "MHC", "topk": "Top-k", "other": "其它",
+    },
 }
+
+
+# `DEFAULT_LANG` is declared with the locale table further down, so the default
+# is resolved when the function runs rather than when it is defined.
+def family_title(fam: str, lang: str | None = None) -> str:
+    table = FAMILY_TITLE.get(lang or DEFAULT_LANG) or FAMILY_TITLE["en"]
+    return table.get(fam) or FAMILY_TITLE["en"].get(fam) or fam
 # (slug, locale key of the page title, families in display order)
 DATA_PAGES = [
     ("attention", "page.attention.title", ["attention"]),
@@ -190,19 +269,41 @@ def dtype_of(config_name: str) -> str | None:
 # Longer suffixes come first: device_busy_p10_ms must not match as latency_ms.
 _METRIC_SUFFIXES = (
     "device_busy_p10_ms", "device_busy_p90_ms", "device_busy_ms",
-    "latency_p10_ms", "latency_p90_ms", "latency_ms", "gap_ms",
+    "latency_p10_ms", "latency_p90_ms",
+    # The two D036 fields that end in `_latency_ms` themselves, so they are
+    # matched before the bare suffix claims them and files them under a tag
+    # named `baseline_runner_up`.
+    "runner_up_latency_ms", "handwritten_latency_ms",
+    "latency_ms", "gap_ms",
     "uncounted_copy_ms", "bandwidth_tbs", "tflops", "ratio", "n_kernels",
     "n_samples", "flops", "bytes", "compute_roof", "dtype", "timing",
     "variant",
+    # D036: who the comparison group was, who won it, and what it held. The
+    # harness has written `_us` for the two runner-up/handwritten times and
+    # `_latency_ms` for them at different points; both spellings are read, and
+    # `pool_size` comes before `pool` for the same reason as above.
+    "name", "tier", "selection", "pool_size", "pool",
+    "runner_up_us", "runner_up", "handwritten_us", "handwritten",
 )
 _NUMERIC_METRICS = {
     "device_busy_ms", "device_busy_p10_ms", "device_busy_p90_ms",
     "latency_ms", "latency_p10_ms", "latency_p90_ms", "gap_ms",
     "uncounted_copy_ms", "tflops", "bandwidth_tbs", "ratio", "flops",
     "bytes", "n_kernels", "n_samples",
+    "pool_size", "runner_up_us", "runner_up_latency_ms",
+    "handwritten_us", "handwritten_latency_ms",
 }
-# The alias the benchmark writes for its first baseline. Dropped whole: it
-# duplicates an implementation under a name none has, and its key set grows.
+# The name the benchmark writes its comparison group under.
+#
+# Upstream writes it as an *alias* for whichever named baseline it timed first,
+# so there it duplicates an implementation under a name none has -- and it is
+# dropped whole, below, exactly when something else is present to duplicate.
+#
+# The Ascend fork writes it as the only comparison group there is: one D036 pool
+# per workload, with `baseline_name` saying which member of the pool won and
+# `baseline_pool` listing every member with its time and its provenance tier.
+# There is nothing to duplicate, so it is kept and it is what the Alternatives
+# column shows.
 _LEGACY_TAG = "baseline"
 
 
@@ -233,10 +334,13 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
             for suf in _METRIC_SUFFIXES:
                 if key.endswith("_" + suf):
                     tag = key[: -len(suf) - 1]
-                    if tag == _LEGACY_TAG:
-                        break
                     impls[tag][suf] = _num(val) if suf in _NUMERIC_METRICS else val
                     break
+        # See `_LEGACY_TAG`: an alias for a baseline that is also present under
+        # its own name is a duplicate row, and goes. The comparison group of a
+        # snapshot that publishes nothing else stays.
+        if any(t not in _OURS_TAGS and t != _LEGACY_TAG for t in impls):
+            impls.pop(_LEGACY_TAG, None)
         workloads.append({
             "name": name,
             "config": name.split("[")[-1].rstrip("]") if "[" in name else name,
@@ -346,9 +450,57 @@ def _busy_of(impl: dict) -> float | None:
     return _pos(impl.get("device_busy_ms")) or _pos(impl.get("latency_ms"))
 
 
+# --- The D036 candidate pool ------------------------------------------------
+# `baseline_pool` is one line of text per workload: every candidate the harness
+# built and timed, `name=<time>us (tier)`, joined by "; ", already ordered
+# fastest first. The winner of that race is the baseline the ratio divides by.
+_POOL_SEP = "; "
+# Greedy on the name, so the *last* `=` splits: a name carries `::`, `<>`, `|`
+# and `->` from a C++ template instantiation, and the time never carries one.
+_POOL_ENTRY = re.compile(r"^(?P<name>.+)=(?P<time>[^=]*?)\s*\((?P<tier>[^()]*)\)$")
+
+
+def parse_pool(pool: str) -> list[dict]:
+    """Every candidate in one workload's pool, in the order it was written.
+
+    A candidate name may itself contain the separator, so a chunk that does not
+    close with a `(tier)` is joined back onto the one before it rather than
+    dropped: a pool this function cannot parse must lose no member.
+
+    A time of `not-timed` is a *recorded absence*, kept as None. Rendering it as
+    0 would put a candidate that was never measured at the top of the pool.
+    """
+    out: list[dict] = []
+    buf = ""
+    for chunk in (pool or "").split(_POOL_SEP):
+        buf = f"{buf}{_POOL_SEP}{chunk}" if buf else chunk
+        m = _POOL_ENTRY.match(buf.strip())
+        if m is None:
+            continue
+        raw = m.group("time").strip()
+        us = _num(raw[:-2]) if raw.endswith("us") else None
+        out.append({"name": m.group("name").strip(),
+                    "ms": us / 1000 if us is not None else None,
+                    "raw_time": raw, "prov": m.group("tier").strip() or None})
+        buf = ""
+    if buf.strip():
+        # Unparseable tail: shown by name with no time, never discarded.
+        out.append({"name": buf.strip(), "ms": None, "raw_time": "", "prov": None})
+    return out
+
+
+def _ms_of(d: dict, *keys) -> float | None:
+    """A time in ms from the first key present, `_us` spellings converted."""
+    for k in keys:
+        v = _pos(d.get(k))
+        if v is not None:
+            return v / 1000 if k.endswith("_us") else v
+    return None
+
+
 def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
     """Derive every displayed metric for one benchmarked workload."""
-    tl = w["impls"].get("tileops", {})
+    tl = ours_of(w["impls"])
     busy = _busy_of(tl)
     tflops = _pos(tl.get("tflops"))
 
@@ -361,10 +513,9 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
         "sol": sol_of(tl, sol_engine),
     }
 
+    others = {t: d for t, d in w["impls"].items() if t not in _OURS_TAGS}
     rivals = {}
-    for tag, d in w["impls"].items():
-        if tag.startswith("tileops"):
-            continue
+    for tag, d in others.items():
         b_busy = _busy_of(d)
         if not b_busy:
             continue
@@ -373,12 +524,33 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
         # the write precision of the times alone.
         computed = (b_busy / busy) if busy else None
         recorded = _pos(d.get("ratio"))
+        if recorded is None and tag == _LEGACY_TAG and len(others) == 1:
+            # The Ascend snapshot records the ratio on the provider's own tag,
+            # since a workload there has exactly one comparison group. Read it
+            # only in that case, so a snapshot with several named rivals can
+            # never have one rival's ratio attributed to another.
+            recorded = _pos(tl.get("ratio"))
         rivals[tag] = {
             "tier": tier_of(tag), "busy_ms": b_busy,
             "speedup": recorded or computed,
             "computed_ratio": computed, "recorded_ratio": recorded,
         }
     m["rivals"] = rivals
+
+    # --- D036: the pool behind the one baseline the ratio used --------------
+    base = w["impls"].get(_LEGACY_TAG, {})
+    m["pool"] = parse_pool(base.get("pool", ""))
+    m["pool_winner"] = base.get("name") or None
+    m["pool_selection"] = base.get("selection") or None
+    m["prov_tier"] = base.get("tier") or None
+    # The winner's own recorded time. It is the fallback for a winner whose pool
+    # line says `not-timed`, which is a gap on the harness side, not a zero.
+    m["baseline_ms"] = _busy_of(base)
+    # The tier-1-only reading D006 asks for: the fastest hand-written candidate,
+    # whether or not it won the pool.
+    hw_ms = _ms_of(base, "handwritten_latency_ms", "handwritten_us")
+    m["hw"] = {"name": base.get("handwritten") or None, "ms": hw_ms}
+    m["hw_ratio"] = (hw_ms / busy) if (hw_ms and busy) else None
     return m
 
 
@@ -414,6 +586,13 @@ def op_summary(metrics: list[dict]) -> dict:
     geometric-mean ratio here only orders the op sections.
     """
     s = {"workloads": len(metrics)}
+    # Two coverage readings, both per D006: whether this op was raced against a
+    # pool at all, and whether that pool held a tier-1 hand-written candidate.
+    # An op whose pool is vendor-only is still measured against a real rival --
+    # it is simply not measured against a hand-written library, and the index
+    # says so with its own denominator rather than blurring the two.
+    s["pooled"] = any(m.get("pool") for m in metrics)
+    s["handwritten"] = any(m.get("hw", {}).get("ms") for m in metrics)
 
     tag, ratio = best_rival(metrics, (TIER_LIB, TIER_TORCH))
     ref_only = False
@@ -458,10 +637,38 @@ STRINGS = {
         "table.sub.ratio": "alt / ours",
         "table.sub.device_time": "ms",
         "table.sub.alt_name": "name",
+        "table.sub.alt_name_tiered": "name \u00b7 tier",
         "table.sub.alt_time": "ms",
         "table.sub.throughput": "TFLOP/s",
         "table.sub.sol": "of ceiling",
         "table.sub.bound": "by",
+        # --- D036: the comparison group, its members, and their provenance
+        "tier.handwritten": "handwritten",
+        "tier.vendor": "vendor",
+        "tier.title": (
+            "Where this kernel came from \u2014 not which one is faster. Click for "
+            "what a tier means."
+        ),
+        "alt.basis": "basis",
+        "alt.basis_title": (
+            "The member of the pool the Ratio column divides by: the fastest one "
+            "measured on this workload."
+        ),
+        "alt.untimed_title": (
+            "The pool line recorded no time for this candidate. The figure shown, "
+            "marked *, is the baseline latency the run published separately. Not a "
+            "measurement of zero."
+        ),
+        "alt.untimed_empty_title": (
+            "Not timed: the pool line recorded no time for this candidate, and the "
+            "run published none elsewhere. Not a measurement of zero."
+        ),
+        "alt.hw_ratio": "hw",
+        "alt.hw_ratio_title": (
+            "The tier-1 reading: the fastest hand-written candidate's device time "
+            "divided by ours. It lost the pool, so it is not the number the colour "
+            "grades."
+        ),
         # --- The data pages' titles, in DATA_PAGES order
         "page.attention.title": "Attention",
         "page.linear-attention.title": "Linear Attention & SSM",
@@ -521,10 +728,33 @@ STRINGS = {
         ),
         "index.coverage.heading": "Coverage",
         "index.coverage.rated": (
-            "**{rated} of {total} ops** are measured against a real alternative — "
-            "a tuned library kernel or a native PyTorch op — on the identical "
-            "workload. The rest run against an eager reference only, which is not "
-            "a bar worth reporting a win against."
+            "**{rated} of {total} ops** are rated against a real alternative "
+            "measured on the identical workload. The denominator is the ops "
+            "**this snapshot benchmarked**, not everything TileOPs declares. The "
+            "rest run against an eager reference only, which is not a bar worth "
+            "reporting a win against."
+        ),
+        "index.coverage.pool": (
+            "**Each op is raced against a pool, not against one fixed opponent.** "
+            "Every baseline the harness could build for a workload is timed on "
+            "that workload, and the fastest of them becomes the baseline the "
+            "ratio divides by. The row lists the whole pool, fastest first."
+        ),
+        "index.coverage.handwritten": (
+            "**{n_hw} of {total} ops** have a tier-1 hand-written baseline in "
+            "their pool at all — a kernel out of a hand-written Ascend library, "
+            "admitted only on evidence that the library's own compiled kernel "
+            "ran. Same denominator as above. This is the **stricter** of the two "
+            "readings, and the one to quote for a claim about hand-written "
+            "libraries."
+        ),
+        "index.coverage.vendor_only": (
+            "**For the other {n_vendor} of {total}**, the pool holds vendor "
+            "implementations only — a CANN built-in, or torch_npu's own dispatch. "
+            "Those rows are still measured against a real implementation of the "
+            "op on the identical workload, but a win there is **not** a win over "
+            "a hand-written library. The tier badge on each line says which it "
+            "was."
         ),
         "index.coverage.absent": (
             "**Absent from every table**: {n_failed} workloads errored and "
@@ -542,6 +772,78 @@ STRINGS = {
             "workload?** Each op gets one table, with one row per workload. "
             "Nothing is averaged across workloads: every number on the page "
             "belongs to a single shape and dtype."
+        ),
+        # --- The reading page: who the comparison group is (D036)
+        "reading.baseline.heading": "Who the comparison is against",
+        "reading.baseline.formula": (
+            "`Ratio` is **the strongest of ours divided by the strongest of the "
+            "comparison group**, taken separately for every (op, workload, "
+            "dtype). Neither side is a choice made once for the op: both are "
+            "resolved per row, on that row's own shape and dtype."
+        ),
+        "reading.baseline.pool": (
+            "The two halves of that choice are made by different authorities, on "
+            "purpose. **Which implementations may enter the comparison group** is "
+            "decided by the baseline document, per op family — it is what admits "
+            "a kernel as a legitimate opponent at all. **Which one of them "
+            "becomes the baseline** is decided by measurement: every admitted "
+            "candidate is built and timed on that exact workload, and the fastest "
+            "wins. The `Alternatives` column is that pool, fastest first, with "
+            "the winner marked `basis`."
+        ),
+        "reading.baseline.tier1": (
+            "The stricter reading is on the page too. A pool may hold both a "
+            "hand-written kernel and a vendor one, and the hand-written one "
+            "often loses. Where it does, the row carries a second, muted figure "
+            "under the graded ratio, labelled `hw`: **the ratio against the "
+            "fastest hand-written candidate alone.** Quote that one for a claim "
+            "about hand-written libraries, and the graded one for a claim about "
+            "the fastest implementation available."
+        ),
+        "reading.baseline.single": (
+            "A pool of one is written `single_candidate`: only one opponent could "
+            "be built for that workload. It is still a measured comparison — "
+            "there was simply no race to run."
+        ),
+        # --- The reading page: what a tier says, and what it does not
+        "reading.tier.heading": "What a tier means",
+        "reading.tier.intro": (
+            "Every line in `Alternatives` carries a tier. **A tier records where "
+            "that kernel came from. It says nothing about which kernel is "
+            "faster.**"
+        ),
+        "reading.tier.col_tier": "Tier",
+        "reading.tier.col_meaning": "Meaning",
+        "reading.tier.handwritten_row": (
+            "A kernel out of a hand-written Ascend library, reached through that "
+            "library's own entry point. Admitted only on evidence that the "
+            "library's own compiled kernel actually ran: a custom operator "
+            "package that is missing a kernel falls back to the CANN built-in "
+            "**silently**, with the call succeeding, the outputs correct and the "
+            "timings plausible. So provenance here is established by tracing "
+            "which binary the process opened, never by the call returning."
+        ),
+        "reading.tier.vendor_row": (
+            "A vendor implementation: a CANN built-in operator, or torch_npu's "
+            "own dispatch for the op. A real implementation on the identical "
+            "workload, and on this device frequently the fastest one."
+        ),
+        "reading.tier.not_faster": (
+            "So `handwritten` beside a **slower** time than `vendor` on the same "
+            "row is not an error, and for several op families here it is the "
+            "ordinary case. Reading the badge as a strength ranking is the one "
+            "mistake this column exists to prevent."
+        ),
+        "reading.tier.inventory": (
+            "It has to be read that way, because the hand-written coverage is "
+            "thin. As of 2026-09-04, of the 91 ops TileOPs declares, 58 have no "
+            "hand-written Ascend baseline in existence for this device — not "
+            "unbuilt and not unwired: no source. Their comparison group falls "
+            "back to vendor implementations by necessity. Taking the strongest "
+            "opponent available, whatever its provenance, is deliberate; the "
+            "consequence is that **the tier badge on a row, not the page as a "
+            "whole, is what tells you whether that number is a result against a "
+            "hand-written library.**"
         ),
         # --- The reading page: the colour is the verdict
         "reading.colour.heading": "The colour is the verdict",
@@ -576,21 +878,27 @@ STRINGS = {
             "already fix — `max_seqlen_q` is `max(q_lens)` — is not repeated."
         ),
         "reading.columns.ratio": (
-            "`alt / ours` — the fastest alternative's device time divided by "
-            "ours, the one number the colour grades."
+            "`alt / ours` — the baseline's device time divided by ours, the one "
+            "number the colour grades. A second, muted figure labelled `hw` "
+            "appears under it wherever a hand-written candidate ran and lost the "
+            "pool: the tier-1-only reading of that same row."
         ),
         "reading.columns.device_time": (
             "Milliseconds the device spent executing the call's kernels — the "
             "union of their intervals. Every comparison on these pages uses it."
         ),
         "reading.columns.alternatives": (
-            "One line per other implementation measured on this workload, fastest "
-            "first, with its own device time in ms. A tuned library kernel "
-            "(`fla`, `mamba`, `fa3`, `triton`, …), a native PyTorch op "
-            "(`{torch}`), or a name ending in `-{ref}` — an eager composition of "
-            "PyTorch ops, which is not a bar worth reporting a win against. "
-            "Divide any of them by our device time to get the ratio against that "
-            "one."
+            "One line per implementation the comparison group held for this "
+            "workload, fastest first, each with its own device time in ms and "
+            "its provenance tier. The line marked `basis` is the one `Ratio` "
+            "divides by. A name is shown by its identifying head — hover it for "
+            "the full binding, template instantiation and all. Divide any line "
+            "by our device time to get the ratio against that one. Where a run "
+            "publishes no pool, the lines are the named baselines it timed: a "
+            "tuned library kernel (`fla`, `mamba`, `fa3`, `triton`, …), a native "
+            "PyTorch op (`{torch}`), or a name ending in `-{ref}` — an eager "
+            "composition of PyTorch ops, which is not a bar worth reporting a win "
+            "against."
         ),
         "reading.columns.throughput": (
             "TFLOP/s: required FLOPs / device time. The count is analytic — the "
@@ -700,6 +1008,14 @@ STRINGS = {
             "the value is zero: the op reported no FLOP count for that workload, "
             "or no alternative ran on it."
         ),
+        "reading.empty.untimed": (
+            "In the comparison group the same absence has its own spelling. A "
+            "candidate the run selected but never measured is recorded as "
+            "`not-timed`. Where the run published that baseline's time elsewhere, "
+            "the cell shows it followed by `*`, with the reason on the cell; "
+            "where it did not, the cell is `{empty}`. Neither is ever rendered as "
+            "`0`, which would read as an infinitely fast kernel."
+        ),
     },
     # Placeholders: English verbatim until translated.
     "zh": {
@@ -720,10 +1036,20 @@ STRINGS = {
         "table.sub.ratio": "对照 / 我们",
         "table.sub.device_time": "ms",
         "table.sub.alt_name": "名称",
+        "table.sub.alt_name_tiered": "名称 · 档位",
         "table.sub.alt_time": "ms",
         "table.sub.throughput": "TFLOP/s",
         "table.sub.sol": "占天花板",
         "table.sub.bound": "受限于",
+        "tier.handwritten": "手写",
+        "tier.vendor": "厂商",
+        "tier.title": "这一档说的是这个 kernel 的来源，不是谁更快。点击查看档位的定义。",
+        "alt.basis": "基准",
+        "alt.basis_title": "「比值」那一列除的就是它：这个工作负载上实测最快的那个候选。",
+        "alt.untimed_title": "候选池那一行没有记下这个候选的时间。这里显示的（带 * 的）是本次运行另外发布的基线耗时。**它不是「测出来是零」。**",
+        "alt.untimed_empty_title": "没有计时：候选池那一行没有记下这个候选的时间，本次运行别处也没有。**这不是「测出来是零」。**",
+        "alt.hw_ratio": "手写",
+        "alt.hw_ratio_title": "tier-1 口径：最快的那个手写候选的耗时除以我们的耗时。它没赢下候选池，所以不是颜色评的那个数。",
         "page.attention.title": "Attention",
         "page.linear-attention.title": "Linear Attention 与 SSM",
         "page.gemm-moe.title": "GEMM、MoE 与量化",
@@ -747,7 +1073,10 @@ STRINGS = {
         "index.snapshot.run_link": " · [本次运行]({url})",
         "index.snapshot.rendered": "页面渲染于 {rendered}，数据取自[最新快照]({url})。",
         "index.coverage.heading": "覆盖情况",
-        "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的 —— 调优过的库 kernel，或 PyTorch 原生算子。其余只与 eager 参考实现比较，**赢过它不值得作为成绩报告**。",
+        "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是**本次快照实际跑过的算子数**，不是 TileOPs 声明的全部算子。其余只与 eager 参考实现比较，**赢过它不值得作为成绩报告**。",
+        "index.coverage.pool": "**每个算子对的是一个候选池，不是一个事先定死的对手。** 一个工作负载上，harness 能建起来的每一个基线都在它上面实测一遍，**最快的那个**才成为比值的分母。整个候选池都列在对应那一行上，最快的在前。",
+        "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 手写基线 —— 也就是出自手写 Ascend 算子库的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「手写库」的说法都应该引这个数**。",
+        "index.coverage.vendor_only": "**剩下 {total} 里的 {n_vendor} 个**，候选池里只有厂商实现 —— CANN 内置算子，或 torch_npu 自己的分发。这些行仍然是在完全相同的工作负载上与一个真实实现比较，但**在那里赢了不等于赢过手写库**。每一行的档位徽章会说清它到底是哪一档。",
         "index.coverage.absent": "**所有表格里都没出现的**：本次运行有 {n_failed} 个工作负载报错、{n_skipped} 个被跳过。",
         "index.data.heading": "数据页",
         "index.data.col_page": "页面",
@@ -755,6 +1084,19 @@ STRINGS = {
         "index.data.col_workloads": "工作负载数",
         "reading.title": "这些数字是怎么来的",
         "reading.intro": "每个数据页只回答一个问题：**在同一个工作负载上，TileOPs 与同一算子最快的其它实现相比如何？** 每个算子一张表，每个工作负载一行。**不做跨工作负载的平均** —— 页面上每一个数字都只属于一个具体的 shape 和 dtype。",
+        "reading.baseline.heading": "对照的是谁",
+        "reading.baseline.formula": "`比值` = **我们这边最强的 ÷ 对照组里最强的**，按每一个 (算子, 工作负载, dtype) **分别**取。两边都不是「给这个算子定一次就完了」：每一行都在它自己的 shape 和 dtype 上重新决定一次。",
+        "reading.baseline.pool": "这个选择的两半，**故意由两个不同的权威决定**。**哪些实现有资格进对照组**，由基线文档按算子族裁定 —— 它管的是「一个 kernel 算不算正当对手」。**它们当中哪一个成为基准**，由实测决定：每个获准的候选都在那个确切的工作负载上现建、现测，**最快的赢**。`对照实现` 那一列就是这个候选池，最快的在前，赢家标着 `基准`。",
+        "reading.baseline.tier1": "**更严的那个口径也在页面上。** 一个候选池里可能同时有手写 kernel 和厂商 kernel，而**手写的经常输**。凡是输了的行，在被评级的比值下面还有一个灰色的第二个数，标着 `手写`：**只跟最快的手写候选比出来的比值**。谈「手写库」时引这一个，谈「现有最快实现」时引被评级的那一个。",
+        "reading.baseline.single": "只有一个候选的池，harness 记作 `single_candidate`：那个工作负载上只建得起一个对手。它**仍然是一次实测比较** —— 只是没有可比的第二家。",
+        "reading.tier.heading": "档位是什么意思",
+        "reading.tier.intro": "`对照实现` 里的每一行都带一个档位。**档位记录的是这个 kernel 的来源，它完全不说明谁更快。**",
+        "reading.tier.col_tier": "档位",
+        "reading.tier.col_meaning": "含义",
+        "reading.tier.handwritten_row": "出自**手写 Ascend 算子库**的 kernel，通过那个库自己的入口点调用。只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳：一个**缺 kernel 的自定义算子包会静默回落到 CANN 内置**，调用照样成功、输出照样正确、时间照样看着合理。所以这里的来源认定靠的是**追踪进程实际打开了哪个二进制**，绝不是「调用没报错」。",
+        "reading.tier.vendor_row": "厂商实现：CANN 内置算子，或 torch_npu 自己对这个算子的分发。它是**完全相同工作负载上的一个真实实现**，而且在这块硬件上**经常就是最快的那个**。",
+        "reading.tier.not_faster": "所以同一行里 `手写` 的时间**比 `厂商` 慢**，**不是错误**；在这里的好几个算子族上，这就是常态。**把这个徽章读成强弱排名，正是这一列存在的目的所要防止的那个误解。**",
+        "reading.tier.inventory": "必须这样读，因为**手写覆盖本来就很薄**。截至 2026-09-04，TileOPs 声明的 91 个算子里，有 **58 个在这块硬件上根本不存在手写 Ascend 基线** —— 不是没编、也不是没接线：**源码层面就没有**。它们的对照组只能回落到厂商实现。「不论来源、一律取现有最强的对手」是**有意的选择**；它的代价是：**判断某个数字算不算「赢过手写库」，靠的是那一行上的档位徽章，而不是整页的标题。**",
         "reading.colour.heading": "颜色就是结论",
         "reading.colour.col_meaning": "含义",
         "reading.colour.behind": "比对照实现慢 —— 低于 {lo}×。",
@@ -767,9 +1109,9 @@ STRINGS = {
         "reading.columns.col_column": "列",
         "reading.columns.col_meaning": "含义",
         "reading.columns.workload": "`W1`、`W2`、… —— 每张表上方的图例会把每一个展开：benchmark 自己给它的 id、它跑的 dtype，以及每个输入张量（写成 `名称: shape, dtype`）。形状相同的张量并列在一起，但**各自带自己的 dtype**，所以一个 `bool` 的 `mask` 会在被读到的地方就标明。张量之后是那些**决定算子规模但不决定形状**的维度（GEMM 的 `m`/`n`/`k`，MoE 路由的 `num_experts`），再往后是灰色的、调用时**没有沿用签名默认值**的参数。已经能由其它量确定的不再重复 —— 例如 `max_seqlen_q` 就是 `max(q_lens)`。",
-        "reading.columns.ratio": "`对照 / 我们` —— 最快的对照实现的耗时除以我们的耗时。**颜色评的就是这一个数。**",
+        "reading.columns.ratio": "`对照 / 我们` —— **基准**的耗时除以我们的耗时。**颜色评的就是这一个数。** 凡是有手写候选跑了却输掉候选池的行，它下面还有一个灰色的、标着 `手写` 的数：同一行的 **tier-1 口径**。",
         "reading.columns.device_time": "本次调用在 device 上执行它各个 kernel 的**区间并集**，单位毫秒。本页所有比较都用它。每个工作负载另存了一份 host 挂钟读数作端到端参考 —— 两者之差约 40–50 µs，所以**便宜的工作负载用 host 计时会把比值推向 1.0**。详见「测量方法」一节。",
-        "reading.columns.alternatives": "这个工作负载上测过的每个其它实现一行，最快的在前，各自带自己的耗时（ms）。可能是调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` …）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的实现 —— 那是若干 PyTorch 算子的 eager 拼装，**赢过它不值得作为成绩报告**。把其中任意一个除以我们的耗时，就得到对它的比值。",
+        "reading.columns.alternatives": "对照组在这个工作负载上握有的每一个实现占一行，最快的在前，各自带自己的耗时（ms）**和来源档位**。标着 `基准` 的那一行就是 `比值` 除的那个。名字只显示它的**识别头部** —— 鼠标悬停可看完整绑定，含 C++ 模板实例化全文。把任意一行除以我们的耗时，就得到对它的比值。**如果某次运行没有发布候选池**，这些行就是它实测过的具名基线：调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` …）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的实现 —— 那是若干 PyTorch 算子的 eager 拼装，**赢过它不值得作为成绩报告**。",
         "reading.columns.throughput": "TFLOP/s：所需 FLOPs ÷ 耗时。这个 FLOP 数是**解析算出来的** —— 用算子的 `eval_roofline` 公式代入该工作负载自己的 shape，**不是硬件计数器** —— 所以它算的是**问题本身要求的工作量**，不是 kernel 实际发出的指令。padding、重算、被 mask 掉的 tile 在这里都看不见；这个数**只在同一算子、同一工作负载的不同实现之间可比**。",
         "reading.columns.sol": "占算法光速（speed-of-light）的比例：该工作负载在物理上最快可能的时间 ÷ 我们的耗时。`比值` 那一列说的是**今天有没有人比我们快**；SOL 说的是**任何人最多还能快多少**。详见下文。",
         "reading.columns.bound": "决定这个工作负载下限的资源：`mem`（HBM 搬运）、`comp`（计算吞吐），或 `lat` —— 工作负载太小，模型无法判定，它的 SOL 数字也会随之置灰。",
@@ -797,6 +1139,7 @@ STRINGS = {
         "reading.shapes.body": "快照记录的是每个工作负载**测了什么**，而不是它**跑在什么上面**：shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行。**manifest 没有声明的工作负载** —— 也就是手写的、不由 spec 驱动的 benchmark —— 只显示那个 id，下面没有 shape。",
         "reading.empty.heading": "空单元格",
         "reading.empty.body": "`{empty}` 表示**这个指标的某个输入没有被记录**，**绝不表示值是零**：可能是该算子在这个工作负载上没有报告 FLOP 数，或者根本没有对照实现在它上面跑过。",
+        "reading.empty.untimed": "在对照组里，同一种「缺失」有它自己的写法。**被选中却从未被实测**的候选，记作 `not-timed`。如果本次运行在别处发布了那个基线的时间，单元格就显示那个值并跟一个 `*`，把原因写在单元格的提示里；如果连别处也没有，单元格就是 `{empty}`。**两种情况都绝不会渲染成 `0`** —— 那会被读成一个无限快的 kernel。",
     },
 }
 
@@ -937,7 +1280,7 @@ def _bound_cell(sol: dict | None) -> str:
 # Every number belongs to one workload: a median over shapes orders of magnitude
 # apart matches no reproducible run. HTML because Markdown cannot span a heading
 # across columns; no class, because the CSS keys off `table:not([class])`.
-def detail_header(lang: str = DEFAULT_LANG) -> tuple[str, ...]:
+def detail_header(lang: str = DEFAULT_LANG, tiered: bool = False) -> tuple[str, ...]:
     return (
         "<table>",
         "<thead>",
@@ -957,7 +1300,11 @@ def detail_header(lang: str = DEFAULT_LANG) -> tuple[str, ...]:
         "<tr>",
         f'<th class="subhead">{_S(lang, "table.sub.ratio")}</th>',
         f'<th class="subhead">{_S(lang, "table.sub.device_time")}</th>',
-        f'<th class="subhead">{_S(lang, "table.sub.alt_name")}</th>',
+        # The sub-head names the tier badge only where the snapshot published
+        # tiers. Promising a tier the rows do not carry is worse than no label.
+        f'<th class="subhead">'
+        f'{_S(lang, "table.sub.alt_name_tiered" if tiered else "table.sub.alt_name")}'
+        f"</th>",
         f'<th class="subhead">{_S(lang, "table.sub.alt_time")}</th>',
         f'<th class="subhead">{_S(lang, "table.sub.throughput")}</th>',
         f'<th class="subhead">{_S(lang, "table.sub.sol")}</th>',
@@ -971,21 +1318,23 @@ def detail_header(lang: str = DEFAULT_LANG) -> tuple[str, ...]:
 DETAIL_FOOTER = ("</tbody>", "</table>")
 
 
-def _stack(cells: list[str]) -> str:
+def _stack(cells: list[str], pick: int = 0) -> str:
     """One line per alternative, fastest first. Both sub-columns stack in the
     same order, so they read across without a nested table.
 
-    Only the first line stays at full strength: it is the one `Ratio` divides
-    by. The slower alternatives are context, and reading them as equals costs a
-    reader the moment of finding which bar was actually cleared.
+    Only one line stays at full strength: `pick`, the alternative `Ratio`
+    divides by. The others are context, and reading them as equals costs a
+    reader the moment of finding which bar was actually cleared. `pick` is a
+    parameter rather than always the first line because a pool whose winner the
+    harness did not write first must still be marked on the line that won.
     """
     if not cells:
         return EMPTY
-    head, *rest = cells
-    if not rest:
-        return head
-    tail = "<br>".join(f'<span class="alt-slow">{c}</span>' for c in rest)
-    return f"{head}<br>{tail}"
+    if len(cells) == 1:
+        return cells[0]
+    return "<br>".join(
+        c if i == pick else f'<span class="alt-slow">{c}</span>'
+        for i, c in enumerate(cells))
 
 
 WORKLOAD_CODE = "W"
@@ -1151,10 +1500,98 @@ def workload_key(rows: list) -> list:
     return ['<div class="wl-key">', *blocks, "</div>", ""]
 
 
-def detail_row(code: str, m: dict) -> str:
+# --- The Alternatives column, for a snapshot that publishes a D036 pool -----
+# A candidate names its binding and then how that binding is reached: `-> ` a
+# C++ template instantiation, ` / ` the second entry point of a two-phase aclnn
+# call. Both run past a hundred characters, and the cells in this table do not
+# wrap, so one of them would set the width of the whole page. The identifying
+# head is shown and the full string stays on the cell as its title.
+_POOL_REACH = (" -> ", " / ")
+
+
+def _short_candidate(name: str, prov: str | None) -> str:
+    short = name
+    for sep in _POOL_REACH:
+        short = short.split(sep)[0].strip()
+    # `torch_npu eager (vendor)` carries its own tier in its name, and the badge
+    # beside it says the same thing. Drop the repeat, never a different suffix.
+    if prov and short.endswith(f"({prov})"):
+        short = short[: -len(prov) - 2].strip()
+    return short or name
+
+
+def _tier_badge(prov: str | None, lang: str) -> str:
+    """The provenance tier, badged and linking to what a tier means.
+
+    Clickable on purpose: a reader who meets `handwritten` beside a slower time
+    than `vendor` has to be able to reach the sentence saying that a tier is
+    about where the kernel came from and not about which is faster.
+    """
+    if not prov:
+        return ""
+    label = _S(lang, PROV_LABEL_KEY[prov]) if prov in PROV_LABEL_KEY else prov
+    cls = PROV_CLASS.get(prov, "tier-other")
+    return (f' <a class="tier {cls}" href="{PROV_HREF}"'
+            f' title="{html.escape(_S(lang, "tier.title"), quote=True)}">'
+            f"{html.escape(label)}</a>")
+
+
+def _pool_name_cell(c: dict, is_pick: bool, lang: str) -> str:
+    short = _short_candidate(c["name"], c["prov"])
+    body = f"<code>{html.escape(short)}</code>"
+    if short != c["name"]:
+        body = (f'<abbr title="{html.escape(c["name"], quote=True)}">'
+                f"{body}</abbr>")
+    pick = ""
+    if is_pick:
+        pick = (f' <span class="alt-pick"'
+                f' title="{html.escape(_S(lang, "alt.basis_title"), quote=True)}">'
+                f'{html.escape(_S(lang, "alt.basis"))}</span>')
+    return body + _tier_badge(c["prov"], lang) + pick
+
+
+def _pool_time_cell(c: dict, fallback_ms: float | None, lang: str) -> str:
+    """One candidate's device time, or a marked stand-in when it has none.
+
+    `not-timed` is the harness recording that it never measured this candidate.
+    The winner's time is published separately, so it is shown and marked as the
+    stand-in it is; a loser's is not, and the cell stays the empty marker.
+    Neither may render as `0`, which would read as an infinitely fast kernel.
+    """
+    if c["ms"] is not None:
+        return _sig_ms(c["ms"])
+    if fallback_ms:
+        return (f'<span class="alt-untimed"'
+                f' title="{html.escape(_S(lang, "alt.untimed_title"), quote=True)}">'
+                f"{_sig_ms(fallback_ms)}*</span>")
+    return (f'<span class="alt-untimed"'
+            f' title="{html.escape(_S(lang, "alt.untimed_empty_title"), quote=True)}">'
+            f"{EMPTY}</span>")
+
+
+def _pool_cells(m: dict, lang: str) -> tuple[str, str]:
+    """The two Alternatives sub-columns for a workload that raced a pool."""
+    pool = m["pool"]
+    names = [c["name"] for c in pool]
+    # The winner is named outright by the snapshot; matching on it rather than
+    # taking the first line means the mark cannot drift from the number the
+    # ratio used if the pool is ever written in another order.
+    pick = names.index(m["pool_winner"]) if m["pool_winner"] in names else 0
+    return (
+        _stack([_pool_name_cell(c, i == pick, lang)
+                for i, c in enumerate(pool)], pick),
+        _stack([_pool_time_cell(c, m["baseline_ms"] if i == pick else None, lang)
+                for i, c in enumerate(pool)], pick),
+    )
+
+
+def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
     ordered = sorted(m["rivals"].items(), key=lambda kv: kv[1]["busy_ms"])
-    names = _stack([f"<code>{html.escape(t)}</code>" for t, _ in ordered])
-    times = _stack([_sig_ms(r["busy_ms"]) for _, r in ordered])
+    if m.get("pool"):
+        names, times = _pool_cells(m, lang)
+    else:
+        names = _stack([f"<code>{html.escape(t)}</code>" for t, _ in ordered])
+        times = _stack([_sig_ms(r["busy_ms"]) for _, r in ordered])
     # Against the fastest non-reference alternative, so a win over an eager
     # reference is not painted as a win over a real one — see `_ratio_cell`.
     real = [r for _, r in ordered if r["tier"] != TIER_REF and r["speedup"]]
@@ -1162,6 +1599,15 @@ def detail_row(code: str, m: dict) -> str:
     gap = _ratio_cell(real[0]["speedup"] if real else
                       weak[0]["speedup"] if weak else None,
                       rated=bool(real))
+    # D006 asks for the tier-1-only reading as well, and it is a different
+    # number exactly when a hand-written candidate ran and lost the pool. Shown
+    # under the graded one, muted and labelled, so the two can never be read as
+    # one figure.
+    if m.get("hw_ratio") and m.get("prov_tier") != PROV_HANDWRITTEN:
+        gap = _stack([gap, f'<span class="perf-unrated"'
+                           f' title="{html.escape(_S(lang, "alt.hw_ratio_title"), quote=True)}">'
+                           f'{html.escape(_S(lang, "alt.hw_ratio"))} '
+                           f'{_speed(m["hw_ratio"])}</span>'])
     return (
         "<tr>"
         f'<td class="colsep"><b>{code}</b></td>'
@@ -1260,9 +1706,24 @@ def index_page(args, meta: dict, rows: list[tuple],
     # needs before reading any single number off a data page.
     by = Counter(s["status"] for _, _, s, _, _ in rows)
     rated = len(rows) - by[UNRATED]
+    total = len(rows)
     lines += [f'## {_S(lang, "index.coverage.heading")}', "",
               "- " + _S(lang, "index.coverage.rated",
-                        rated=rated, total=len(rows))]
+                        rated=rated, total=total)]
+    # Two numbers over the same denominator, and the denominator said out loud:
+    # how many ops were raced against a pool, and how many of those pools held a
+    # tier-1 hand-written candidate at all. They are far apart on this device,
+    # and a page that reported only the first would read as if every comparison
+    # here were against a hand-written library. It is not — see the tier badge
+    # on each row, and `reading.md`.
+    if any(s.get("pooled") for _, _, s, _, _ in rows):
+        n_hw = sum(1 for _, _, s, _, _ in rows if s.get("handwritten"))
+        lines += ["- " + _S(lang, "index.coverage.pool", total=total),
+                  "- " + _S(lang, "index.coverage.handwritten",
+                            n_hw=n_hw, total=total)]
+        if n_hw < total:
+            lines.append("- " + _S(lang, "index.coverage.vendor_only",
+                                   n_vendor=total - n_hw, total=total))
     if n_failed or n_skipped:
         lines.append("- " + _S(lang, "index.coverage.absent",
                                n_failed=n_failed, n_skipped=n_skipped))
@@ -1302,6 +1763,29 @@ def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG) -> str:
     lines = [
         f'# {_S(lang, "reading.title")}', "",
         _S(lang, "reading.intro"), "",
+        # Before the colour and before the columns: a reader cannot grade a
+        # ratio without knowing who is on the other side of it, and this is the
+        # question the page previously did not answer at all.
+        f'## {_S(lang, "reading.baseline.heading")}', "",
+        _S(lang, "reading.baseline.formula"), "",
+        _S(lang, "reading.baseline.pool"), "",
+        _S(lang, "reading.baseline.tier1"), "",
+        _S(lang, "reading.baseline.single"), "",
+        # An explicit id: the tier badges on every data row link here, and a
+        # slug generated from the Chinese heading would not be this string.
+        f'## {_S(lang, "reading.tier.heading")} '
+        + "{#" + PROV_ANCHOR + "}", "",
+        _S(lang, "reading.tier.intro"), "",
+        f'| {_S(lang, "reading.tier.col_tier")} '
+        f'| {_S(lang, "reading.tier.col_meaning")} |',
+        "| --- | --- |",
+        f'| <span class="tier tier-hw">{_S(lang, "tier.handwritten")}</span> | '
+        + _S(lang, "reading.tier.handwritten_row") + " |",
+        f'| <span class="tier tier-vendor">{_S(lang, "tier.vendor")}</span> | '
+        + _S(lang, "reading.tier.vendor_row") + " |",
+        "",
+        _S(lang, "reading.tier.not_faster"), "",
+        _S(lang, "reading.tier.inventory"), "",
         f'## {_S(lang, "reading.colour.heading")}', "",
         f'| | {_S(lang, "reading.colour.col_meaning")} |',
         "| --- | --- |",
@@ -1373,6 +1857,8 @@ def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG) -> str:
         f'## {_S(lang, "reading.empty.heading")}', "",
         _S(lang, "reading.empty.body", empty=EMPTY),
         "",
+        _S(lang, "reading.empty.untimed", empty=EMPTY),
+        "",
     ]
     return "\n".join(lines) + "\n"
 
@@ -1388,7 +1874,7 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
     n_workloads = sum(s["workloads"] for f in present
                       for _, _, s, _, _ in rows_by_fam[f])
     tally = " · ".join(
-        f"{FAMILY_TITLE.get(f, f)} {len(rows_by_fam[f])}" for f in present)
+        f"{family_title(f, lang)} {len(rows_by_fam[f])}" for f in present)
     lines = [f"# {title}", "",
              _S(lang, "data.tally", n_ops=n_ops, n_workloads=n_workloads,
                 tally=tally)
@@ -1404,7 +1890,7 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
         # Within a band, the widest margin first.
         rows = sorted(rows, key=lambda r: (rank.get(r[2]["status"], 9),
                                            -(r[2]["speedup"] or 0), r[0]))
-        lines += [f"## {FAMILY_TITLE.get(fam, fam)}", ""]
+        lines += [f"## {family_title(fam, lang)}", ""]
         # One table per op rather than one per family: the op name would
         # otherwise repeat down the widest column of every row. The `datatable`
         # wrapper is a styling hook — see extra.css.
@@ -1417,13 +1903,15 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
                              key=lambda z: z[0]["config"])
             coded = [(f"{WORKLOAD_CODE}{i}", w)
                      for i, (w, _) in enumerate(ordered, 1)]
+            tiered = any(c["prov"] for _, m in ordered for c in m.get("pool", ()))
             lines += [f"### {_op_cell(op, module, ref)}{warn}",
                       "", *workload_key(coded),
                       # No `markdown="1"`, and no blank line until `</div>`: a
                       # blank line would end the raw-HTML block mid-table.
-                      '<div class="datatable">', *detail_header(lang)]
+                      '<div class="datatable">',
+                      *detail_header(lang, tiered)]
             for (code, _), (_, m) in zip(coded, ordered, strict=True):
-                lines.append(detail_row(code, m))
+                lines.append(detail_row(code, m, lang))
             lines += [*DETAIL_FOOTER, "</div>", ""]
     return "\n".join(lines) + "\n"
 
@@ -1481,8 +1969,8 @@ def main():
 
     unclassified = sorted({
         t for w in workloads for t in w["impls"]
-        if not t.startswith("tileops") and t not in _KNOWN_TAGS})
-    timings = Counter(w["impls"].get("tileops", {}).get("timing")
+        if t not in _OURS_TAGS and t not in _KNOWN_TAGS})
+    timings = Counter(ours_of(w["impls"]).get("timing")
                       for w in workloads).most_common(1)
     timing = timings[0][0] if timings else None
 

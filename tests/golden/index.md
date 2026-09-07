@@ -18,11 +18,11 @@ Not published by this run: `image`, `driver`, `cuda`, `torch`, `tilelang`.
 - **One process, common inputs.** Every implementation of an op is timed on the same tensors in the same process, in forward and then reversed order so drift does not land on whichever ran last.
 - **A fixed warmup and measurement budget** per implementation, reported as the median over however many samples fit in it, with L2 cleared between iterations.
 - **Compilation and workspace setup excluded.**
-- **Device time is what is compared** — the union of the intervals the device spent executing the call's kernels, collected through CUPTI. A run that cannot collect device activity fails rather than falling back to a different clock.
+- **Device time is what is compared** — the union of the intervals the device spent executing the call's kernels, collected through torch_npu.profiler. A run that cannot collect device activity fails rather than falling back to a different clock.
 
 ## Coverage
 
-- **5 of 5 ops** are measured against a real alternative — a tuned library kernel or a native PyTorch op — on the identical workload. The rest run against an eager reference only, which is not a bar worth reporting a win against.
+- **5 of 5 ops** are rated against a real alternative measured on the identical workload. The denominator is the ops **this snapshot benchmarked**, not everything TileOPs declares. The rest run against an eager reference only, which is not a bar worth reporting a win against.
 - **Absent from every table**: 1 workloads errored and 1 were skipped in this run.
 
 [How these numbers are taken](reading.md)

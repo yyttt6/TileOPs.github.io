@@ -743,6 +743,70 @@ html[lang="zh"] .md-typeset .keystone {
   color: var(--md-default-fg-color--light);
 }
 
+/* Baseline provenance badges: where the kernel on the other side came from.
+ *
+ * Deliberately off the verdict axis. Green and rose mean faster and slower
+ * everywhere else on this site, so a tier painted in either would be claiming
+ * that a hand-written kernel is the stronger one -- and a tier makes no claim
+ * about speed at all. The two hues are the site's structural violet and its
+ * aside teal, at one weight and one chroma, so they read as two labels rather
+ * than as a ranking. Each badge links to what a tier means, because a reader
+ * who meets `handwritten` beside a slower time needs that sentence.
+ */
+.md-typeset .tier {
+  font-family: var(--tf-mono);
+  font-size: 0.84em;
+  font-weight: 400;
+  padding: 0.05em 0.35em;
+  border-radius: 2px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.md-typeset .tier-hw {
+  color: var(--tf-violet-dark);
+  background: var(--tf-violet-wash);
+}
+
+.md-typeset .tier-vendor {
+  color: var(--tf-teal);
+  background: var(--tf-teal-soft);
+}
+
+/* A tier the renderer does not know: shown as written, in neither hue. */
+.md-typeset .tier-other {
+  color: var(--tf-muted);
+  background: rgba(106, 100, 120, 0.08);
+}
+
+/* Which member of the pool the Ratio column divided by. Ink, not a verdict
+ * colour: it marks where the number came from, not whether that is good.
+ */
+.md-typeset .alt-pick {
+  font-family: var(--tf-body);
+  font-size: 0.8em;
+  font-weight: 700;
+  color: var(--tf-ink);
+}
+
+/* A candidate the run selected but never timed. Muted and italic, so a
+ * stand-in figure cannot be read across the row as a measurement.
+ */
+.md-typeset .alt-untimed {
+  color: var(--tf-muted);
+  font-style: italic;
+}
+
+/* A candidate's name is shown by its identifying head; the full binding --
+ * template instantiation, second aclnn entry point -- is the title. Dotted, so
+ * there is something to tell the reader to hover.
+ */
+.md-typeset .datatable table:not([class]) abbr {
+  text-decoration: underline dotted rgba(26, 23, 32, 0.35);
+  text-underline-offset: 0.25em;
+  cursor: help;
+}
+
 /* What the heading is about, not part of it: body face, running-text weight.
  * In the display face at 800 it read as a second half of the op's name.
  */

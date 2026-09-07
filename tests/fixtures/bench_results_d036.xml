@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="tileops" tests="5" skipped="0">
+ <testcase name="GemmFwdOp[pool4-float16]" classname="GemmFwdOp">
+  <property name="op" value="GemmFwdOp" />
+  <property name="op_module" value="tileops.ops.gemm.gemm" />
+  <property name="tilelang_dtype" value="float16" />
+  <property name="tilelang_timing" value="graph" />
+  <property name="tilelang_n_samples" value="30" />
+  <property name="tilelang_latency_ms" value="0.940625" />
+  <property name="tilelang_ratio" value="1.0563" />
+  <property name="tilelang_flops" value="124017180672" />
+  <property name="tilelang_bytes" value="106299392" />
+  <property name="baseline_latency_ms" value="0.993625" />
+  <property name="baseline_dtype" value="float16" />
+  <property name="baseline_name" value="catlass-r252:r252_gemm -&gt; Catlass::Gemm::Device::DeviceGemm&lt;BasicMatmul&lt;half|bfloat16_t, RowMajor x RowMajor|ColumnMajor&gt;&gt;" />
+  <property name="baseline_tier" value="handwritten" />
+  <property name="baseline_selection" value="d036_best_of_pool" />
+  <property name="baseline_pool_size" value="4" />
+  <property name="baseline_pool" value="catlass-r252:r252_gemm -&gt; Catlass::Gemm::Device::DeviceGemm&lt;BasicMatmul&lt;half|bfloat16_t, RowMajor x RowMajor|ColumnMajor&gt;&gt;=993.625us (handwritten); ops-nn-gemm:aclnnMm / aclnnMmGetWorkspaceSize=1010.875us (vendor); torch_npu eager (vendor)=1011.000us (vendor); catlass:catlass_gemm_fp16 -&gt; Catlass::Gemm::Device::DeviceGemm&lt;BasicMatmul&lt;...&gt;&gt;=1099.000us (handwritten)" />
+  <property name="baseline_runner_up" value="ops-nn-gemm:aclnnMm / aclnnMmGetWorkspaceSize" />
+  <property name="baseline_runner_up_us" value="1010.875" />
+  <property name="baseline_handwritten" value="catlass-r252:r252_gemm -&gt; Catlass::Gemm::Device::DeviceGemm&lt;BasicMatmul&lt;half|bfloat16_t, RowMajor x RowMajor|ColumnMajor&gt;&gt;" />
+  <property name="baseline_handwritten_us" value="993.625" />
+ </testcase>
+ <testcase name="RmsNormFwdOp[hw-wins-bfloat16]" classname="RmsNormFwdOp">
+  <property name="op" value="RmsNormFwdOp" />
+  <property name="op_module" value="tileops.ops.normalization.rms_norm" />
+  <property name="tilelang_dtype" value="bfloat16" />
+  <property name="tilelang_timing" value="graph" />
+  <property name="tilelang_n_samples" value="30" />
+  <property name="tilelang_latency_ms" value="0.26875" />
+  <property name="tilelang_ratio" value="0.6707" />
+  <property name="tilelang_bytes" value="134250496" />
+  <property name="tilelang_flops" value="134217728" />
+  <property name="baseline_latency_ms" value="0.1705" />
+  <property name="baseline_dtype" value="bfloat16" />
+  <property name="baseline_name" value="ops-nn:aclnnRmsNorm / aclnnRmsNormGetWorkspaceSize" />
+  <property name="baseline_tier" value="handwritten" />
+  <property name="baseline_selection" value="d036_best_of_pool" />
+  <property name="baseline_pool_size" value="2" />
+  <property name="baseline_pool" value="ops-nn:aclnnRmsNorm / aclnnRmsNormGetWorkspaceSize=170.500us (handwritten); torch_npu eager (vendor)=818.750us (vendor)" />
+  <property name="baseline_runner_up" value="torch_npu eager (vendor)" />
+  <property name="baseline_runner_up_us" value="818.75" />
+  <property name="baseline_handwritten" value="ops-nn:aclnnRmsNorm / aclnnRmsNormGetWorkspaceSize" />
+  <property name="baseline_handwritten_us" value="170.5" />
+ </testcase>
+ <testcase name="MulFwdOp[hw-loses-bfloat16]" classname="MulFwdOp">
+  <property name="op" value="MulFwdOp" />
+  <property name="op_module" value="tileops.ops.elementwise.mul" />
+  <property name="tilelang_dtype" value="bfloat16" />
+  <property name="tilelang_timing" value="graph" />
+  <property name="tilelang_n_samples" value="30" />
+  <property name="tilelang_latency_ms" value="0.059" />
+  <property name="tilelang_ratio" value="1.0127" />
+  <property name="tilelang_bytes" value="50331648" />
+  <property name="tilelang_flops" value="8388608" />
+  <property name="baseline_latency_ms" value="0.05975" />
+  <property name="baseline_dtype" value="bfloat16" />
+  <property name="baseline_name" value="torch_npu eager (vendor)" />
+  <property name="baseline_tier" value="vendor" />
+  <property name="baseline_selection" value="d036_best_of_pool" />
+  <property name="baseline_pool_size" value="2" />
+  <property name="baseline_pool" value="torch_npu eager (vendor)=51.750us (vendor); ops-nn-ew:aclnnForeachMulList / aclnnForeachMulListGetWorkspaceSize=56.500us (handwritten)" />
+  <property name="baseline_runner_up" value="ops-nn-ew:aclnnForeachMulList / aclnnForeachMulListGetWorkspaceSize" />
+  <property name="baseline_runner_up_us" value="56.5" />
+  <property name="baseline_handwritten" value="ops-nn-ew:aclnnForeachMulList / aclnnForeachMulListGetWorkspaceSize" />
+  <property name="baseline_handwritten_us" value="56.5" />
+ </testcase>
+ <testcase name="MulFwdOp[untimed-float16]" classname="MulFwdOp">
+  <property name="op" value="MulFwdOp" />
+  <property name="op_module" value="tileops.ops.elementwise.mul" />
+  <property name="tilelang_dtype" value="float16" />
+  <property name="tilelang_timing" value="graph" />
+  <property name="tilelang_n_samples" value="30" />
+  <property name="tilelang_latency_ms" value="0.04825" />
+  <property name="tilelang_ratio" value="1.2487" />
+  <property name="tilelang_bytes" value="51380736" />
+  <property name="tilelang_flops" value="12845056" />
+  <property name="baseline_latency_ms" value="0.06025" />
+  <property name="baseline_dtype" value="float16" />
+  <property name="baseline_name" value="torch_npu eager (vendor)" />
+  <property name="baseline_tier" value="vendor" />
+  <property name="baseline_selection" value="single_candidate" />
+  <property name="baseline_pool_size" value="1" />
+  <property name="baseline_pool" value="torch_npu eager (vendor)=not-timed (vendor)" />
+ </testcase>
+ <testcase name="MulFwdOp[semicolon-float32]" classname="MulFwdOp">
+  <property name="op" value="MulFwdOp" />
+  <property name="op_module" value="tileops.ops.elementwise.mul" />
+  <property name="tilelang_dtype" value="float32" />
+  <property name="tilelang_timing" value="graph" />
+  <property name="tilelang_n_samples" value="30" />
+  <property name="tilelang_latency_ms" value="0.012" />
+  <property name="tilelang_ratio" value="0.16667" />
+  <property name="tilelang_bytes" value="49164" />
+  <property name="tilelang_flops" value="4097" />
+  <property name="baseline_latency_ms" value="0.002" />
+  <property name="baseline_dtype" value="float32" />
+  <property name="baseline_name" value="torch_npu eager (vendor)" />
+  <property name="baseline_tier" value="vendor" />
+  <property name="baseline_selection" value="d036_best_of_pool" />
+  <property name="baseline_pool_size" value="2" />
+  <property name="baseline_pool" value="torch_npu eager (vendor)=1.500us (vendor); ops-nn-ew:aclnnFoo; variant=b / aclnnFooGetWorkspaceSize=9.250us (handwritten)" />
+  <property name="baseline_runner_up" value="ops-nn-ew:aclnnFoo; variant=b / aclnnFooGetWorkspaceSize" />
+  <property name="baseline_runner_up_latency_ms" value="0.00925" />
+  <property name="baseline_handwritten" value="ops-nn-ew:aclnnFoo; variant=b / aclnnFooGetWorkspaceSize" />
+  <property name="baseline_handwritten_latency_ms" value="0.00925" />
+ </testcase>
+</testsuite>
