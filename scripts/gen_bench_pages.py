@@ -107,7 +107,7 @@ def tier_of(tag: str) -> str:
 # on the other side *came from*, which the Ascend snapshot records per workload
 # as `baseline_tier`. The two must not be conflated: `handwritten` is a
 # statement about provenance, backed by kernel-source evidence, and carries no
-# claim about speed. A hand-written kernel losing to a vendor one is the
+# claim about speed. A open-source kernel losing to a vendor one is the
 # ordinary case here, not an error -- see the reading page.
 PROV_HANDWRITTEN, PROV_VENDOR = "handwritten", "vendor"
 # The css class each one is badged with. An unrecognised value keeps the neutral
@@ -546,7 +546,7 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
     # The winner's own recorded time. It is the fallback for a winner whose pool
     # line says `not-timed`, which is a gap on the harness side, not a zero.
     m["baseline_ms"] = _busy_of(base)
-    # The tier-1-only reading D006 asks for: the fastest hand-written candidate,
+    # The tier-1-only reading D006 asks for: the fastest open-source candidate,
     # whether or not it won the pool.
     hw_ms = _ms_of(base, "handwritten_latency_ms", "handwritten_us")
     m["hw"] = {"name": base.get("handwritten") or None, "ms": hw_ms}
@@ -587,9 +587,9 @@ def op_summary(metrics: list[dict]) -> dict:
     """
     s = {"workloads": len(metrics)}
     # Two coverage readings, both per D006: whether this op was raced against a
-    # pool at all, and whether that pool held a tier-1 hand-written candidate.
+    # pool at all, and whether that pool held a tier-1 open-source candidate.
     # An op whose pool is vendor-only is still measured against a real rival --
-    # it is simply not measured against a hand-written library, and the index
+    # it is simply not measured against an open-source library, and the index
     # says so with its own denominator rather than blurring the two.
     s["pooled"] = any(m.get("pool") for m in metrics)
     s["handwritten"] = any(m.get("hw", {}).get("ms") for m in metrics)
@@ -643,8 +643,8 @@ STRINGS = {
         "table.sub.sol": "of ceiling",
         "table.sub.bound": "by",
         # --- D036: the comparison group, its members, and their provenance
-        "tier.handwritten": "handwritten",
-        "tier.vendor": "vendor",
+        "tier.handwritten": "open-source",
+        "tier.vendor": "vendor library",
         "tier.title": (
             "Where this kernel came from \u2014 not which one is faster. Click for "
             "what a tier means."
@@ -663,9 +663,9 @@ STRINGS = {
             "Not timed: the pool line recorded no time for this candidate, and the "
             "run published none elsewhere. Not a measurement of zero."
         ),
-        "alt.hw_ratio": "hw",
+        "alt.hw_ratio": "open-src",
         "alt.hw_ratio_title": (
-            "The tier-1 reading: the fastest hand-written candidate's device time "
+            "The tier-1 reading: the fastest open-source candidate's device time "
             "divided by ours. It lost the pool, so it is not the number the colour "
             "grades."
         ),
@@ -741,11 +741,11 @@ STRINGS = {
             "ratio divides by. The row lists the whole pool, fastest first."
         ),
         "index.coverage.handwritten": (
-            "**{n_hw} of {total} ops** have a tier-1 hand-written baseline in "
-            "their pool at all — a kernel out of a hand-written Ascend library, "
+            "**{n_hw} of {total} ops** have a tier-1 open-source baseline in "
+            "their pool at all — a kernel built from the source of a third-party Ascend operator library, "
             "admitted only on evidence that the library's own compiled kernel "
             "ran. Same denominator as above. This is the **stricter** of the two "
-            "readings, and the one to quote for a claim about hand-written "
+            "readings, and the one to quote for a claim about open-source "
             "libraries."
         ),
         "index.coverage.vendor_only": (
@@ -753,7 +753,7 @@ STRINGS = {
             "implementations only — a CANN built-in, or torch_npu's own dispatch. "
             "Those rows are still measured against a real implementation of the "
             "op on the identical workload, but a win there is **not** a win over "
-            "a hand-written library. The tier badge on each line says which it "
+            "an open-source library. The tier badge on each line says which it "
             "was."
         ),
         "index.coverage.absent": (
@@ -793,11 +793,11 @@ STRINGS = {
         ),
         "reading.baseline.tier1": (
             "The stricter reading is on the page too. A pool may hold both a "
-            "hand-written kernel and a vendor one, and the hand-written one "
+            "open-source kernel and a vendor one, and the open-source one "
             "often loses. Where it does, the row carries a second, muted figure "
             "under the graded ratio, labelled `hw`: **the ratio against the "
-            "fastest hand-written candidate alone.** Quote that one for a claim "
-            "about hand-written libraries, and the graded one for a claim about "
+            "fastest open-source candidate alone.** Quote that one for a claim "
+            "about open-source libraries, and the graded one for a claim about "
             "the fastest implementation available."
         ),
         "reading.baseline.single": (
@@ -815,7 +815,7 @@ STRINGS = {
         "reading.tier.col_tier": "Tier",
         "reading.tier.col_meaning": "Meaning",
         "reading.tier.handwritten_row": (
-            "A kernel out of a hand-written Ascend library, reached through that "
+            "A kernel out of an open-source Ascend library, reached through that "
             "library's own entry point. Admitted only on evidence that the "
             "library's own compiled kernel actually ran: a custom operator "
             "package that is missing a kernel falls back to the CANN built-in "
@@ -829,21 +829,21 @@ STRINGS = {
             "workload, and on this device frequently the fastest one."
         ),
         "reading.tier.not_faster": (
-            "So `handwritten` beside a **slower** time than `vendor` on the same "
+            "So `open-source` beside a **slower** time than `vendor library` on the same "
             "row is not an error, and for several op families here it is the "
             "ordinary case. Reading the badge as a strength ranking is the one "
             "mistake this column exists to prevent."
         ),
         "reading.tier.inventory": (
-            "It has to be read that way, because the hand-written coverage is "
+            "It has to be read that way, because the open-source coverage is "
             "thin. As of 2026-09-04, of the 91 ops TileOPs declares, 58 have no "
-            "hand-written Ascend baseline in existence for this device — not "
+            "open-source Ascend baseline in existence for this device — not "
             "unbuilt and not unwired: no source. Their comparison group falls "
             "back to vendor implementations by necessity. Taking the strongest "
             "opponent available, whatever its provenance, is deliberate; the "
             "consequence is that **the tier badge on a row, not the page as a "
             "whole, is what tells you whether that number is a result against a "
-            "hand-written library.**"
+            "open-source library.**"
         ),
         # --- The reading page: the colour is the verdict
         "reading.colour.heading": "The colour is the verdict",
@@ -880,7 +880,7 @@ STRINGS = {
         "reading.columns.ratio": (
             "`alt / ours` — the baseline's device time divided by ours, the one "
             "number the colour grades. A second, muted figure labelled `hw` "
-            "appears under it wherever a hand-written candidate ran and lost the "
+            "appears under it wherever an open-source candidate ran and lost the "
             "pool: the tier-1-only reading of that same row."
         ),
         "reading.columns.device_time": (
@@ -1041,15 +1041,15 @@ STRINGS = {
         "table.sub.throughput": "TFLOP/s",
         "table.sub.sol": "占天花板",
         "table.sub.bound": "受限于",
-        "tier.handwritten": "手写",
-        "tier.vendor": "厂商",
+        "tier.handwritten": "开源库",
+        "tier.vendor": "厂商库",
         "tier.title": "这一档说的是这个 kernel 的来源，不是谁更快。点击查看档位的定义。",
         "alt.basis": "基准",
         "alt.basis_title": "「比值」那一列除的就是它：这个工作负载上实测最快的那个候选。",
         "alt.untimed_title": "候选池那一行没有记下这个候选的时间。这里显示的（带 * 的）是本次运行另外发布的基线耗时。**它不是「测出来是零」。**",
         "alt.untimed_empty_title": "没有计时：候选池那一行没有记下这个候选的时间，本次运行别处也没有。**这不是「测出来是零」。**",
-        "alt.hw_ratio": "手写",
-        "alt.hw_ratio_title": "tier-1 口径：最快的那个手写候选的耗时除以我们的耗时。它没赢下候选池，所以不是颜色评的那个数。",
+        "alt.hw_ratio": "开源库",
+        "alt.hw_ratio_title": "tier-1 口径：最快的那个开源库候选的耗时除以我们的耗时。它没赢下候选池，所以不是颜色评的那个数。",
         "page.attention.title": "Attention",
         "page.linear-attention.title": "Linear Attention 与 SSM",
         "page.gemm-moe.title": "GEMM、MoE 与量化",
@@ -1075,8 +1075,8 @@ STRINGS = {
         "index.coverage.heading": "覆盖情况",
         "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是**本次快照实际跑过的算子数**，不是 TileOPs 声明的全部算子。其余只与 eager 参考实现比较，**赢过它不值得作为成绩报告**。",
         "index.coverage.pool": "**每个算子对的是一个候选池，不是一个事先定死的对手。** 一个工作负载上，harness 能建起来的每一个基线都在它上面实测一遍，**最快的那个**才成为比值的分母。整个候选池都列在对应那一行上，最快的在前。",
-        "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 手写基线 —— 也就是出自手写 Ascend 算子库的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「手写库」的说法都应该引这个数**。",
-        "index.coverage.vendor_only": "**剩下 {total} 里的 {n_vendor} 个**，候选池里只有厂商实现 —— CANN 内置算子，或 torch_npu 自己的分发。这些行仍然是在完全相同的工作负载上与一个真实实现比较，但**在那里赢了不等于赢过手写库**。每一行的档位徽章会说清它到底是哪一档。",
+        "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 开源库基线 —— 也就是从第三方 Ascend 算子库的源码编出来的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「第三方算子库」的说法都应该引这个数**。",
+        "index.coverage.vendor_only": "**剩下 {total} 里的 {n_vendor} 个**，候选池里只有厂商库实现 —— CANN 内置算子，或 torch_npu 自己的分发。这些行仍然是在完全相同的工作负载上与一个真实实现比较，但**在那里赢了不等于赢过第三方算子库**。每一行的来源徽章会说清它到底是哪一档。",
         "index.coverage.absent": "**所有表格里都没出现的**：本次运行有 {n_failed} 个工作负载报错、{n_skipped} 个被跳过。",
         "index.data.heading": "数据页",
         "index.data.col_page": "页面",
@@ -1087,16 +1087,16 @@ STRINGS = {
         "reading.baseline.heading": "对照的是谁",
         "reading.baseline.formula": "`比值` = **我们这边最强的 ÷ 对照组里最强的**，按每一个 (算子, 工作负载, dtype) **分别**取。两边都不是「给这个算子定一次就完了」：每一行都在它自己的 shape 和 dtype 上重新决定一次。",
         "reading.baseline.pool": "这个选择的两半，**故意由两个不同的权威决定**。**哪些实现有资格进对照组**，由基线文档按算子族裁定 —— 它管的是「一个 kernel 算不算正当对手」。**它们当中哪一个成为基准**，由实测决定：每个获准的候选都在那个确切的工作负载上现建、现测，**最快的赢**。`对照实现` 那一列就是这个候选池，最快的在前，赢家标着 `基准`。",
-        "reading.baseline.tier1": "**更严的那个口径也在页面上。** 一个候选池里可能同时有手写 kernel 和厂商 kernel，而**手写的经常输**。凡是输了的行，在被评级的比值下面还有一个灰色的第二个数，标着 `手写`：**只跟最快的手写候选比出来的比值**。谈「手写库」时引这一个，谈「现有最快实现」时引被评级的那一个。",
+        "reading.baseline.tier1": "**更严的那个口径也在页面上。** 一个候选池里可能同时有开源库 kernel 和厂商库 kernel，而**开源库那一侧经常输**。凡是输了的行，在被评级的比值下面还有一个灰色的第二个数，标着 `开源库`：**只跟最快的开源库候选比出来的比值**。谈「第三方算子库」时引这一个，谈「现有最快实现」时引被评级的那一个。",
         "reading.baseline.single": "只有一个候选的池，harness 记作 `single_candidate`：那个工作负载上只建得起一个对手。它**仍然是一次实测比较** —— 只是没有可比的第二家。",
         "reading.tier.heading": "档位是什么意思",
         "reading.tier.intro": "`对照实现` 里的每一行都带一个档位。**档位记录的是这个 kernel 的来源，它完全不说明谁更快。**",
         "reading.tier.col_tier": "档位",
         "reading.tier.col_meaning": "含义",
-        "reading.tier.handwritten_row": "出自**手写 Ascend 算子库**的 kernel，通过那个库自己的入口点调用。只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳：一个**缺 kernel 的自定义算子包会静默回落到 CANN 内置**，调用照样成功、输出照样正确、时间照样看着合理。所以这里的来源认定靠的是**追踪进程实际打开了哪个二进制**，绝不是「调用没报错」。",
+        "reading.tier.handwritten_row": "从**第三方 Ascend 算子库的源码**编出来的 kernel，通过那个库自己的入口点调用。只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳：一个**缺 kernel 的自定义算子包会静默回落到 CANN 内置**，调用照样成功、输出照样正确、时间照样看着合理。所以这里的来源认定靠的是**追踪进程实际打开了哪个二进制**，绝不是「调用没报错」。",
         "reading.tier.vendor_row": "厂商实现：CANN 内置算子，或 torch_npu 自己对这个算子的分发。它是**完全相同工作负载上的一个真实实现**，而且在这块硬件上**经常就是最快的那个**。",
-        "reading.tier.not_faster": "所以同一行里 `手写` 的时间**比 `厂商` 慢**，**不是错误**；在这里的好几个算子族上，这就是常态。**把这个徽章读成强弱排名，正是这一列存在的目的所要防止的那个误解。**",
-        "reading.tier.inventory": "必须这样读，因为**手写覆盖本来就很薄**。截至 2026-09-04，TileOPs 声明的 91 个算子里，有 **58 个在这块硬件上根本不存在手写 Ascend 基线** —— 不是没编、也不是没接线：**源码层面就没有**。它们的对照组只能回落到厂商实现。「不论来源、一律取现有最强的对手」是**有意的选择**；它的代价是：**判断某个数字算不算「赢过手写库」，靠的是那一行上的档位徽章，而不是整页的标题。**",
+        "reading.tier.not_faster": "所以同一行里 `开源库` 的时间**比 `厂商库` 慢**，**不是错误**；在这里的好几个算子族上，这就是常态。**把这个徽章读成强弱排名，正是这一列存在的目的所要防止的那个误解。**",
+        "reading.tier.inventory": "必须这样读，因为**开源库的覆盖本来就很薄**。截至 2026-09-04，TileOPs 声明的 91 个算子里，有 **58 个在这块硬件上根本不存在第三方 Ascend 基线** —— 不是没编、也不是没接线：**源码层面就没有**。它们的对照组只能回落到厂商实现。「不论来源、一律取现有最强的对手」是**有意的选择**；它的代价是：**判断某个数字算不算「赢过第三方算子库」，靠的是那一行上的档位徽章，而不是整页的标题。**",
         "reading.colour.heading": "颜色就是结论",
         "reading.colour.col_meaning": "含义",
         "reading.colour.behind": "比对照实现慢 —— 低于 {lo}×。",
@@ -1109,7 +1109,7 @@ STRINGS = {
         "reading.columns.col_column": "列",
         "reading.columns.col_meaning": "含义",
         "reading.columns.workload": "`W1`、`W2`、… —— 每张表上方的图例会把每一个展开：benchmark 自己给它的 id、它跑的 dtype，以及每个输入张量（写成 `名称: shape, dtype`）。形状相同的张量并列在一起，但**各自带自己的 dtype**，所以一个 `bool` 的 `mask` 会在被读到的地方就标明。张量之后是那些**决定算子规模但不决定形状**的维度（GEMM 的 `m`/`n`/`k`，MoE 路由的 `num_experts`），再往后是灰色的、调用时**没有沿用签名默认值**的参数。已经能由其它量确定的不再重复 —— 例如 `max_seqlen_q` 就是 `max(q_lens)`。",
-        "reading.columns.ratio": "`对照 / 我们` —— **基准**的耗时除以我们的耗时。**颜色评的就是这一个数。** 凡是有手写候选跑了却输掉候选池的行，它下面还有一个灰色的、标着 `手写` 的数：同一行的 **tier-1 口径**。",
+        "reading.columns.ratio": "`对照 / 我们` —— **基准**的耗时除以我们的耗时。**颜色评的就是这一个数。** 凡是有开源库候选跑了却输掉候选池的行，它下面还有一个灰色的、标着 `开源库` 的数：同一行的 **tier-1 口径**。",
         "reading.columns.device_time": "本次调用在 device 上执行它各个 kernel 的**区间并集**，单位毫秒。本页所有比较都用它。每个工作负载另存了一份 host 挂钟读数作端到端参考 —— 两者之差约 40–50 µs，所以**便宜的工作负载用 host 计时会把比值推向 1.0**。详见「测量方法」一节。",
         "reading.columns.alternatives": "对照组在这个工作负载上握有的每一个实现占一行，最快的在前，各自带自己的耗时（ms）**和来源档位**。标着 `基准` 的那一行就是 `比值` 除的那个。名字只显示它的**识别头部** —— 鼠标悬停可看完整绑定，含 C++ 模板实例化全文。把任意一行除以我们的耗时，就得到对它的比值。**如果某次运行没有发布候选池**，这些行就是它实测过的具名基线：调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` …）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的实现 —— 那是若干 PyTorch 算子的 eager 拼装，**赢过它不值得作为成绩报告**。",
         "reading.columns.throughput": "TFLOP/s：所需 FLOPs ÷ 耗时。这个 FLOP 数是**解析算出来的** —— 用算子的 `eval_roofline` 公式代入该工作负载自己的 shape，**不是硬件计数器** —— 所以它算的是**问题本身要求的工作量**，不是 kernel 实际发出的指令。padding、重算、被 mask 掉的 tile 在这里都看不见；这个数**只在同一算子、同一工作负载的不同实现之间可比**。",
@@ -1136,7 +1136,7 @@ STRINGS = {
         "reading.sol.row_empty": "缺少某个输入：没有 roofline 公式、计时方式不是 device 侧采集，或者这个设备没有硬件档案。",
         "reading.sol.spec_note": "这个模型、它的阈值以及公式审计机制，规定在 TileOPs 的 [`docs/design/roofline.md`]({url}) 里；本页直接导入那份实现，而不是自己重新推导一遍。",
         "reading.shapes.heading": "shape 是从哪来的",
-        "reading.shapes.body": "快照记录的是每个工作负载**测了什么**，而不是它**跑在什么上面**：shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行。**manifest 没有声明的工作负载** —— 也就是手写的、不由 spec 驱动的 benchmark —— 只显示那个 id，下面没有 shape。",
+        "reading.shapes.body": "快照记录的是每个工作负载**测了什么**，而不是它**跑在什么上面**：shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行。**manifest 没有声明的工作负载** —— 也就是人工编写的、不由 spec 驱动的 benchmark —— 只显示那个 id，下面没有 shape。",
         "reading.empty.heading": "空单元格",
         "reading.empty.body": "`{empty}` 表示**这个指标的某个输入没有被记录**，**绝不表示值是零**：可能是该算子在这个工作负载上没有报告 FLOP 数，或者根本没有对照实现在它上面跑过。",
         "reading.empty.untimed": "在对照组里，同一种「缺失」有它自己的写法。**被选中却从未被实测**的候选，记作 `not-timed`。如果本次运行在别处发布了那个基线的时间，单元格就显示那个值并跟一个 `*`，把原因写在单元格的提示里；如果连别处也没有，单元格就是 `{empty}`。**两种情况都绝不会渲染成 `0`** —— 那会被读成一个无限快的 kernel。",
@@ -1600,7 +1600,7 @@ def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
                       weak[0]["speedup"] if weak else None,
                       rated=bool(real))
     # D006 asks for the tier-1-only reading as well, and it is a different
-    # number exactly when a hand-written candidate ran and lost the pool. Shown
+    # number exactly when an open-source candidate ran and lost the pool. Shown
     # under the graded one, muted and labelled, so the two can never be read as
     # one figure.
     if m.get("hw_ratio") and m.get("prov_tier") != PROV_HANDWRITTEN:
@@ -1712,9 +1712,9 @@ def index_page(args, meta: dict, rows: list[tuple],
                         rated=rated, total=total)]
     # Two numbers over the same denominator, and the denominator said out loud:
     # how many ops were raced against a pool, and how many of those pools held a
-    # tier-1 hand-written candidate at all. They are far apart on this device,
+    # tier-1 open-source candidate at all. They are far apart on this device,
     # and a page that reported only the first would read as if every comparison
-    # here were against a hand-written library. It is not — see the tier badge
+    # here were against an open-source library. It is not — see the tier badge
     # on each row, and `reading.md`.
     if any(s.get("pooled") for _, _, s, _, _ in rows):
         n_hw = sum(1 for _, _, s, _, _ in rows if s.get("handwritten"))

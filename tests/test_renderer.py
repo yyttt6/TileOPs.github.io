@@ -253,8 +253,8 @@ def test_a_hand_written_candidate_that_lost_still_reports_its_own_ratio(d036):
     # D006: the tier-1-only reading stays available where the pool's winner is
     # a vendor kernel. 56.5 us against our 59 us -> 0.96x, under the graded one.
     row = _row(d036[0], "ops-nn-ew:aclnnForeachMulList")
-    assert "hw 0.96×" in row
-    # And is absent where the hand-written candidate won the pool: there it
+    assert "open-src 0.96×" in row
+    # And is absent where the open-source candidate won the pool: there it
     # would be the same number twice.
     assert "hw " not in _row(d036[0], "ops-nn:aclnnRmsNorm")
     assert "hw " not in _row(d036[0], "catlass-r252:r252_gemm")
@@ -292,9 +292,9 @@ def test_the_tier_subhead_appears_only_where_the_snapshot_has_tiers(d036, render
 
 def test_the_index_reports_both_coverage_readings_over_one_denominator(d036):
     index = d036[1]["index.md"]
-    # Three ops, all three with a hand-written candidate somewhere in a pool.
+    # Three ops, all three with an open-source candidate somewhere in a pool.
     assert "**3 of 3 ops** are rated against a real alternative" in index
-    assert "**3 of 3 ops** have a tier-1 hand-written baseline" in index
+    assert "**3 of 3 ops** have a tier-1 open-source baseline" in index
     assert "this snapshot benchmarked" in index  # what the denominator is
 
 
@@ -357,7 +357,7 @@ def test_the_baseline_alias_is_dropped_only_when_it_duplicates_a_rival(tmp_path)
 
 def test_the_two_d036_time_spellings_are_both_read(tmp_path):
     # The harness has written `_us` and `_latency_ms` for the runner-up and
-    # hand-written times at different points. A suffix table that let the bare
+    # open-source times at different points. A suffix table that let the bare
     # `latency_ms` claim them would file them under an invented tag.
     xml = tmp_path / "spellings.xml"
     xml.write_text(
