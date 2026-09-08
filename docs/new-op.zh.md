@@ -15,6 +15,43 @@
 
 下文以最简单的矩阵乘 `GemmFwdOp` 为例走一遍这六处。
 
+## 动手之前：Ascend 的编译环境
+
+🚨 **`pyproject.toml` 声明的 `tilelang` 里没有 Ascend 后端。**
+本仓声明的依赖是 `tilelang>=0.1.9,<0.2.0`，它解析到
+[`tile-ai/tilelang`](https://github.com/tile-ai/tilelang) —— 那里面没有任何 Ascend 代码生成。
+**照声明依赖装完再写 kernel，它在 NPU 上编不出来。**
+
+Ascend 支持在 [`tile-ai/tilelang-ascend`](https://github.com/tile-ai/tilelang-ascend)。
+该仓**没有 `main` 分支**，按后端路线选：`ascendc_pto`（AscendC / PTO 代码生成）
+或 `npuir`（MLIR 路线）。⚠️ **两条路线要用两个独立环境** ——
+一个 Python 进程里 `import tilelang` 只会解析到其中一个。
+
+⚠️ **`PYTHONPATH` 要追加，不要覆盖**：
+
+```bash
+export PYTHONPATH=/path/to/tilelang-ascend:$PYTHONPATH   # 对
+export PYTHONPATH=/path/to/tilelang-ascend               # 错 —— 顶掉 CANN 自己的 python 路径
+```
+
+覆盖之后 CANN 的 `$ASCEND_HOME_PATH/python/site-packages` 与
+`.../opp/built-in/op_impl/ai_core/tbe` 就没了，编译阶段抛
+`ModuleNotFoundError: No module named 'tbe'` —— **这条报错读起来像「这个算子编不动」，其实是环境。**
+
+动手前先跑一遍自检，它能挡掉上面绝大多数问题：
+
+```bash
+python -c "
+import torch, torch_npu, os, tilelang, pathlib
+print('torch_npu', torch_npu.__version__, '| CANN', os.environ.get('ASCEND_HOME_PATH'))
+print('NPU 可见', torch.npu.device_count())
+root = pathlib.Path(tilelang.__file__).parent
+n = len(list(root.rglob('*ascend*')))
+print('tilelang ascend 相关文件', n, '->', 'OK' if n else '🚨 装的 tilelang 没有 Ascend 后端')"
+```
+
+**最后一行为 0 就先别往下写。**
+
 ## 第一步：写 spec
 
 spec 各字段的含义与写法见[读写 manifest](manifest.md)，这里只说新算子特有的两件事。
@@ -156,32 +193,45 @@ build=lambda: self.kernel_map[slot](m, n, k, a.dtype, tune=self.tune)
 
 ## 第三步：写 kernel
 
-kernel 类继承 [`Kernel`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/kernels/kernel_base.py)，放在 [`src/tileops/kernels/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/kernels) 下，用 TileLang 写，构造时编译、`__call__` 时启动。构造参数与调用参数照第二步 `build` 里那次构造、以及 `kernel(a, b)` 那次调用来定。
-
-它是这六处里唯一不受 spec 约束的一处：kernel 不读 spec，spec 校验器也不检查它的内容，只登记它的路径与类名。
-
-构造参数与调用参数的划分有一条硬性要求：**只有会被编译进生成代码的值才进构造函数。** `GemmKernel` 是这样分的：
+kernel 放在 [`src/tileops/kernels/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/kernels) 下，用 TileLang 写。**本仓的 kernel 是一个用 [`@register`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/kernels/_registry.py) 登记的 build 函数，不是继承基类的 kernel 类** —— 它接过本次调用的张量，返回一个可调用对象：
 
 ```python
-class GemmKernel(Kernel):
-    def __init__(self, m, n, k, dtype, config=None, tune=False, trans_a=False, trans_b=False):
-        self.kernel = _gemm_kernel(m, n, k, trans_a, trans_b, self.dtype_str)  # 这一行就编译了
-        self.init_config(config, tune)      # block_m / block_n / block_k / num_stages
+from .._registry import register
 
-    def __call__(self, a, b):               # 每次调用只传张量
+@register("GemmFwdOp")                       # 名字就是算子类名
+def build_gemm(a, b, *, trans_a=False, trans_b=True):
+    ...                                      # 校验
+    return build_gemm_kernel(tuple(a.shape), tuple(b.shape), a.dtype, trans_a, trans_b)
+```
+
+算子层通过 `get_or_build_kernel(name, inputs)` 要到它，**算子层自己从不构造 kernel**。
+
+**这个 build 函数的签名由 spec 定死**：照 `signature.inputs` 的声明顺序，一个位置参数对应一个输入（没传的可选输入是 `None`），然后 `signature.params` 按关键字传。
+kernel 的**内容**不受约束 —— kernel 不读 spec，spec 校验器也不检查它算什么，只登记它的路径。
+
+kernel 本体用 `T.Kernel(..., is_npu=True)` 起，body 按执行单元分成两种 scope —— `T.Scope("C")` 是 Cube、`T.Scope("V")` 是 Vector：
+
+```python
+with T.Kernel(launch_blocks, is_npu=True) as (cid, vid):
+    with T.Scope("C"):                       # Cube：矩阵乘
+        ...
+    with T.Scope("V"):                       # Vector：逐元素、归约
         ...
 ```
 
-`m`、`n`、`k`、dtype 与两个布局标志进了构造函数，因为生成的代码里这些值是常量：循环边界、TMA 描述符、WGMMA 的形状都按它们展开。tile 尺寸（`block_m` 等）同理。张量本身留给 `__call__`，每次调用只换指针。
+划分参数有一条硬性要求：**只有会被编译进生成代码的值才进那个被缓存的 builder。**
+形状、dtype、布局标志属于这一类，因为生成的代码里它们是常量：循环边界、tile 尺寸、
+搬运指令的形状都按它们展开。**张量本身不进 builder** —— 它们由 `@register` 那层接住,
+每次调用只换指针。
 
 分错的代价是重新编译。decode 一步一步往前走，`seq_len` 每步 +1，batch 随 running set 变化：
 
 ```python
-# 错：seq_len 进了构造函数 —— 每一步都是一个新 kernel
-kernel = AttnKernel(batch, seq_len, num_heads, dtype)
+# 错：seq_len 进了被缓存的 builder —— 每一步都是一个新 kernel
+kernel = build_attn_kernel(batch, seq_len, num_heads, dtype)
 
-# 对：只有编译期常量进构造函数，变化的量随调用传入
-kernel = AttnKernel(num_heads, head_dim, dtype)
+# 对：只有编译期常量进 builder，变化的量从张量形状读
+kernel = build_attn_kernel(num_heads, head_dim, dtype)
 out = kernel(q, k, v)                       # seq_len 从张量形状里读
 ```
 
@@ -194,6 +244,17 @@ out = kernel(q, k, v)                       # seq_len 从张量形状里读
 骨架用 [`tests/test_base.py`](https://github.com/tile-ai/TileOPs/blob/main/tests/test_base.py) 里的 `TestBase` 与 `FixtureBase`，用例写在 `PARAMS` 里。
 
 如果这个算子有可选输入，传与不传各至少要有一条用例 —— 两侧走的往往是不同的 kernel。
+
+🚨 **在 Ascend 上，构造算子时必须显式传 `target="ascend"`**：
+
+```python
+op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b, target="ascend")   # 必须
+op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b)                    # 第一次 forward 抛 OpNotAvailableError
+```
+
+`tileops.backend.dispatch.detect_target()` 对 `npu` 设备返回 `None`（`None` 的语义是
+「这台硬件没有装外部后端」），所以不指定 target 的算子在第一次 `forward` 时找不到 kernel。
+**症状是整个测试文件全红，看起来像 kernel 完全不工作** —— 测试里每一处构造算子都要带上它。
 
 ## 第五步：写 benchmark
 

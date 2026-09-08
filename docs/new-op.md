@@ -18,6 +18,45 @@ from it.**{ .keystone }
 
 `GemmFwdOp` — the plainest matmul there is — runs through all six below.
 
+## Before you start: the Ascend build environment
+
+🚨 **The `tilelang` this repository declares has no Ascend backend.** The declared
+dependency is `tilelang>=0.1.9,<0.2.0`, which resolves to
+[`tile-ai/tilelang`](https://github.com/tile-ai/tilelang) — and that package contains no
+Ascend codegen at all. **Install the declared dependencies, write a kernel, and it will not
+compile for NPU.**
+
+Ascend support lives in [`tile-ai/tilelang-ascend`](https://github.com/tile-ai/tilelang-ascend).
+That repository has **no `main` branch**; pick the backend path you want: `ascendc_pto`
+(AscendC / PTO codegen) or `npuir` (the MLIR path). ⚠️ **Use a separate environment per
+path** — a single Python process resolves `import tilelang` to exactly one of them.
+
+⚠️ **Append to `PYTHONPATH`; do not overwrite it**:
+
+```bash
+export PYTHONPATH=/path/to/tilelang-ascend:$PYTHONPATH   # right
+export PYTHONPATH=/path/to/tilelang-ascend               # wrong -- drops CANN's own python paths
+```
+
+Overwriting loses CANN's `$ASCEND_HOME_PATH/python/site-packages` and
+`.../opp/built-in/op_impl/ai_core/tbe`, and compilation then fails with
+`ModuleNotFoundError: No module named 'tbe'` — **an error that reads like "this operator
+cannot be compiled" when it is really the environment.**
+
+Run this check first; it catches most of the above:
+
+```bash
+python -c "
+import torch, torch_npu, os, tilelang, pathlib
+print('torch_npu', torch_npu.__version__, '| CANN', os.environ.get('ASCEND_HOME_PATH'))
+print('NPUs', torch.npu.device_count())
+root = pathlib.Path(tilelang.__file__).parent
+n = len(list(root.rglob('*ascend*')))
+print('tilelang ascend files', n, '->', 'OK' if n else '🚨 this tilelang has no Ascend backend')"
+```
+
+**If the last line is 0, stop here.**
+
 ## Step 1: write the spec
 
 What the fields mean and how to write them is in [writing a spec](manifest.md). Two things
@@ -205,42 +244,55 @@ Two things to finish, a few lines each:
 
 ## Step 3: write the kernel
 
-A kernel class subclasses [`Kernel`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/kernels/kernel_base.py), lives under [`src/tileops/kernels/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/kernels), is written in
-TileLang, compiles at construction and launches on `__call__`. Its constructor and call
-signatures are the ones step 2 just used — the `build` lambda and the `kernel(a, b)` that
-follows it.
-
-This is the one place of the six the spec does not constrain: a kernel neither reads the
-spec nor is checked against it, and the spec records only its path and class name.
-
-How the constructor and the call divide their arguments is a hard requirement: **only
-values compiled into the generated code go in the constructor.** `GemmKernel` divides them
-like this:
+A kernel lives under [`src/tileops/kernels/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/kernels) and is written in TileLang.
+**In this repository a kernel is a build function registered with
+[`@register`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/kernels/_registry.py), not a class subclassing a base** — it takes this
+call's tensors and returns something callable:
 
 ```python
-class GemmKernel(Kernel):
-    def __init__(self, m, n, k, dtype, config=None, tune=False, trans_a=False, trans_b=False):
-        self.kernel = _gemm_kernel(m, n, k, trans_a, trans_b, self.dtype_str)  # this line compiles
-        self.init_config(config, tune)      # block_m / block_n / block_k / num_stages
+from .._registry import register
 
-    def __call__(self, a, b):               # a call passes tensors, nothing else
+@register("GemmFwdOp")                       # the name is the op class name
+def build_gemm(a, b, *, trans_a=False, trans_b=True):
+    ...                                      # validation
+    return build_gemm_kernel(tuple(a.shape), tuple(b.shape), a.dtype, trans_a, trans_b)
+```
+
+The op layer asks for it through `get_or_build_kernel(name, inputs)` and **never
+constructs a kernel itself**.
+
+**The build function's signature is fixed by the spec**: one positional argument per
+`signature.inputs` entry in declaration order — an optional input that was not passed
+arrives as `None` — then `signature.params` by keyword. What the kernel *computes* is
+unconstrained: it neither reads the spec nor is checked against it, and the spec records
+only its path.
+
+The kernel body opens with `T.Kernel(..., is_npu=True)`, and splits by execution unit —
+`T.Scope("C")` is the Cube, `T.Scope("V")` the Vector:
+
+```python
+with T.Kernel(launch_blocks, is_npu=True) as (cid, vid):
+    with T.Scope("C"):                       # Cube: matrix multiply
+        ...
+    with T.Scope("V"):                       # Vector: elementwise, reductions
         ...
 ```
 
-`m`, `n`, `k`, the dtype and the two layout flags are constructor arguments because the
-generated code treats them as constants: loop bounds, TMA descriptors and the WGMMA shape
-all unroll from them, as do the tile sizes (`block_m` and the rest). The tensors belong to
-`__call__`, where each call swaps pointers.
+How arguments divide is a hard requirement: **only values compiled into the generated code
+go into the cached builder.** Shapes, dtypes and layout flags belong there, because the
+generated code treats them as constants: loop bounds, tile sizes and the shapes of the
+transfer instructions all unroll from them. **The tensors do not go into the builder** —
+the `@register` layer takes them, and each call swaps pointers.
 
 Dividing them wrong costs a recompile. A decode step advances one token at a time, so
 `seq_len` grows by one every step and batch changes with the running set:
 
 ```python
-# wrong: seq_len in the constructor — every step is a new kernel
-kernel = AttnKernel(batch, seq_len, num_heads, dtype)
+# wrong: seq_len in the cached builder — every step is a new kernel
+kernel = build_attn_kernel(batch, seq_len, num_heads, dtype)
 
-# right: compile-time constants in the constructor, the varying sizes per call
-kernel = AttnKernel(num_heads, head_dim, dtype)
+# right: only compile-time constants in the builder; varying sizes come off the tensors
+kernel = build_attn_kernel(num_heads, head_dim, dtype)
 out = kernel(q, k, v)                       # seq_len is read off the tensor shapes
 ```
 
@@ -258,6 +310,19 @@ The scaffolding is `TestBase` and `FixtureBase` from
 
 Where the op has an optional input, both sides need a case — passed and not passed often
 run different kernels.
+
+🚨 **On Ascend the op must be constructed with `target="ascend"` explicitly**:
+
+```python
+op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b, target="ascend")   # required
+op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b)                    # OpNotAvailableError on the first forward
+```
+
+`tileops.backend.dispatch.detect_target()` returns `None` for an `npu` device — `None`
+meaning "no external backend is installed for this hardware" — so an op constructed
+without a target finds no kernel when it first runs. **The symptom is an entire test file
+failing, which looks like the kernel does not work at all.** Every op construction in a
+test needs it.
 
 ## Step 5: write the benchmark
 
