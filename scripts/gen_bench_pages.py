@@ -398,7 +398,12 @@ def load_sol_engine(gpu: str, tileops: str = TILEOPS):
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         from tileops.perf.profile import find_profile
-        profile = find_profile(gpu)
+        # The profile table is keyed without a space (``Ascend910B1``) while
+        # meta.json's ``gpu`` carries the human-readable form ``Ascend 910B1``
+        # that this page also prints, so a bare lookup misses and the SOL column
+        # silently disappears.  Try the printed form first, then the de-spaced
+        # one, so the label stays readable and the lookup still resolves.
+        profile = find_profile(gpu) or find_profile(gpu.replace(" ", ""))
     except Exception as exc:  # noqa: BLE001 — degrade to an empty column
         print(f"warning: SOL column disabled ({exc})", file=sys.stderr)
         return None, None
