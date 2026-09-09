@@ -1595,7 +1595,16 @@ def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
     if m.get("pool"):
         names, times = _pool_cells(m, lang)
     else:
-        names = _stack([f"<code>{html.escape(t)}</code>" for t, _ in ordered])
+        # Without a pool line this printed the raw tag, so an op whose adapter
+        # produced no per-case race record read `baseline` -- which is exactly the
+        # column a reader needs to answer "is the opponent real?".  Prefer the
+        # winner's name when the snapshot carries one; it is the kernel that
+        # actually ran, e.g. `aclnnSoftplus_SoftplusV2_SoftplusV2` rather than
+        # `baseline`.  Falls back to the tag when there is no name at all.
+        def _rival_label(t: str) -> str:
+            name = m.get("pool_winner") if t == _LEGACY_TAG else None
+            return html.escape(name or t)
+        names = _stack([f"<code>{_rival_label(t)}</code>" for t, _ in ordered])
         times = _stack([_sig_ms(r["busy_ms"]) for _, r in ordered])
     # Against the fastest non-reference alternative, so a win over an eager
     # reference is not painted as a win over a real one — see `_ratio_cell`.
