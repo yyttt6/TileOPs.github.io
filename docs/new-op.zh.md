@@ -248,9 +248,14 @@ out = kernel(q, k, v)                       # seq_len 从张量形状里读
 🚨 **在 Ascend 上，构造算子时必须显式传 `target="ascend"`**：
 
 ```python
-op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b, target="ascend")   # 必须
-op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b)                    # 第一次 forward 抛 OpNotAvailableError
+op = MyFwdOp(...)
+op.target = "ascend"          # ← 这种写法对所有算子都有效
 ```
+
+⚠️ **不要用 `MyFwdOp(..., target="ascend")`** —— `target` 是 `Op` 的**类属性**,
+只有一部分算子在自己的 `__init__` 里也接了这个关键字参数（实测 157 个算子里 81 个接、**76 个不接**,
+`AbsFwdOp` / `BmmFwdOp` / `CosFwdOp` 都在不接那一半）。
+**赋属性的写法处处可用，传构造参数的写法会在近一半算子上抛 `TypeError`。**
 
 `tileops.backend.dispatch.detect_target()` 对 `npu` 设备返回 `None`（`None` 的语义是
 「这台硬件没有装外部后端」），所以不指定 target 的算子在第一次 `forward` 时找不到 kernel。

@@ -314,9 +314,15 @@ run different kernels.
 🚨 **On Ascend the op must be constructed with `target="ascend"` explicitly**:
 
 ```python
-op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b, target="ascend")   # required
-op = GemmSplitKFwdOp(trans_a=False, trans_b=trans_b)                    # OpNotAvailableError on the first forward
+op = MyFwdOp(...)
+op.target = "ascend"          # this form works for every operator
 ```
+
+⚠️ **Do not write `MyFwdOp(..., target="ascend")`.** `target` is a **class attribute** on
+`Op`, and only some operators also accept it as a keyword in their own `__init__` -- 81 of
+157 do, **76 do not**, including `AbsFwdOp`, `BmmFwdOp` and `CosFwdOp`.
+**Setting the attribute works everywhere; passing it to the constructor raises `TypeError`
+on nearly half of them.**
 
 `tileops.backend.dispatch.detect_target()` returns `None` for an `npu` device — `None`
 meaning "no external backend is installed for this hardware" — so an op constructed
