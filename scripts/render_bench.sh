@@ -13,8 +13,8 @@
 # shapes are read from; without it each workload is named by its benchmark id.
 set -euo pipefail
 
-# One commit per run on `snapshots`; the newest is what this renders, and
-# `git log snapshots` is where an older one is read back from.
+# One commit per run on `nightly-bench`; the newest is what this renders, and
+# `git log nightly-bench` is where an older one is read back from.
 # --- Ascend fork -------------------------------------------------------------
 # Upstream publishes snapshots to its own tile-ai/TileOPs-nightly repo. This
 # fork reads them from a branch of yyttt6/TileOPs instead, so no extra repo has

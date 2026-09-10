@@ -174,9 +174,17 @@ def test_a_run_reports_what_it_could_not_describe(rendered):
 def test_without_a_manifest_the_pages_still_render(tmp_path):
     pages, _ = render(str(tmp_path / "bare"), manifest_dir=str(tmp_path / "none"))
     assert pages, "a missing manifest must not stop the deploy"
-    # No shapes to state, so every workload is named by its benchmark id alone.
-    assert "wl-tensor" not in "".join(pages.values())
-    assert "decode-b1-h8-bfloat16" in "".join(pages.values())
+    text = "".join(pages.values())
+    # A workload the manifest described is now named by its benchmark id alone:
+    # nothing declares its shapes any more.
+    assert "decode-b1-h8-bfloat16" in text
+    assert "[B, H, DK]" not in text
+    # A workload whose shape the snapshot recorded itself does not depend on the
+    # manifest and still states it. Only what the signature added is lost:
+    # `is_causal` is no longer known to be a parameter, so it prints as one more
+    # scalar rather than a dimmed one.
+    assert "<span class=\"wl-k\">x</span>: [1, 4097, 128]" in text
+    assert "probe-tail" in text
 
 
 # --- Rules the pages do not show -------------------------------------------

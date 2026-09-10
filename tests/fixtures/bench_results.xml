@@ -109,6 +109,24 @@
       </properties>
     </testcase>
 
+    <!-- A label the manifest does not declare, on an op it does: the shape
+         comes from the snapshot's own `shape` property instead. Covers each
+         branch of that reading — a declared input tensor, the output the row
+         must not list, a declared parameter away from its default, and a
+         scalar the signature never mentions. -->
+    <testcase classname="bench" name="test_bench[probe-tail-bfloat16]">
+      <properties>
+        <property name="op" value="ChunkScanFwdOp"/>
+        <property name="op_module" value="tileops.ops.mamba.scan"/>
+        <property name="shape" value="{&quot;x&quot;: [1, 4097, 128], &quot;mask&quot;: [1, 4097], &quot;out&quot;: [1, 4097, 128], &quot;is_causal&quot;: false, &quot;tail&quot;: 17}"/>
+        <property name="tileops_device_busy_ms" value="0.0700"/>
+        <property name="tileops_dtype" value="bfloat16"/>
+        <property name="tileops_timing" value="cupti"/>
+        <property name="torch-ref_device_busy_ms" value="0.1400"/>
+        <property name="torch-ref_ratio" value="2.0"/>
+      </properties>
+    </testcase>
+
     <testcase classname="bench" name="test_bench[skipped-case-float16]">
       <properties><property name="op" value="ChunkScanFwdOp"/></properties>
       <skipped message="no baseline available on this GPU"/>

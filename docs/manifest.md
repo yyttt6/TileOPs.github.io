@@ -7,7 +7,7 @@ runs, gets described afterwards.
 TileOPs is organised the other way round: an op's specification is declared first, and
 the implementation is derived from it. That
 specification is the op's **spec**, a YAML declaration under
-[`src/tileops/manifest/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/manifest); those files together are the manifest.
+[`src/tileops/manifest/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/manifest); those files together are the manifest.
 
 **A spec makes the op an input to the whole system.** Every stage reads the same
 declaration rather than reading the implementation:
@@ -15,12 +15,12 @@ declaration rather than reading the implementation:
 | Consumer | Reads from the spec | Produces |
 | --- | --- | --- |
 | Codegen — the agent writing the op and kernel | `signature`, `shape_rules` | the op layer's parameter validation, shape inference, and the kernel's call signature |
-| [pytest](https://github.com/tile-ai/TileOPs/tree/main/tests) | `ref_api`, the dtypes in `workloads` | a numerical comparison against the reference on every workload |
-| [The nightly benchmark](https://github.com/tile-ai/TileOPs/tree/main/benchmarks) | `workloads` | the device time on those shapes |
-| [Roofline](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/perf) | the variables and formulas in `roofline` | the FLOPs and bytes one call moves — the denominator of efficiency |
+| [pytest](https://github.com/yyttt6/TileOPs/tree/main/tests) | `ref_api`, the dtypes in `workloads` | a numerical comparison against the reference on every workload |
+| [The nightly benchmark](https://github.com/yyttt6/TileOPs/tree/main/benchmarks) | `workloads` | the device time on those shapes |
+| [Roofline](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/perf) | the variables and formulas in `roofline` | the FLOPs and bytes one call moves — the denominator of efficiency |
 | CI's `compile-contract-gate` | `torch_compile_fullgraph` | the test that requires `fullgraph=True` to compile |
 | This site | every field | the support matrix, the op list, the API reference |
-| CI's [spec validator](https://github.com/tile-ai/TileOPs/blob/main/scripts/validate_manifest.py) | every field | five levels of checking that declaration and implementation agree — see [Writing a spec](#writing-a-spec) |
+| CI's [spec validator](https://github.com/yyttt6/TileOPs/blob/main/scripts/validate_manifest.py) | every field | five levels of checking that declaration and implementation agree — see [Writing a spec](#writing-a-spec) |
 
 **Every row presupposes a spec**: without one there is no generated validation, no
 numerical comparison, no performance data, and nothing in CI holding a regression back.
@@ -136,7 +136,7 @@ Five steps, each one checkable immediately.
    reference API supports, not the ones the current kernel does.
 3. **Write `shape_rules`.** `shape` and `shape_rules` together have to determine an
    output's shape completely. For ops with a `dim`, use the helpers in
-   [`shape_rules.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/manifest/shape_rules.py) — `dim_range_validity`, `reduced_shape` and the rest — which the
+   [`shape_rules.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/manifest/shape_rules.py) — `dim_range_validity`, `reduced_shape` and the rest — which the
    op layer calls too, so the two cannot disagree.
 4. **Write `workloads`.** For a single-tensor-input op the shape key must be
    `{input}_shape`, and every other key must be a `params` name or the reserved
@@ -705,7 +705,7 @@ read against them one by one before the validator in the next section runs.
 
 ## The spec validator {#spec-validator}
 
-Validation is [`scripts/validate_manifest.py`](https://github.com/tile-ai/TileOPs/blob/main/scripts/validate_manifest.py), and a spec can be run through it the
+Validation is [`scripts/validate_manifest.py`](https://github.com/yyttt6/TileOPs/blob/main/scripts/validate_manifest.py), and a spec can be run through it the
 moment it is written:
 
 ```bash
@@ -750,7 +750,7 @@ leaves three things out of reach:
   distinguish a rule about presence from a rule about shape.
 - **A wrong call is caught by the op itself.** Passing `weight` without `bias` clears
   spec validation, and the error comes from the runtime checks in
-  [`GroupNormFwdOp.forward`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/norm/group_norm.py).
+  [`GroupNormFwdOp.forward`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/norm/group_norm.py).
 - **Kernel internals are not in the manifest.** Multi-kernel ordering, accumulator
   dtypes, persistent state, tile sizes and autotuning config are not what a spec
   describes.

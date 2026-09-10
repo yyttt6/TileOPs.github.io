@@ -46,4 +46,4 @@ Two things this reference does not carry:
 
 These pages are generated from the docstrings in TileOPs, so an op whose docstring is
 thin reads thin here. The fix belongs upstream, in
-[`src/tileops/ops/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/ops).
+[`src/tileops/ops/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/ops).

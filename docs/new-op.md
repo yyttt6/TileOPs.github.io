@@ -9,12 +9,12 @@ from it.**{ .keystone }
 
 | # | File | Named in the spec by | Contents |
 | --- | --- | --- | --- |
-| 1 | [`src/tileops/manifest/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/manifest)`<family>.yaml` | the key is the op's class name | the spec itself |
-| 2 | [`src/tileops/ops/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/ops)`<family>/…` | `source.op` | the op class, subclassing `Op` |
-| 2 | [`src/tileops/ops/__init__.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/__init__.py) | — | the op's name, exported |
-| 3 | [`src/tileops/kernels/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/kernels)`<family>/…` | `source.kernel` | the kernel class, subclassing `Kernel` |
-| 4 | [`tests/ops/`](https://github.com/tile-ai/TileOPs/tree/main/tests/ops)`test_<name>.py` | `source.test` | the comparison against `ref_api` |
-| 5 | [`benchmarks/ops/`](https://github.com/tile-ai/TileOPs/tree/main/benchmarks/ops)`bench_<name>.py` | `source.bench` | the benchmark |
+| 1 | [`src/tileops/manifest/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/manifest)`<family>.yaml` | the key is the op's class name | the spec itself |
+| 2 | [`src/tileops/ops/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/ops)`<family>/…` | `source.op` | the op class, subclassing `Op` |
+| 2 | [`src/tileops/ops/__init__.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/__init__.py) | — | the op's name, exported |
+| 3 | [`src/tileops/kernels/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/kernels)`<family>/…` | `source.kernel` | the kernel class, subclassing `Kernel` |
+| 4 | [`tests/ops/`](https://github.com/yyttt6/TileOPs/tree/main/tests/ops)`test_<name>.py` | `source.test` | the comparison against `ref_api` |
+| 5 | [`benchmarks/ops/`](https://github.com/yyttt6/TileOPs/tree/main/benchmarks/ops)`bench_<name>.py` | `source.bench` | the benchmark |
 
 `GemmFwdOp` — the plainest matmul there is — runs through all six below.
 
@@ -111,7 +111,7 @@ cases the op splits into.
 
 ## Step 2: write the op class {#op-class}
 
-The op class subclasses [`Op`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/op_base.py) and sits between the spec and the kernel: it validates the
+The op class subclasses [`Op`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/op_base.py) and sits between the spec and the kernel: it validates the
 arguments against the spec, infers the output shapes, then fetches a kernel and launches
 it. It comes first because the spec dictates all of it, and the line where it builds a
 kernel is what fixes that kernel's constructor signature.
@@ -240,7 +240,7 @@ Two things to finish, a few lines each:
   `_eager_forward`. The op above declares none, so its `forward` holds all the work. How to
   declare it is in [bringing an op into torch.compile](torch-compile.md).
 - **Add the op's name** to the imports and `__all__` in
-  [`src/tileops/ops/__init__.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/__init__.py), or `from tileops.ops import ...` will not find it.
+  [`src/tileops/ops/__init__.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/__init__.py), or `from tileops.ops import ...` will not find it.
 
 ## Step 3: write the kernel
 
@@ -301,12 +301,12 @@ every step compiles, and decode goes nowhere.
 
 ## Step 4: write the test
 
-Tests live in [`tests/ops/`](https://github.com/tile-ai/TileOPs/tree/main/tests/ops), and what they compare against is the spec's `ref_api`, point
+Tests live in [`tests/ops/`](https://github.com/yyttt6/TileOPs/tree/main/tests/ops), and what they compare against is the spec's `ref_api`, point
 by point, over the shapes and dtypes the spec declares — small shapes marked `smoke` for
 the PR checks, large ones `full` for the nightly.
 
 The scaffolding is `TestBase` and `FixtureBase` from
-[`tests/test_base.py`](https://github.com/tile-ai/TileOPs/blob/main/tests/test_base.py), with the cases in `PARAMS`.
+[`tests/test_base.py`](https://github.com/yyttt6/TileOPs/blob/main/tests/test_base.py), with the cases in `PARAMS`.
 
 Where the op has an optional input, both sides need a case — passed and not passed often
 run different kernels.
@@ -332,7 +332,7 @@ test needs it.
 
 ## Step 5: write the benchmark
 
-Benchmarks live in [`benchmarks/ops/`](https://github.com/tile-ai/TileOPs/tree/main/benchmarks/ops) and subclass `ManifestBenchmark`. The shapes are not
+Benchmarks live in [`benchmarks/ops/`](https://github.com/yyttt6/TileOPs/tree/main/benchmarks/ops) and subclass `ManifestBenchmark`. The shapes are not
 written here: they come from the spec's `workloads` through `load_workloads(<op>)`, and
 hand-written shapes fail L4 validation:
 

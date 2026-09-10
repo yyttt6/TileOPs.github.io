@@ -6,12 +6,12 @@
 
 | # | 文件 | spec 里由谁指名 | 内容 |
 | --- | --- | --- | --- |
-| 1 | [`src/tileops/manifest/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/manifest)`<family>.yaml` | 顶层的名字就是算子类名 | spec 本身 |
-| 2 | [`src/tileops/ops/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/ops)`<family>/…` | `source.op` | 算子类，继承 `Op` |
-| 2 | [`src/tileops/ops/__init__.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/__init__.py) | —— | 导出算子名 |
-| 3 | [`src/tileops/kernels/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/kernels)`<family>/…` | `source.kernel` | kernel 类，继承 `Kernel` |
-| 4 | [`tests/ops/`](https://github.com/tile-ai/TileOPs/tree/main/tests/ops)`test_<名字>.py` | `source.test` | 与 `ref_api` 的数值比对 |
-| 5 | [`benchmarks/ops/`](https://github.com/tile-ai/TileOPs/tree/main/benchmarks/ops)`bench_<名字>.py` | `source.bench` | benchmark |
+| 1 | [`src/tileops/manifest/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/manifest)`<family>.yaml` | 顶层的名字就是算子类名 | spec 本身 |
+| 2 | [`src/tileops/ops/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/ops)`<family>/…` | `source.op` | 算子类，继承 `Op` |
+| 2 | [`src/tileops/ops/__init__.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/__init__.py) | —— | 导出算子名 |
+| 3 | [`src/tileops/kernels/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/kernels)`<family>/…` | `source.kernel` | kernel 类，继承 `Kernel` |
+| 4 | [`tests/ops/`](https://github.com/yyttt6/TileOPs/tree/main/tests/ops)`test_<名字>.py` | `source.test` | 与 `ref_api` 的数值比对 |
+| 5 | [`benchmarks/ops/`](https://github.com/yyttt6/TileOPs/tree/main/benchmarks/ops)`bench_<名字>.py` | `source.bench` | benchmark |
 
 下文以最简单的矩阵乘 `GemmFwdOp` 为例走一遍这六处。
 
@@ -94,7 +94,7 @@ GemmFwdOp:
 
 ## 第二步：写算子类 {#op-class}
 
-算子类继承 [`Op`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/op_base.py)，是 spec 与 kernel 之间的一层：它按 spec 校验入参、推导输出形状，再取到 kernel 并 launch。先写它，是因为它的内容全部由 spec 决定，而它调用 kernel 的那一行同时定下了 kernel 的构造签名。
+算子类继承 [`Op`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/op_base.py)，是 spec 与 kernel 之间的一层：它按 spec 校验入参、推导输出形状，再取到 kernel 并 launch。先写它，是因为它的内容全部由 spec 决定，而它调用 kernel 的那一行同时定下了 kernel 的构造签名。
 
 ### 类的骨架与四个成员
 
@@ -189,7 +189,7 @@ build=lambda: self.kernel_map[slot](m, n, k, a.dtype, tune=self.tune)
 两件事收尾，都是几行的事：
 
 - **要支持 `torch.compile`**，得多声明一条编译边界：`forward` 只调用那个不透明算子，校验、取 kernel、launch kernel 挪进 `_eager_forward`。上面这个算子没有声明，所以 `forward` 里就是全部工作。做法见[接入 torch.compile](torch-compile.md)。
-- **把算子名加进** [`src/tileops/ops/__init__.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/__init__.py) 的导入与 `__all__`，`from tileops.ops import ...` 才拿得到它。
+- **把算子名加进** [`src/tileops/ops/__init__.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/__init__.py) 的导入与 `__all__`，`from tileops.ops import ...` 才拿得到它。
 
 ## 第三步：写 kernel
 
@@ -239,9 +239,9 @@ out = kernel(q, k, v)                       # seq_len 从张量形状里读
 
 ## 第四步：写测试
 
-测试放在 [`tests/ops/`](https://github.com/tile-ai/TileOPs/tree/main/tests/ops)，比对对象就是 spec 的 `ref_api`，逐点比。形状与 dtype 取 spec 声明的范围，小形状标 `smoke` 进 PR 检查，大形状标 `full` 留给 nightly。
+测试放在 [`tests/ops/`](https://github.com/yyttt6/TileOPs/tree/main/tests/ops)，比对对象就是 spec 的 `ref_api`，逐点比。形状与 dtype 取 spec 声明的范围，小形状标 `smoke` 进 PR 检查，大形状标 `full` 留给 nightly。
 
-骨架用 [`tests/test_base.py`](https://github.com/tile-ai/TileOPs/blob/main/tests/test_base.py) 里的 `TestBase` 与 `FixtureBase`，用例写在 `PARAMS` 里。
+骨架用 [`tests/test_base.py`](https://github.com/yyttt6/TileOPs/blob/main/tests/test_base.py) 里的 `TestBase` 与 `FixtureBase`，用例写在 `PARAMS` 里。
 
 如果这个算子有可选输入，传与不传各至少要有一条用例 —— 两侧走的往往是不同的 kernel。
 
@@ -263,7 +263,7 @@ op.target = "ascend"          # ← 这种写法对所有算子都有效
 
 ## 第五步：写 benchmark
 
-benchmark 放在 [`benchmarks/ops/`](https://github.com/tile-ai/TileOPs/tree/main/benchmarks/ops)，继承 `ManifestBenchmark`。形状不自己写，而是经 `load_workloads(<算子名>)` 从 spec 的 `workloads` 取 —— 手写形状过不了 L4 校验：
+benchmark 放在 [`benchmarks/ops/`](https://github.com/yyttt6/TileOPs/tree/main/benchmarks/ops)，继承 `ManifestBenchmark`。形状不自己写，而是经 `load_workloads(<算子名>)` 从 spec 的 `workloads` 取 —— 手写形状过不了 L4 校验：
 
 ```python
 from benchmarks.benchmark_base import ManifestBenchmark, workload_params

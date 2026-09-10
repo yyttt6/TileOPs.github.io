@@ -2,19 +2,19 @@
 
 传统算子库以实现为中心：算子逐个写、逐个调优，支持哪些形状、哪些 dtype、跑多快，都由实现事后说明，文档写的是追述。
 
-TileOPs 的组织方式相反：算子的规格先声明，实现由规格推导。每个算子的规格称为它的 **spec**，写在 [`src/tileops/manifest/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/manifest) 下的 YAML 文件里；这些文件合起来就是 manifest。
+TileOPs 的组织方式相反：算子的规格先声明，实现由规格推导。每个算子的规格称为它的 **spec**，写在 [`src/tileops/manifest/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/manifest) 下的 YAML 文件里；这些文件合起来就是 manifest。
 
 **一个算子有了 spec，就成为整个系统的数据输入。** 各个环节读同一份声明，而不是各自去读实现：
 
 | 谁消费 | 读 spec 里的什么 | 产出 |
 | --- | --- | --- |
 | codegen，即生成算子与 kernel 的 agent | `signature`、`shape_rules` | 算子层的参数校验、形状推导、kernel 的调用签名 |
-| [pytest](https://github.com/tile-ai/TileOPs/tree/main/tests) | `ref_api`、`workloads` 的 dtype | 与参考实现在每个 workload 上逐个比对数值 |
-| [每晚的 benchmark](https://github.com/tile-ai/TileOPs/tree/main/benchmarks) | `workloads` | 这些形状上测得的 device time |
-| [roofline](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/perf) | `roofline` 的变量与公式 | 一次调用的计算量与访存量，效率的分母 |
+| [pytest](https://github.com/yyttt6/TileOPs/tree/main/tests) | `ref_api`、`workloads` 的 dtype | 与参考实现在每个 workload 上逐个比对数值 |
+| [每晚的 benchmark](https://github.com/yyttt6/TileOPs/tree/main/benchmarks) | `workloads` | 这些形状上测得的 device time |
+| [roofline](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/perf) | `roofline` 的变量与公式 | 一次调用的计算量与访存量，效率的分母 |
 | CI 的 `compile-contract-gate` | `torch_compile_fullgraph` | 要求 `fullgraph=True` 能编过的那条测试 |
 | 本文档站 | 全部字段 | 支持矩阵、算子清单、API 参考 |
-| CI 的 [spec 校验器](https://github.com/tile-ai/TileOPs/blob/main/scripts/validate_manifest.py) | 全部字段 | 分五级检查声明与实现是否一致，见[写一份新 spec](#writing-a-spec) |
+| CI 的 [spec 校验器](https://github.com/yyttt6/TileOPs/blob/main/scripts/validate_manifest.py) | 全部字段 | 分五级检查声明与实现是否一致，见[写一份新 spec](#writing-a-spec) |
 
 **每一行都以 spec 为前提**：没有 spec，就没有生成的校验、没有数值比对、没有性能数据，CI 也拦不下任何回退。**为一个算子写 manifest 不是补文档，而是把它接进这条数据流。**{ .keystone }
 
@@ -101,7 +101,7 @@ load_workloads("RMSNormFwdOp")             # 该算子的 workload 列表
 
 1. **起名，选 family。** 键是算子的类名，spec 写进 `family` 对应的那个文件。
 2. **写 `signature`。** 张量进 `inputs` / `outputs`，非张量进 `params`；按调用顺序排，可选输入排在必填输入之后。dtype 写参考 API 支持的全部范围，不是当前 kernel 支持的范围。
-3. **写 `shape_rules`。** 输出形状必须由 `shape` 与 `shape_rules` 完全确定。涉及 `dim` 的算子用 [`shape_rules.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/manifest/shape_rules.py) 里的 `dim_range_validity`、`reduced_shape` 等辅助函数 —— 算子层调的是同一批函数，两边不会各说一套。
+3. **写 `shape_rules`。** 输出形状必须由 `shape` 与 `shape_rules` 完全确定。涉及 `dim` 的算子用 [`shape_rules.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/manifest/shape_rules.py) 里的 `dim_range_validity`、`reduced_shape` 等辅助函数 —— 算子层调的是同一批函数，两边不会各说一套。
 4. **写 `workloads`。** 单张量输入的算子，形状键必须是 `{输入名}_shape`，其余键只能是 `params` 的名字或保留的 `dtypes` / `label`。
 5. **写 `roofline` 与 `source`。**
 
@@ -580,7 +580,7 @@ ReciprocalFwdOp:
 
 ## spec 校验器 {#spec-validator}
 
-校验由 [`scripts/validate_manifest.py`](https://github.com/tile-ai/TileOPs/blob/main/scripts/validate_manifest.py) 执行，写完一份 spec 就可以立刻跑：
+校验由 [`scripts/validate_manifest.py`](https://github.com/yyttt6/TileOPs/blob/main/scripts/validate_manifest.py) 执行，写完一份 spec 就可以立刻跑：
 
 ```bash
 python scripts/validate_manifest.py                            # 全部 spec
@@ -618,7 +618,7 @@ spec 里的每个字段都有确定的消费者，也有确定的报错：
 五级查的是语法与一致性，不是求值，三件事因此查不到：
 
 - **`shape_rules` 不求值。** 校验器只看每条规则是不是合法的 Python 表达式，既不枚举调用的传法，也不区分「管传没传」与「管形状」两类规则。
-- **传错的调用由算子自己拦。** 传了 `weight` 却不传 `bias`，spec 校验一样通过，报错来自 [`GroupNormFwdOp.forward`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/norm/group_norm.py) 的运行时检查。
+- **传错的调用由算子自己拦。** 传了 `weight` 却不传 `bias`，spec 校验一样通过，报错来自 [`GroupNormFwdOp.forward`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/norm/group_norm.py) 的运行时检查。
 - **kernel 的执行细节不在 manifest 里。** 多 kernel 的执行顺序、累加 dtype、持久状态、tile 尺寸、autotune 配置，都不属于 spec 描述的内容。
 
 完整的字段规范与全部规则见 [Op Manifest](design/manifest.md)。

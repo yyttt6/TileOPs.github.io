@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Documentation site for [TileOPs](https://github.com/tile-ai/TileOPs) — spec-driven
+Documentation site for [TileOPs](https://github.com/yyttt6/TileOPs) — spec-driven
 LLM operators across backends, built on TileLang. MkDocs + Material, deployed to
 `gh-pages` by GitHub Actions. Palette and type are shared with
 [TileFoundry](https://github.com/tile-ai/TileFoundry.github.io); see
@@ -10,7 +10,7 @@ LLM operators across backends, built on TileLang. MkDocs + Material, deployed to
 
 ```bash
 pip install -r requirements-docs.txt -r requirements-dev.txt
-git clone --depth 1 https://github.com/tile-ai/TileOPs.git TileOPs   # or symlink one
+git clone --depth 1 https://github.com/yyttt6/TileOPs.git TileOPs   # or symlink one
 mkdocs serve
 ```
 
@@ -47,7 +47,7 @@ Never edit these by hand — change what produces them.
 |-------|-------------|
 | `docs/api/` | mkdocstrings, from TileOPs docstrings |
 | `docs/design/` | `include-markdown`, mirroring TileOPs `docs/design/` |
-| `docs/benchmarks/` | `scripts/gen_bench_pages.py`, from the newest commit on the `snapshots` branch of [tile-ai/TileOPs-nightly](https://github.com/tile-ai/TileOPs-nightly) (`scripts/render_bench.sh` fetches it) |
+| `docs/benchmarks/` | `scripts/gen_bench_pages.py`, from the newest commit on the `nightly-bench` branch of [yyttt6/TileOPs](https://github.com/yyttt6/TileOPs/tree/nightly-bench) (`scripts/render_bench.sh` fetches it; upstream publishes to its own `tile-ai/TileOPs-nightly`, this fork does not) |
 
 `hooks.py` rewrites the repo-relative paths mirrored content arrives with, and
 expands the single `Benchmarks` nav entry to whichever pages the renderer produced.

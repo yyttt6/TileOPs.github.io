@@ -16,6 +16,12 @@ Anything the manifest declares as a parameter rather than a dimension
 (``is_causal``, ``page_size``) is reported separately and only when it differs
 from the signature's default: a workload that takes the default is the ordinary
 case and saying so on every row costs more than it tells.
+
+A workload the manifest does not declare at all — an edge-case probe the Ascend
+harness adds, not a spec-driven one — has no manifest shape to read.
+``describe_recorded`` describes those from the shape the snapshot itself
+recorded; see the comment above it for why that is a fallback and not the
+first thing tried.
 """
 from __future__ import annotations
 
@@ -409,6 +415,79 @@ def describe(entry: dict, config: str) -> Spec | None:
 
     return Spec(label, dtype, tensors, _pair_counts(dims_out), params_out,
                 symbolic, bindings)
+
+
+# --- Shapes the snapshot recorded itself -------------------------------------
+# The manifest declares the shapes of *spec-driven* workloads. The Ascend
+# harness also runs edge-case probes of its own (`nondiv-tail`,
+# `three-way-broadcast`, `t111-probe-8M`, ...) under labels the manifest has
+# never heard of, and for those `describe` above has nothing to work from: 55
+# rows across 23 ops printed their benchmark id and no shape. The harness does
+# know those shapes and now publishes them per case (`shape` in the snapshot's
+# JUnit XML), so they can be read from there instead of guessed.
+#
+# Read only where the manifest cannot describe the workload. The manifest stays
+# the source of truth wherever it declares one, so no row that renders today
+# changes: what the op *is allowed* to receive is a declaration, and only the
+# rows that have no declaration fall back to what one run happened to pass.
+
+# What the harness calls the output it wrote into. The manifest's own output
+# name is read from the signature; these two are the names the harness uses
+# regardless of it, and an output is not part of "what the op takes", which is
+# what the tensor cells list.
+_RECORDED_OUTPUT_KEYS = {"out", "output"}
+
+
+def split_config(config: str, dtype: str | None) -> tuple[str, str | None]:
+    """``("nondiv-tail-float16", "float16")`` -> ``("nondiv-tail", "float16")``.
+
+    The id is `<label>-<dtype>` and the dtype is the one the snapshot recorded
+    for the run, so it is stripped rather than guessed at. An id that does not
+    end in it keeps its whole self as the label.
+    """
+    if dtype and config.endswith("-" + dtype):
+        return config[: -len(dtype) - 1], dtype
+    return config, dtype
+
+
+def describe_recorded(entry, config: str, recorded, dtype=None) -> Spec | None:
+    """Describe one workload from the shape the snapshot recorded, or None.
+
+    `recorded` is the `name -> dims` map the harness measured on. A list value
+    is a tensor; anything else is a scalar, reported as a parameter when the
+    signature declares one under that name and it is not the default, and as a
+    dimension otherwise — the same division `describe` makes, so a row from
+    here reads like a row from the manifest.
+    """
+    if not isinstance(recorded, dict) or not recorded:
+        return None
+    signature = (entry or {}).get("signature") or {}
+    inputs = signature.get("inputs") or {}
+    outputs = signature.get("outputs") or {}
+    declared = signature.get("params") or {}
+    label, dtype = split_config(config, dtype)
+
+    shapes, dims_out, params_out = [], [], []
+    for key, value in recorded.items():
+        if key in outputs or key in _RECORDED_OUTPUT_KEYS:
+            continue
+        if isinstance(value, list) and value and all(
+                isinstance(d, int) and not isinstance(d, bool) for d in value):
+            shapes.append((key, value, _concrete_dtype(inputs.get(key))))
+        elif isinstance(value, (int, float, str, bool)):
+            if key in declared:
+                default = (declared[key].get("default")
+                           if isinstance(declared[key], dict) else None)
+                if value != default:
+                    params_out.append((key, _fmt_value(value)))
+            else:
+                dims_out.append((key, _fmt_value(value)))
+
+    tensors = _group_tensors((name, fmt_shape(d), dt) for name, d, dt in shapes)
+    # No symbolic form: these workloads have no signature template to write
+    # themselves in, so every row prints its own shapes — the `not symbolic`
+    # path the renderer already takes for manifest workloads given outright.
+    return Spec(label, dtype, tensors, _pair_counts(dims_out), params_out) or None
 
 
 def _group_tensors(shapes) -> list:

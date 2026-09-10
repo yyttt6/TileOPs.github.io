@@ -92,7 +92,7 @@ breaks and guards below, see [how dynamo works](#how-dynamo-works).
 
 `RMSNormFwdOp` was the first op brought in. Its skeleton, method bodies elided — the full
 file is
-[`src/tileops/ops/norm/rms_norm.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/norm/rms_norm.py):
+[`src/tileops/ops/norm/rms_norm.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/norm/rms_norm.py):
 
 ```python
 class RMSNormFwdOp(Op):

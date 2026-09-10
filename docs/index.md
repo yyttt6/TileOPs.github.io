@@ -51,5 +51,5 @@ flops, nbytes = op.eval_roofline()   # what the call had to do and move
 
 ## Links
 
-- [GitHub](https://github.com/tile-ai/TileOPs)
-- [Development guide](https://github.com/tile-ai/TileOPs/blob/main/docs/development.md)
+- [GitHub](https://github.com/yyttt6/TileOPs)
+- [Development guide](https://github.com/yyttt6/TileOPs/blob/main/docs/development.md)

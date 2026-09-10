@@ -65,7 +65,7 @@ block(x, w)
 
 接入一个算子要写的代码：边界怎么声明、fake 怎么写、target 判定为什么要在节点内部重做一次。其中的追踪、切图、guard 见[dynamo 是怎么工作的](#dynamo)。
 
-`RMSNormFwdOp` 是仓内第一个接入的算子。下面是它的骨架，方法体一律省略，完整代码见 [`src/tileops/ops/norm/rms_norm.py`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/ops/norm/rms_norm.py)：
+`RMSNormFwdOp` 是仓内第一个接入的算子。下面是它的骨架，方法体一律省略，完整代码见 [`src/tileops/ops/norm/rms_norm.py`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/ops/norm/rms_norm.py)：
 
 ```python
 class RMSNormFwdOp(Op):

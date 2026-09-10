@@ -329,7 +329,10 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
 
         impls: dict[str, dict] = defaultdict(dict)
         for key, val in props.items():
-            if key in ("op", "op_module"):
+            # `shape` is the case's own record of what it ran on, not a metric
+            # of one implementation, so it carries no `<tag>_` prefix and is
+            # read straight off the testcase below.
+            if key in ("op", "op_module", "shape"):
                 continue
             for suf in _METRIC_SUFFIXES:
                 if key.endswith("_" + suf):
@@ -347,6 +350,7 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
             "op": props["op"],
             "op_module": props.get("op_module"),
             "impls": dict(impls),
+            "shape": props.get("shape"),
         })
     return workloads, failures, skips
 
@@ -1000,12 +1004,14 @@ STRINGS = {
         # --- The reading page: closing
         "reading.shapes.heading": "Where the shapes come from",
         "reading.shapes.body": (
-            "The snapshot records what each workload measured, not what it ran "
-            "on: the shapes are read from the TileOPs [spec manifest]({url}), "
-            "joined to a row by the label and dtype the benchmark id is built "
-            "from. A workload the manifest does not declare — a benchmark written "
-            "by hand rather than driven by a spec — shows that id alone, with no "
-            "shapes under it."
+            "The shapes are read from the TileOPs [spec manifest]({url}), joined "
+            "to a row by the label and dtype the benchmark id is built from — so "
+            "a row states what its op is declared to take. A workload the "
+            "manifest does not declare — an edge-case probe written by hand "
+            "rather than driven by a spec — instead shows the shape the snapshot "
+            "recorded for that run, which is one measured call rather than a "
+            "declaration. Where neither is available, the row shows its "
+            "benchmark id alone, with no shapes under it."
         ),
         "reading.empty.heading": "Empty cells",
         "reading.empty.body": (
@@ -1141,7 +1147,7 @@ STRINGS = {
         "reading.sol.row_empty": "缺少某个输入：没有 roofline 公式、计时方式不是 device 侧采集，或者这个设备没有硬件档案。",
         "reading.sol.spec_note": "这个模型、它的阈值以及公式审计机制，规定在 TileOPs 的 [`docs/design/roofline.md`]({url}) 里；本页直接导入那份实现，而不是自己重新推导一遍。",
         "reading.shapes.heading": "shape 是从哪来的",
-        "reading.shapes.body": "快照记录的是每个工作负载**测了什么**，而不是它**跑在什么上面**：shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行。**manifest 没有声明的工作负载** —— 也就是人工编写的、不由 spec 驱动的 benchmark —— 只显示那个 id，下面没有 shape。",
+        "reading.shapes.body": "shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行 —— 所以一行给出的是这个算子**声明**可以接受的形状。**manifest 没有声明的工作负载** —— 也就是人工编写的、不由 spec 驱动的边界用例探针 —— 改为显示快照为那次运行**记录下来的**形状：那是实测的一次调用，不是一份声明。两者都没有时，这一行只显示 benchmark id，下面没有 shape。",
         "reading.empty.heading": "空单元格",
         "reading.empty.body": "`{empty}` 表示**这个指标的某个输入没有被记录**，**绝不表示值是零**：可能是该算子在这个工作负载上没有报告 FLOP 数，或者根本没有对照实现在它上面跑过。",
         "reading.empty.untimed": "在对照组里，同一种「缺失」有它自己的写法。**被选中却从未被实测**的候选，记作 `not-timed`。如果本次运行在别处发布了那个基线的时间，单元格就显示那个值并跟一个 `*`，把原因写在单元格的提示里；如果连别处也没有，单元格就是 `{empty}`。**两种情况都绝不会渲染成 `0`** —— 那会被读成一个无限快的 kernel。",
@@ -1225,7 +1231,11 @@ def op_link(op: str, module: str | None, ref: str) -> str:
         rel = "src/" + module.replace(".", "/") + ".py"
         if os.path.exists(os.path.join(TILEOPS, rel)):
             return f"{_GH}/blob/{ref}/{rel}"
-    return f"{_GH}/search?q=repo%3Atile-ai%2FTileOPs+{op}&type=code"
+    # `repo:` scopes the search, and it scoped it to UPSTREAM while the host was
+    # already this fork: every one of these links searched tile-ai/TileOPs for a
+    # symbol that may only exist here. Percent-encoded, which is why a grep for
+    # `tile-ai/TileOPs` never found it (T283).
+    return f"{_GH}/search?q=repo%3Ayyttt6%2FTileOPs+{op}&type=code"
 
 
 def _op_cell(op: str, module: str | None, ref: str) -> str:
@@ -1990,17 +2000,37 @@ def main():
 
     sol_engine = load_sol_engine(args.gpu, args.tileops)
 
-    # The snapshot names a workload but does not carry its shapes; the spec
-    # manifest declares both, under the same label. Ops it does not declare
-    # keep the benchmark's own id — see `workload_cell`.
+    # The spec manifest declares a workload's label and its shapes together, so
+    # it is what the id is resolved against first. Where it declares no such
+    # label — an edge-case probe the harness added, not a spec-driven workload —
+    # the snapshot's own `shape` property is read instead. Neither: the row keeps
+    # the benchmark's own id and no shapes, see `workload_key`.
     manifest = (workload_shape.load_manifest(args.manifest_dir)
                 if os.path.isdir(args.manifest_dir) else {})
     undeclared = set()
+    from_snapshot = set()
     for w in workloads:
         entry = manifest.get(w["op"])
         w["spec"] = workload_shape.describe(entry, w["config"]) if entry else None
+        w["spec_source"] = "manifest" if w["spec"] else None
         if not w["spec"]:
-            undeclared.add(w["op"])
+            recorded = None
+            if w.get("shape"):
+                try:
+                    recorded = json.loads(w["shape"])
+                except (TypeError, ValueError):
+                    recorded = None
+            # The dtype is the one the run recorded, so the `<label>-<dtype>`
+            # id can be split on it rather than on its last hyphen: a label is
+            # allowed to contain one, and `legacy-probe-1-int32` does.
+            w["spec"] = workload_shape.describe_recorded(
+                entry, w["config"], recorded,
+                ours_of(w["impls"]).get("dtype"))
+            if w["spec"]:
+                w["spec_source"] = "snapshot"
+                from_snapshot.add(w["op"])
+            else:
+                undeclared.add(w["op"])
 
     metrics_by_op: dict[str, list[dict]] = defaultdict(list)
     workloads_of: dict[str, list[dict]] = defaultdict(list)
@@ -2056,11 +2086,17 @@ def main():
     if unclassified:
         print("warning: baseline tags with no tier: "
               + ", ".join(unclassified), file=sys.stderr)
+    n_snapshot = sum(1 for w in workloads if w.get("spec_source") == "snapshot")
+    if n_snapshot:
+        print(f"note: {n_snapshot} workloads across {len(from_snapshot)} ops are "
+              "not declared in the manifest, so their shapes come from the "
+              "snapshot's own record of the run: "
+              + ", ".join(sorted(from_snapshot)), file=sys.stderr)
     n_undeclared = sum(1 for w in workloads if not w["spec"])
     if n_undeclared:
         print(f"warning: {n_undeclared} workloads across "
-              f"{len(undeclared)} ops have no manifest entry, so they show "
-              "their benchmark id and no shapes: "
+              f"{len(undeclared)} ops have neither a manifest entry nor a "
+              "recorded shape, so they show their benchmark id and no shapes: "
               + ", ".join(sorted(undeclared)), file=sys.stderr)
 
 

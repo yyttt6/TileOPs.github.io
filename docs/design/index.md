@@ -1,7 +1,7 @@
 # Design
 
 Architecture and design documentation for TileOPs internals. The pages
-below mirror `docs/design/` in the [`tile-ai/TileOPs`](https://github.com/tile-ai/TileOPs)
+below mirror `docs/design/` in the [`yyttt6/TileOPs`](https://github.com/yyttt6/TileOPs)
 repository — the source of truth — pulled in at site build time.
 
 - [Architecture](architecture.md) — top-level module layout and the spec-driven pipeline.

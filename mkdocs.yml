@@ -1,8 +1,8 @@
 site_name: TileOPs
-site_url: https://tile-ai.github.io/TileOPs.github.io/
+site_url: https://yyttt6.github.io/TileOPs.github.io/
 site_description: High-performance LLM operator library built on TileLang
-repo_url: https://github.com/tile-ai/TileOPs
-repo_name: tile-ai/TileOPs
+repo_url: https://github.com/yyttt6/TileOPs
+repo_name: yyttt6/TileOPs
 
 theme:
   name: material
@@ -222,6 +222,6 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/tile-ai/TileOPs
+      link: https://github.com/yyttt6/TileOPs
 
 copyright: Copyright &copy; 2026 tile-ai

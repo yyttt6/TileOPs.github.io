@@ -1,10 +1,11 @@
 name: Daily refresh
 
-# Daily refresh of the whole site: the Benchmarks pages from the newest snapshot in
-# tile-ai/TileOPs-nightly, and every page that reads the TileOPs
-# checkout — the API reference from its docstrings, the mirrored design docs — since this
-# job checks that repository out fresh each run. Nothing is committed; the rendered HTML
-# lives on gh-pages.
+# Daily refresh of the whole site: the Benchmarks pages from the newest snapshot on
+# the `nightly-bench` branch of yyttt6/TileOPs (upstream publishes its snapshots to a
+# separate tile-ai/TileOPs-nightly repo; this fork does not have one), and every page
+# that reads the TileOPs checkout — the API reference from its docstrings, the
+# mirrored design docs — since this job checks that repository out fresh each run.
+# Nothing is committed; the rendered HTML lives on gh-pages.
 #
 # 22:00 UTC is 06:00 Beijing, and the TileOPs nightly finishes before that, so the data is
 # waiting at the start of the working day. GitHub queues scheduled runs, so the deploy can

@@ -1,9 +1,9 @@
 # TileOPs Documentation
 
-The documentation site for [TileOPs](https://github.com/tile-ai/TileOPs) — spec-driven
+The documentation site for [TileOPs](https://github.com/yyttt6/TileOPs) — spec-driven
 LLM operators across backends, built on TileLang.
 
-**Live site**: [tile-ai.github.io/TileOPs.github.io](https://tile-ai.github.io/TileOPs.github.io/)
+**Live site**: [yyttt6.github.io/TileOPs.github.io](https://yyttt6.github.io/TileOPs.github.io/)
 
 MkDocs + Material. GitHub Actions deploys to `gh-pages` on every push to `main`,
 and re-renders the Benchmarks pages nightly.
@@ -17,7 +17,7 @@ pip install mkdocs-material "mkdocstrings[python]" mkdocs-include-markdown-plugi
 # The API and design pages read from a TileOPs checkout at ./TileOPs. The
 # workflows clone it there; locally, clone it too — or point a symlink at a
 # clone you already have. Either way the path is gitignored.
-git clone --depth 1 https://github.com/tile-ai/TileOPs.git TileOPs
+git clone --depth 1 https://github.com/yyttt6/TileOPs.git TileOPs
 
 mkdocs serve
 ```

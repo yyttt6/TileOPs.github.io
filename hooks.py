@@ -16,7 +16,12 @@ from __future__ import annotations
 import os
 import re
 
-UPSTREAM_BLOB = "https://github.com/tile-ai/TileOPs/blob/main"
+# The design pages are mirrored from the TileOPs checkout the workflow makes,
+# and that checkout is this fork (render-benchmarks.yml: `repository:
+# yyttt6/TileOPs`). So the repo-relative paths in them resolve against the
+# fork, not upstream: `.claude/skills/scaffold-op/slot-rules.md` below exists
+# only here, and pointing these at tile-ai/TileOPs served a 404.
+SOURCE_BLOB = "https://github.com/yyttt6/TileOPs/blob/main"
 
 _DESIGN_REPO_PATH = re.compile(r"\.\./\.\./([\w./-]+)")
 
@@ -55,11 +60,11 @@ def on_page_markdown(markdown, page, config, files):
     src = page.file.src_path.replace("\\", "/")
 
     if src.startswith("design/"):
-        # Upstream design docs link to source files via ../../<repo path>.
+        # The design docs link to source files via ../../<repo path>.
         # Redirect those to GitHub so they resolve from the published site.
-        markdown = _DESIGN_REPO_PATH.sub(rf"{UPSTREAM_BLOB}/\1", markdown)
+        markdown = _DESIGN_REPO_PATH.sub(rf"{SOURCE_BLOB}/\1", markdown)
         markdown = _DESIGN_SLOT_ANCHOR.sub(
-            rf"]({UPSTREAM_BLOB}/{_SLOT_RULES}#\1)", markdown
+            rf"]({SOURCE_BLOB}/{_SLOT_RULES}#\1)", markdown
         )
 
     notice = _fallback_notice(page)

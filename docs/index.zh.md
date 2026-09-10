@@ -36,5 +36,5 @@ flops, nbytes = op.eval_roofline()   # 本次调用所需的计算量与访存�
 
 ## 相关链接
 
-- [GitHub](https://github.com/tile-ai/TileOPs)
-- [开发指南](https://github.com/tile-ai/TileOPs/blob/main/docs/development.md)
+- [GitHub](https://github.com/yyttt6/TileOPs)
+- [开发指南](https://github.com/yyttt6/TileOPs/blob/main/docs/development.md)

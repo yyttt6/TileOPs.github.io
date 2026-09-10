@@ -383,7 +383,7 @@ that TileOPs is too old.
 
 **Writing a kernel needs the manifest, not the TileOPs source.** A builder's signature
 is the op's manifest signature — `RMSNormFwdOp` in
-[`src/tileops/manifest/normalization.yaml`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/manifest/normalization.yaml):
+[`src/tileops/manifest/normalization.yaml`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/manifest/normalization.yaml):
 
 ```yaml
 signature:
@@ -600,7 +600,7 @@ author meets them:
 None of the seven depends on hardware and every target gets them identically; a
 third-party backend neither bypasses one nor substitutes its own.
 
-The kernels TileOPs ships ([`src/tileops/kernels/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/kernels)) are the **default
+The kernels TileOPs ships ([`src/tileops/kernels/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/kernels)) are the **default
 implementation**: they have no target name and are not in the registry.
 
 **The default state is no substitution.** With no backend claiming a device, calls on

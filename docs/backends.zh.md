@@ -314,7 +314,7 @@ docker run --rm --gpus all -v "$PWD/..":/work -w /work \
 
 ### 签名来自 manifest
 
-**编写 kernel 只需读 manifest，不必读 TileOPs 的源码。** builder 的签名就是该算子的 manifest 签名。以 [`src/tileops/manifest/normalization.yaml`](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/manifest/normalization.yaml) 里的 `RMSNormFwdOp` 为例：
+**编写 kernel 只需读 manifest，不必读 TileOPs 的源码。** builder 的签名就是该算子的 manifest 签名。以 [`src/tileops/manifest/normalization.yaml`](https://github.com/yyttt6/TileOPs/blob/main/src/tileops/manifest/normalization.yaml) 里的 `RMSNormFwdOp` 为例：
 
 ```yaml
 signature:
@@ -483,7 +483,7 @@ TileOPs 不解析 `torch.device`，而是把它原样传给 `detect`。这样做
 
 七项均与硬件无关，每个 target 得到的完全相同；接入第三方后端不得绕过其中任何一项，也不得另行实现。
 
-TileOPs 自带的 kernel（[`src/tileops/kernels/`](https://github.com/tile-ai/TileOPs/tree/main/src/tileops/kernels)）是**默认实现**：它没有 target 名，也不进注册表。
+TileOPs 自带的 kernel（[`src/tileops/kernels/`](https://github.com/yyttt6/TileOPs/tree/main/src/tileops/kernels)）是**默认实现**：它没有 target 名，也不进注册表。
 
 **默认状态是不替换。** 没有后端认领某块设备时，这台设备上的调用走自带实现；装上一个后端、并且它认领了这块设备，该算子的 kernel 才换成后端的那一套。协议里因此不存在「默认 target」这个概念。
 
