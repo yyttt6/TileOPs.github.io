@@ -1,0 +1,182 @@
+# tilelang-mlir-ascend 冻结测量
+
+<div class="mlir-scope-note"><p><strong>tilelang-mlir-ascend：跨进程冻结，池外绝对耗时。</strong> 测量日期：2026-09-14 UTC。保留 T302 三次独立样本最小 device_us，同 workload 多 variant 取最小值。未与我方在同一 profiler session 计时，禁止据此计算 MLIR vs 我方比值；不进入 D036 候选池、主比值或评级。空格表示此 workload 无可发布冻结测量。</p></div>
+
+
+可见算子 22/23；可见 workload 51/53（冻结表分母）。
+
+当前 coverage 截取时间: 2026-09-15T11:56:12.122641+00:00
+
+[T302 frozen table](t320-evidence/mlir_latency_table.json) · [Measurement receipts](t320-evidence/mlir_latency_receipts.json) · [Full enumeration](t320-evidence/01-enumeration.json) · [Source hashes](t320-evidence/input-manifest.json) · [Published XML](t320-evidence/bench_results.xml)
+
+Table SHA256: `46bdefb32460e1ca1566c39dfef54574262c751e3986c449ee600774e7f27a05`
+
+MLIR commit: `0f0809ddae52d661d2c2d5c7199930c33ec9a343`
+
+## AbsFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>elementwise-16M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="AbsFwdOp[elementwise-16M-float16]" data-device-us="192.625" data-measured-at="2026-09-14T14:00:56.007138+00:00"><strong>192.625 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/abs/abs_2d.py</code></td></tr>
+<tr><td><code>elementwise-256M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="AbsFwdOp[elementwise-256M-float16]" data-device-us="3449.75" data-measured-at="2026-09-14T13:20:22.662238+00:00"><strong>3449.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/abs/abs_2d.py</code></td></tr>
+</tbody></table></div>
+
+## AdaLayerNormFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="AdaLayerNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="4.0" data-measured-at="2026-09-14T12:49:06.859390+00:00"><strong>4.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>high_perf</code><br><code>examples/norm/ada_layer_norm_and_zero.py</code></td></tr>
+</tbody></table></div>
+
+## AdaLayerNormZeroFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="AdaLayerNormZeroFwdOp[llama-8b-decode-bfloat16]" data-device-us="4.75" data-measured-at="2026-09-14T12:50:55.109460+00:00"><strong>4.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>high_perf</code><br><code>examples/norm/ada_layer_norm_and_zero.py</code></td></tr>
+</tbody></table></div>
+
+## AddFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>hidden-state-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="AddFwdOp[hidden-state-prefill-bfloat16]" data-device-us="313.625" data-measured-at="2026-09-14T12:56:52.013043+00:00"><strong>313.625 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>example</code><br><code>examples/elementwise/example_elementwise_add.py</code></td></tr>
+<tr><td><code>hidden-state-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="AddFwdOp[hidden-state-prefill-float16]" data-device-us="154.0" data-measured-at="2026-09-14T14:50:22.596720+00:00"><strong>154.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/add/add_2d.py</code></td></tr>
+</tbody></table></div>
+
+## EluFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>mlp-hidden</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="EluFwdOp[mlp-hidden-bfloat16]" data-device-us="34.25" data-measured-at="2026-09-14T14:43:02.634974+00:00"><strong>34.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_elu.py</code></td></tr>
+<tr><td><code>mlp-hidden</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="EluFwdOp[mlp-hidden-float16]" data-device-us="30.75" data-measured-at="2026-09-14T14:07:23.437469+00:00"><strong>30.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_elu.py</code></td></tr>
+<tr><td><code>mlp-hidden-wide</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="EluFwdOp[mlp-hidden-wide-float16]" data-device-us="59.5" data-measured-at="2026-09-14T13:29:22.463265+00:00"><strong>59.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_elu.py</code></td></tr>
+</tbody></table></div>
+
+## FusedAddRMSNormFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-405b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-405b-prefill-bfloat16]" data-device-us="240.25" data-measured-at="2026-09-14T13:51:02.920549+00:00"><strong>240.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="2.0" data-measured-at="2026-09-14T13:00:54.479270+00:00"><strong>2.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-8b-prefill-bfloat16]" data-device-us="75.0" data-measured-at="2026-09-14T13:00:13.308224+00:00"><strong>75.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-8b-prefill-float16]" data-device-us="64.25" data-measured-at="2026-09-14T13:49:40.060214+00:00"><strong>64.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+</tbody></table></div>
+
+## GemmFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>square-1k-nn</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="GemmFwdOp[square-1k-nn-bfloat16]" data-device-us="45.875" data-measured-at="2026-09-14T14:27:25.834928+00:00"><strong>45.875 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>example_gemm</code><br><code>examples/gemm/example_gemm.py</code></td></tr>
+<tr><td><code>square-1k-nn</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="GemmFwdOp[square-1k-nn-float16]" data-device-us="45.75" data-measured-at="2026-09-14T13:03:22.196230+00:00"><strong>45.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>example_gemm</code><br><code>examples/gemm/example_gemm.py</code></td></tr>
+</tbody></table></div>
+
+## HardsigmoidFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>mbv3-se-gate-deep</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardsigmoidFwdOp[mbv3-se-gate-deep-float16]" data-device-us="16.375" data-measured-at="2026-09-14T13:35:49.622264+00:00"><strong>16.375 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardsigmoid.py</code></td></tr>
+<tr><td><code>mbv3-se-gate</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardsigmoidFwdOp[mbv3-se-gate-float16]" data-device-us="5.0" data-measured-at="2026-09-14T13:35:10.620951+00:00"><strong>5.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardsigmoid.py</code></td></tr>
+</tbody></table></div>
+
+## HardtanhFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>bounded-conv-feat</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardtanhFwdOp[bounded-conv-feat-float16]" data-device-us="51.0" data-measured-at="2026-09-14T13:34:13.338760+00:00"><strong>51.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardtanh.py</code></td></tr>
+<tr><td><code>bounded-hidden</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardtanhFwdOp[bounded-hidden-float16]" data-device-us="27.25" data-measured-at="2026-09-14T14:46:42.762288+00:00"><strong>27.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardtanh.py</code></td></tr>
+</tbody></table></div>
+
+## LayerNormFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LayerNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="33.5" data-measured-at="2026-09-14T13:53:24.442221+00:00"><strong>33.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>high_perf</code><br><code>examples/norm/layer_norm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LayerNormFwdOp[llama-8b-prefill-bfloat16]" data-device-us="95.25" data-measured-at="2026-09-14T13:52:57.270421+00:00"><strong>95.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>high_perf</code><br><code>examples/norm/layer_norm.py</code></td></tr>
+</tbody></table></div>
+
+## LeakyReluFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>gan-feat-deep</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LeakyReluFwdOp[gan-feat-deep-float16]" data-device-us="34.25" data-measured-at="2026-09-14T14:14:28.633142+00:00"><strong>34.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_leaky_relu.py</code></td></tr>
+<tr><td><code>gan-feat</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LeakyReluFwdOp[gan-feat-float16]" data-device-us="47.5" data-measured-at="2026-09-14T14:49:08.485871+00:00"><strong>47.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_leaky_relu.py</code></td></tr>
+</tbody></table></div>
+
+## LogSumExpFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>3d-multidim-reduce</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[3d-multidim-reduce-float16]" data-device-us="23.5" data-measured-at="2026-09-14T13:56:30.302360+00:00"><strong>23.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>attn-weights-32k</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[attn-weights-32k-bfloat16]" data-device-us="118.75" data-measured-at="2026-09-14T13:55:07.963960+00:00"><strong>118.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>attn-weights-4k</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[attn-weights-4k-bfloat16]" data-device-us="16.75" data-measured-at="2026-09-14T13:09:07.493767+00:00"><strong>16.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>attn-weights-4k</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[attn-weights-4k-float16]" data-device-us="16.5" data-measured-at="2026-09-14T13:54:11.925972+00:00"><strong>16.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>lm-head-logits</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[lm-head-logits-bfloat16]" data-device-us="13.75" data-measured-at="2026-09-14T14:31:14.160598+00:00"><strong>13.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>lm-head-logits</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[lm-head-logits-float16]" data-device-us="13.75" data-measured-at="2026-09-14T13:10:43.771533+00:00"><strong>13.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+</tbody></table></div>
+
+## MishFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>yolo-p3</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p3-bfloat16]" data-device-us="80.25" data-measured-at="2026-09-14T14:33:40.429612+00:00"><strong>80.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+<tr><td><code>yolo-p3</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p3-float16]" data-device-us="89.25" data-measured-at="2026-09-14T14:32:49.732298+00:00"><strong>89.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+<tr><td><code>yolo-p4</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p4-bfloat16]" data-device-us="47.0" data-measured-at="2026-09-14T14:35:21.315718+00:00"><strong>47.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+<tr><td><code>yolo-p4</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p4-float16]" data-device-us="46.875" data-measured-at="2026-09-14T14:34:30.503780+00:00"><strong>46.875 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+</tbody></table></div>
+
+## RMSNormFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-405b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-405b-prefill-float16]" data-device-us="16638.625" data-measured-at="2026-09-14T14:19:01.306121+00:00"><strong>16638.625 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py</code></td></tr>
+<tr><td><code>llama-70b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-70b-prefill-float16]" data-device-us="65.75" data-measured-at="2026-09-14T14:52:10.294956+00:00"><strong>65.75 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="2.0" data-measured-at="2026-09-14T13:41:23.071674+00:00"><strong>2.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-8b-prefill-bfloat16]" data-device-us="34.5" data-measured-at="2026-09-14T13:39:59.012034+00:00"><strong>34.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-8b-prefill-float16]" data-device-us="34.5" data-measured-at="2026-09-14T14:51:10.673744+00:00"><strong>34.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+</tbody></table></div>
+
+## ReluFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>hidden-state-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="ReluFwdOp[hidden-state-decode-bfloat16]" data-device-us="3.5" data-measured-at="2026-09-14T13:25:29.617243+00:00"><strong>3.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_relu.py</code></td></tr>
+<tr><td><code>hidden-state-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="ReluFwdOp[hidden-state-prefill-bfloat16]" data-device-us="28.0" data-measured-at="2026-09-14T14:04:56.683238+00:00"><strong>28.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_relu.py</code></td></tr>
+<tr><td><code>hidden-state-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="ReluFwdOp[hidden-state-prefill-float16]" data-device-us="27.5" data-measured-at="2026-09-14T14:04:29.629216+00:00"><strong>27.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_relu.py</code></td></tr>
+</tbody></table></div>
+
+## RopeLlama31FwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama31-1d-8k-d128</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RopeLlama31FwdOp[llama31-1d-8k-d128-bfloat16]" data-device-us="10.5" data-measured-at="2026-09-14T14:54:52.159164+00:00"><strong>10.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>rope_llama31</code><br><code>examples/posembedding/rope_llama31/rope_llama31.py</code></td></tr>
+</tbody></table></div>
+
+## RopeNeoxFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>neox-1d-4k-d128</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RopeNeoxFwdOp[neox-1d-4k-d128-bfloat16]" data-device-us="6.25" data-measured-at="2026-09-14T14:55:36.224370+00:00"><strong>6.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>rope_llama31_sf1</code><br><code>examples/posembedding/rope_llama31/rope_llama31.py</code></td></tr>
+</tbody></table></div>
+
+## SeluFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>snn-fc</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SeluFwdOp[snn-fc-float16]" data-device-us="28.0" data-measured-at="2026-09-14T14:09:06.497366+00:00"><strong>28.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_selu.py</code></td></tr>
+<tr><td><code>snn-fc-wide</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SeluFwdOp[snn-fc-wide-float16]" data-device-us="61.25" data-measured-at="2026-09-14T14:44:43.766027+00:00"><strong>61.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_selu.py</code></td></tr>
+</tbody></table></div>
+
+## SigmoidFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>elementwise-16M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SigmoidFwdOp[elementwise-16M-float16]" data-device-us="205.625" data-measured-at="2026-09-14T14:02:18.663956+00:00"><strong>205.625 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/Sigmoid/sigmoid_2d.py</code></td></tr>
+<tr><td><code>elementwise-256M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SigmoidFwdOp[elementwise-256M-float16]" data-device-us="3722.375" data-measured-at="2026-09-14T14:38:05.600721+00:00"><strong>3722.375 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/Sigmoid/sigmoid_2d.py</code></td></tr>
+</tbody></table></div>
+
+## SiluFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-ffn-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SiluFwdOp[llama-8b-ffn-prefill-float16]" data-device-us="365.5" data-measured-at="2026-09-14T14:03:43.588863+00:00"><strong>365.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/Silu/silu_2d.py</code></td></tr>
+</tbody></table></div>
+
+## SoftmaxFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>lm-head-logits</code></td><td>float32</td><td class="mlir-frozen" data-mlir-key="SoftmaxFwdOp[lm-head-logits-float32]" data-device-us="104.5" data-measured-at="2026-09-14T14:21:19.072509+00:00"><strong>104.5 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>autotune_2d</code><br><code>testing/autotune/softmax/softmax_2d.py</code></td></tr>
+</tbody></table></div>
+
+## SoftplusFwdOp
+
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>mlp-hidden</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SoftplusFwdOp[mlp-hidden-float16]" data-device-us="28.25" data-measured-at="2026-09-14T13:31:57.196126+00:00"><strong>28.25 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_softplus.py</code></td></tr>
+<tr><td><code>mlp-hidden-wide</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SoftplusFwdOp[mlp-hidden-wide-float16]" data-device-us="51.0" data-measured-at="2026-09-14T13:32:36.755362+00:00"><strong>51.0 µs</strong><br><small>tilelang-mlir-ascend<br>跨进程冻结；测量 2026-09-14 UTC<br>绝对耗时</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_softplus.py</code></td></tr>
+</tbody></table></div>
+
+## 未显示的冻结 workload
+
+<table><thead><tr><th>Workload</th><th>Reason</th></tr></thead><tbody>
+<tr><td><code>Relu6FwdOp[hidden-state-prefill-bfloat16]</code></td><td>not in current published coverage</td></tr>
+<tr><td><code>Relu6FwdOp[hidden-state-prefill-float16]</code></td><td>not in current published coverage</td></tr>
+</tbody></table>
