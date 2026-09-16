@@ -283,7 +283,7 @@ _METRIC_SUFFIXES = (
     "runner_up_latency_ms", "handwritten_latency_ms",
     "latency_ms", "gap_ms",
     "uncounted_copy_ms", "bandwidth_tbs", "tflops", "ratio", "n_kernels",
-    "n_samples", "flops", "bytes", "compute_roof", "dtype", "timing",
+    "n_samples", "n_trials", "flops", "bytes", "compute_roof", "dtype", "timing",
     "variant",
     # D036: who the comparison group was, who won it, and what it held. The
     # harness has written `_us` for the two runner-up/handwritten times and
@@ -298,7 +298,7 @@ _NUMERIC_METRICS = {
     "device_busy_ms", "device_busy_p10_ms", "device_busy_p90_ms",
     "latency_ms", "latency_p10_ms", "latency_p90_ms", "gap_ms",
     "uncounted_copy_ms", "tflops", "bandwidth_tbs", "ratio", "flops",
-    "bytes", "n_kernels", "n_samples",
+    "bytes", "n_kernels", "n_samples", "n_trials",
     "pool_size", "runner_up_us", "runner_up_latency_ms",
     "handwritten_us", "handwritten_latency_ms",
 }
@@ -569,9 +569,13 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
             for c in json.loads(base["pool_json"])]
     m["pool_refused"] = base.get("refused", "")
     m["measurement_note"] = base.get("measurement_note", "")
-    m["eager_pool_ratio"] = base.get("eager_pool_ratio")
-    m["eager_pool_name"] = base.get("eager_pool_name")
-    m["eager_pool_note"] = base.get("eager_pool_note")
+    # Older publishers hard-code n=3 in this one specific note. The receipt's
+    # explicit count is authoritative; unrelated measurement warnings survive.
+    if m["measurement_note"].startswith(
+            "MLIR cross-process yardstick corrected; n=3 < N>=5; provisional;"):
+        n = base.get("n_trials")
+        if isinstance(n, (int, float)):
+            m["measurement_note"] = (f"MLIR n={n:g} < 5 · provisional" if n < 5 else "")
     m["pool_winner"] = base.get("name") or None
     m["pool_selection"] = base.get("selection") or None
     m["prov_tier"] = base.get("tier") or None
@@ -582,11 +586,6 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
     # comparable to the captured headline. Never splice session times.
     hw_ms = _ms_of(base, "handwritten_latency_ms", "handwritten_us")
     m["hw"] = {"name": base.get("handwritten") or None, "ms": hw_ms}
-    m["hw_ratio"] = (
-        _pos(base.get("handwritten_ratio_in_selection_session"))
-        if base.get("handwritten_selection_regime") == "uncaptured_callable"
-        else None
-    )
     return m
 
 
@@ -695,10 +694,7 @@ STRINGS = {
             "what a tier means."
         ),
         "alt.basis": "basis",
-        "alt.basis_title": (
-            "The member of the pool the Ratio column divides by: the fastest one "
-            "measured on this workload."
-        ),
+        'alt.basis_title': 'The candidate used as the baseline in the headline measurement regime.',
         "alt.untimed_title": (
             "The pool line recorded no time for this candidate. The figure shown, "
             "marked *, is the baseline latency the run published separately. Not a "
@@ -707,12 +703,6 @@ STRINGS = {
         "alt.untimed_empty_title": (
             "Not timed: the pool line recorded no time for this candidate, and the "
             "run published none elsewhere. Not a measurement of zero."
-        ),
-        "alt.hw_ratio": "open-src (selection session, uncaptured; separate from headline)",
-        "alt.hw_ratio_title": (
-            "Fastest open-source candidate divided by ours in the same selection "
-            "session, using uncaptured callables. Separate measurement regime "
-            "from the captured graph headline; excluded from headline grading."
         ),
         # --- The data pages' titles, in DATA_PAGES order
         "page.attention.title": "Attention",
@@ -723,14 +713,7 @@ STRINGS = {
         # --- A data page's own prose
         "data.tally": "**{n_ops} ops, {n_workloads} workloads** — {tally}.",
         "data.tally_single": "**{n_ops} ops, {n_workloads} workloads.**",
-        "data.intro": (
-            "One table per op, one row per workload. `Ratio` is the fastest other "
-            "implementation's device time divided by ours, so <span "
-            "class=\"perf-ahead\">green</span> is faster than it, <span "
-            "class=\"perf-par\">plain</span> is level with it, <span "
-            "class=\"perf-behind\">red</span> is slower. Times are in ms. "
-            "{reading_link}."
-        ),
+        'data.intro': 'One table per op, one row per workload. `Ratio` is the baseline device time divided by ours in the same measurement regime, so <span class="perf-ahead">green</span> is faster than it, <span class="perf-par">plain</span> is level with it, <span class="perf-behind">red</span> is slower. Times are in ms. {reading_link}.',
         # --- The environment block
         "env.heading": "Environment",
         "env.missing.title": "The run did not publish its environment",
@@ -778,12 +761,7 @@ STRINGS = {
             "target set; unconnected targets retain empty tables. Unrated rows "
             "have no measured comparison or only an eager reference."
         ),
-        "index.coverage.pool": (
-            "**Each op is raced against a pool, not against one fixed opponent.** "
-            "Every baseline the harness could build for a workload is timed on "
-            "that workload, and the fastest of them becomes the baseline the "
-            "ratio divides by. The row lists the whole pool, fastest first."
-        ),
+        'index.coverage.pool': '**Each op is raced against a pool.** The fastest eligible candidate in the headline measurement regime becomes its baseline. The row lists all candidates with their individual times and provenance tiers.',
         "index.coverage.handwritten": (
             "**{n_hw} of {total} ops** have a tier-1 open-source baseline in "
             "their pool at all — a kernel built from the source of a third-party Ascend operator library, "
@@ -820,30 +798,14 @@ STRINGS = {
         ),
         # --- The reading page: who the comparison group is (D036)
         "reading.baseline.heading": "Who the comparison is against",
-        "reading.baseline.formula": (
-            "`Ratio` is **the strongest of ours divided by the strongest of the "
-            "comparison group**, taken separately for every (op, workload, "
-            "dtype). Neither side is a choice made once for the op: both are "
-            "resolved per row, on that row's own shape and dtype."
-        ),
-        "reading.baseline.pool": (
-            "The two halves of that choice are made by different authorities, on "
-            "purpose. **Which implementations may enter the comparison group** is "
-            "decided by the baseline document, per op family — it is what admits "
-            "a kernel as a legitimate opponent at all. **Which one of them "
-            "becomes the baseline** is decided by measurement: every admitted "
-            "candidate is built and timed on that exact workload, and the fastest "
-            "wins. The `Alternatives` column is that pool, fastest first, with "
-            "the winner marked `basis`."
-        ),
+        'reading.baseline.formula': '`Ratio` = **baseline device time ÷ our device time**, for the same measurement regime and each (op, workload, dtype). Both sides are selected for that row’s own shape and dtype.',
+        'reading.baseline.pool': 'The baseline document decides which implementations may enter the comparison group. Measurement selects the fastest eligible candidate in the headline regime on the exact workload. The `Alternatives` column lists the candidates and marks the selected baseline as `basis`.',
         "reading.baseline.tier1": (
-            "The stricter reading is on the page too. A pool may hold both a "
-            "open-source kernel and a vendor one, and the open-source one "
-            "often loses. Where it does, the row carries a second, muted figure "
-            "under the graded ratio, labelled `hw`: **the ratio against the "
-            "fastest open-source candidate alone.** Quote that one for a claim "
-            "about open-source libraries, and the graded one for a claim about "
-            "the fastest implementation available."
+            "The `Alternatives` column lists every candidate's name, provenance "
+            "tier and measured device time, including open-source candidates. "
+            "Each row displays one ratio in the headline measurement regime. "
+            "MLIR candidates marked `eager` were measured without graph capture; "
+            "their times do not replace a captured graph baseline."
         ),
         "reading.baseline.single": (
             "A pool of one is written `single_candidate`: only one opponent could "
@@ -917,27 +879,14 @@ STRINGS = {
         ),
         "reading.columns.ratio": (
             "`alt / ours` — the baseline's device time divided by ours, the one "
-            "number the colour grades. A second, muted figure labelled `hw` "
-            "appears under it wherever an open-source candidate ran and lost the "
-            "pool: the tier-1-only reading of that same row."
+            "number the colour grades. Candidate names, tiers and individual "
+            "times are listed in `Alternatives`."
         ),
         "reading.columns.device_time": (
             "Milliseconds the device spent executing the call's kernels — the "
             "union of their intervals. Every comparison on these pages uses it."
         ),
-        "reading.columns.alternatives": (
-            "One line per implementation the comparison group held for this "
-            "workload, fastest first, each with its own device time in ms and "
-            "its provenance tier. The line marked `basis` is the one `Ratio` "
-            "divides by. A name is shown by its identifying head — hover it for "
-            "the full binding, template instantiation and all. Divide any line "
-            "by our device time to get the ratio against that one. Where a run "
-            "publishes no pool, the lines are the named baselines it timed: a "
-            "tuned library kernel (`fla`, `mamba`, `fa3`, `triton`, …), a native "
-            "PyTorch op (`{torch}`), or a name ending in `-{ref}` — an eager "
-            "composition of PyTorch ops, which is not a bar worth reporting a win "
-            "against."
-        ),
+        'reading.columns.alternatives': 'One line per candidate, with its device time in ms and provenance tier. The line marked `basis` supplies the baseline for the headline ratio. Hover a shortened name to see its full binding. Times from different measurement regimes, including candidates marked `eager`, must be read in their own regime. Where a run publishes no pool, the lines are the named baselines it timed: tuned library kernels (`fla`, `mamba`, `fa3`, `triton`, …), native PyTorch ops (`{torch}`), or eager reference compositions whose names end in `-{ref}`.',
         "reading.columns.throughput": (
             "TFLOP/s: required FLOPs / device time. The count is analytic — the "
             "op's `eval_roofline` formula evaluated on the workload's own shapes, "
@@ -1087,11 +1036,9 @@ STRINGS = {
         "tier.agent_written": "Agent 编写 kernel",
         "tier.title": "这一档说的是这个 kernel 的来源，不是谁更快。点击查看档位的定义。",
         "alt.basis": "基准",
-        "alt.basis_title": "「比值」那一列除的就是它：这个工作负载上实测最快的那个候选。",
+        'alt.basis_title': '主测量口径所选的基准候选。',
         "alt.untimed_title": "候选池那一行没有记下这个候选的时间。这里显示的（带 * 的）是本次运行另外发布的基线耗时。**它不是「测出来是零」。**",
         "alt.untimed_empty_title": "没有计时：候选池那一行没有记下这个候选的时间，本次运行别处也没有。**这不是「测出来是零」。**",
-        "alt.hw_ratio": "开源库（选择场次、未捕获；与主比值口径不同）",
-        "alt.hw_ratio_title": "最快开源库候选与我方在同一选择场次、未捕获 callable 下的耗时之比。与 graph 捕获后的主比值属于不同测量口径，不参与主比值评级。",
         "page.attention.title": "Attention",
         "page.linear-attention.title": "Linear Attention 与 SSM",
         "page.gemm-moe.title": "GEMM、MoE 与量化",
@@ -1099,7 +1046,7 @@ STRINGS = {
         "page.norm-conv-pool.title": "Norm、Conv、Pool 及其它",
         "data.tally": "**{n_ops} 个算子，{n_workloads} 个工作负载** —— {tally}。",
         "data.tally_single": "**{n_ops} 个算子，{n_workloads} 个工作负载。**",
-        "data.intro": "每个算子一张表，每个工作负载一行。`比值` 是最快的其它实现的耗时除以我们的耗时，所以 <span class=\"perf-ahead\">绿色</span> 表示我们更快，<span class=\"perf-par\">无色</span> 表示持平，<span class=\"perf-behind\">红色</span> 表示我们更慢。时间单位是 ms。{reading_link}。",
+        'data.intro': '每个算子一张表，每个工作负载一行。`比值` 是同一测量口径下基准的耗时除以我们的耗时，所以 <span class="perf-ahead">绿色</span> 表示我们更快，<span class="perf-par">无色</span> 表示持平，<span class="perf-behind">红色</span> 表示我们更慢。时间单位是 ms。{reading_link}。',
         "env.heading": "运行环境",
         "env.missing.title": "本次运行没有发布它的环境信息",
         "env.missing.body": "没有它，本页任何一个数字都无法和产出它的机器与软件栈对应起来。night-bench 的发布步骤通过 [`meta.json`]({url}) 填写这一段。",
@@ -1116,7 +1063,7 @@ STRINGS = {
         "index.snapshot.rendered": "页面渲染于 {rendered}，数据取自[最新快照]({url})。",
         "index.coverage.heading": "覆盖情况",
         "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是本页展示的目标集合；阶段一未接入的算子保留空表。未评级的行没有实测比较，或只有 eager 参考实现。",
-        "index.coverage.pool": "**每个算子对的是一个候选池，不是一个事先定死的对手。** 一个工作负载上，harness 能建起来的每一个基线都在它上面实测一遍，**最快的那个**才成为比值的分母。整个候选池都列在对应那一行上，最快的在前。",
+        'index.coverage.pool': '**每个算子对的是一个候选池。** 主测量口径下符合准入条件的最快候选成为基准。整行保留所有候选及其各自耗时和来源档位。',
         "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 开源库基线 —— 也就是从第三方 Ascend 算子库的源码编出来的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「第三方算子库」的说法都应该引这个数**。",
         "index.coverage.tilelang_ref": "**{n_tl}/{total} 个算子**的已发布候选池中实测包含 `tilelang-ascend`（`tilelang_ref` 档位）；与上面的开源候选覆盖数可能重叠。",
         "index.coverage.vendor_only": "**剩下 {total} 里的 {n_vendor} 个**，候选池里只有厂商库实现 —— CANN 内置算子，或 torch_npu 自己的分发。这些行仍然是在完全相同的工作负载上与一个真实实现比较，但**在那里赢了不等于赢过第三方算子库**。每一行的来源徽章会说清它到底是哪一档。",
@@ -1128,9 +1075,9 @@ STRINGS = {
         "reading.title": "这些数字是怎么来的",
         "reading.intro": "每个数据页只回答一个问题：**在同一个工作负载上，TileOPs 与同一算子最快的其它实现相比如何？** 每个算子一张表，每个工作负载一行。**不做跨工作负载的平均** —— 页面上每一个数字都只属于一个具体的 shape 和 dtype。",
         "reading.baseline.heading": "对照的是谁",
-        "reading.baseline.formula": "`比值` = **我们这边最强的 ÷ 对照组里最强的**，按每一个 (算子, 工作负载, dtype) **分别**取。两边都不是「给这个算子定一次就完了」：每一行都在它自己的 shape 和 dtype 上重新决定一次。",
-        "reading.baseline.pool": "这个选择的两半，**故意由两个不同的权威决定**。**哪些实现有资格进对照组**，由基线文档按算子族裁定 —— 它管的是「一个 kernel 算不算正当对手」。**它们当中哪一个成为基准**，由实测决定：每个获准的候选都在那个确切的工作负载上现建、现测，**最快的赢**。`对照实现` 那一列就是这个候选池，最快的在前，赢家标着 `基准`。",
-        "reading.baseline.tier1": "**更严的那个口径也在页面上。** 一个候选池里可能同时有开源库 kernel 和厂商库 kernel，而**开源库那一侧经常输**。凡是输了的行，在被评级的比值下面还有一个灰色的第二个数，标着 `开源库`：**只跟最快的开源库候选比出来的比值**。谈「第三方算子库」时引这一个，谈「现有最快实现」时引被评级的那一个。",
+        'reading.baseline.formula': '`比值` = **基准耗时 ÷ 我们的耗时**，在同一测量口径下，按每个 (算子, 工作负载, dtype) 分别计算。两边都按该行的 shape 和 dtype 选择实现。',
+        'reading.baseline.pool': '基线文档决定哪些实现有资格进入对照组。实测在确切工作负载上，选择主测量口径下符合准入条件的最快候选。「对照实现」列保留各候选，所选基准标为 `基准`。',
+        "reading.baseline.tier1": "「对照实现」列保留每个候选的名称、来源档位和实测耗时，包括开源库候选。每行只显示主测量口径的一个比值。标为 `eager` 的 MLIR 候选未经 graph 捕获，其耗时不替代 graph 主比值的基准。",
         "reading.baseline.single": "只有一个候选的池，harness 记作 `single_candidate`：那个工作负载上只建得起一个对手。它**仍然是一次实测比较** —— 只是没有可比的第二家。",
         "reading.tier.heading": "档位是什么意思",
         "reading.tier.intro": "`对照实现` 里的每一行都带一个档位。**档位记录的是这个 kernel 的来源，它完全不说明谁更快。**",
@@ -1153,9 +1100,9 @@ STRINGS = {
         "reading.columns.col_column": "列",
         "reading.columns.col_meaning": "含义",
         "reading.columns.workload": "`W1`、`W2`、… —— 每张表上方的图例会把每一个展开：benchmark 自己给它的 id、它跑的 dtype，以及每个输入张量（写成 `名称: shape, dtype`）。形状相同的张量并列在一起，但**各自带自己的 dtype**，所以一个 `bool` 的 `mask` 会在被读到的地方就标明。张量之后是那些**决定算子规模但不决定形状**的维度（GEMM 的 `m`/`n`/`k`，MoE 路由的 `num_experts`），再往后是灰色的、调用时**没有沿用签名默认值**的参数。已经能由其它量确定的不再重复 —— 例如 `max_seqlen_q` 就是 `max(q_lens)`。",
-        "reading.columns.ratio": "`对照 / 我们` —— **基准**的耗时除以我们的耗时。**颜色评的就是这一个数。** 凡是有开源库候选跑了却输掉候选池的行，它下面还有一个灰色的、标着 `开源库` 的数：同一行的 **tier-1 口径**。",
+        "reading.columns.ratio": "`对照 / 我们` —— **基准**的耗时除以我们的耗时。**颜色评的就是这一个数。** 各候选的名称、档位和逐候选耗时见「对照实现」列。",
         "reading.columns.device_time": "本次调用在 device 上执行它各个 kernel 的**区间并集**，单位毫秒。本页所有比较都用它。每个工作负载另存了一份 host 挂钟读数作端到端参考 —— 两者之差约 40–50 µs，所以**便宜的工作负载用 host 计时会把比值推向 1.0**。详见「测量方法」一节。",
-        "reading.columns.alternatives": "对照组在这个工作负载上握有的每一个实现占一行，最快的在前，各自带自己的耗时（ms）**和来源档位**。标着 `基准` 的那一行就是 `比值` 除的那个。名字只显示它的**识别头部** —— 鼠标悬停可看完整绑定，含 C++ 模板实例化全文。把任意一行除以我们的耗时，就得到对它的比值。**如果某次运行没有发布候选池**，这些行就是它实测过的具名基线：调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` …）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的实现 —— 那是若干 PyTorch 算子的 eager 拼装，**赢过它不值得作为成绩报告**。",
+        'reading.columns.alternatives': '每个候选占一行，各自带耗时（ms）和来源档位。标为 `基准` 的候选用于主比值。名称缩写可悬停查看完整绑定。不同测量口径的耗时应按各自口径解读，包括标为 `eager` 的候选。若运行未发布候选池，则显示实测的具名基线：调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` 等）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的 eager 参考拼装实现。',
         "reading.columns.throughput": "TFLOP/s：所需 FLOPs ÷ 耗时。这个 FLOP 数是**解析算出来的** —— 用算子的 `eval_roofline` 公式代入该工作负载自己的 shape，**不是硬件计数器** —— 所以它算的是**问题本身要求的工作量**，不是 kernel 实际发出的指令。padding、重算、被 mask 掉的 tile 在这里都看不见；这个数**只在同一算子、同一工作负载的不同实现之间可比**。",
         "reading.columns.sol": "占算法光速（speed-of-light）的比例：该工作负载在物理上最快可能的时间 ÷ 我们的耗时。`比值` 那一列说的是**今天有没有人比我们快**；SOL 说的是**任何人最多还能快多少**。详见下文。",
         "reading.columns.bound": "决定这个工作负载下限的资源：`mem`（HBM 搬运）、`comp`（计算吞吐），或 `lat` —— 工作负载太小，模型无法判定，它的 SOL 数字也会随之置灰。",
@@ -1602,10 +1549,19 @@ def _pool_name_cell(c: dict, is_pick: bool, lang: str) -> str:
                 f' title="{html.escape(_S(lang, "alt.basis_title"), quote=True)}">'
                 f'{html.escape(_S(lang, "alt.basis"))}</span>')
     note = c.get("tier_note")
+    if note and c.get("external"):
+        n = c.get("n")
+        threshold = (f" n={n}; below N>=5 publication threshold."
+                     if isinstance(n, (int, float)) and n < 5 else "")
+        note = re.sub(r"\s*n=\d+; below N>=5 publication threshold\.", threshold, note)
     evidence = (f' <abbr title="{html.escape(note, quote=True)}">ⓘ</abbr>'
                 if note else "")
     if c.get("external"):
-        evidence += f' <small>eager · n={c["n"]} &lt; 5 · provisional</small>'
+        n = c.get("n")
+        sample_note = (f'n={n} &lt; 5 · provisional' if isinstance(n, (int, float)) and n < 5
+                       else f'n={n}' if isinstance(n, (int, float)) and n >= 5
+                       else 'n=unknown · provisional')
+        evidence += f' <small>eager · {sample_note}</small>'
     return body + _tier_badge(c["prov"], lang, c["name"]) + evidence + pick
 
 
@@ -1672,20 +1628,7 @@ def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
                       rated=bool(real) and not m.get("measurement_note"))
     if m.get("measurement_note"):
         gap += (f'<br><small title="{html.escape(m["measurement_note"], quote=True)}">'
-                'n=3 &lt; 5 · provisional</small>')
-    if m.get("eager_pool_ratio"):
-        title = html.escape(m.get("eager_pool_note") or "", quote=True)
-        name = html.escape(_short_candidate(m["eager_pool_name"], None))
-        gap += (f'<br><small title="{title}">Eager best pool: {name} '
-                f'{_speed(m["eager_pool_ratio"])} · MLIR n=3 &lt; 5</small>')
-    # This auxiliary reading is explicitly labelled with its selection session
-    # and uncaptured regime in visible text, not just a hover tooltip.
-    # It never participates in the headline rating.
-    if m.get("hw_ratio") and m.get("prov_tier") != PROV_HANDWRITTEN:
-        gap = _stack([gap, f'<span class="perf-unrated"'
-                           f' title="{html.escape(_S(lang, "alt.hw_ratio_title"), quote=True)}">'
-                           f'{html.escape(_S(lang, "alt.hw_ratio"))} '
-                           f'{_speed(m["hw_ratio"])}</span>'])
+                f'{html.escape(m["measurement_note"])}</small>')
     return (
         "<tr>"
         f'<td class="colsep"><b>{code}</b></td>'
@@ -1754,11 +1697,13 @@ def method_block(lang: str = DEFAULT_LANG) -> list[str]:
                                        "method.excluded",
                                        "method.device_time")),
         ("- MLIR 对手在子进程测量，以父子进程共同 case 标尺的中位数之比校正；"
-         "仅进入 eager 池。冻结收据 n=3 < N≥5，展示的比值为待验收结果，不计入达标数。"
+         "每轮同时测量 case 与固定 global 标尺。仅进入 eager 池；候选旁标明实际 N，"
+         "N<5 或样本数未知的候选保留 provisional 标注，不计入达标数。"
          if lang == "zh" else
          "- MLIR opponents are measured in a subprocess and corrected by the ratio "
-         "of common case-yardstick medians. They enter the eager pool only. Frozen "
-         "receipts have n=3 < N≥5; their ratios are provisional and do not count as attainment."),
+         "of common case-yardstick medians, with fresh case and fixed global yardsticks "
+         "in every round. They enter the eager pool only. Each candidate shows its actual N; "
+         "N<5 or unknown counts remain provisional and do not count as attainment."),
         "",
     ]
 
