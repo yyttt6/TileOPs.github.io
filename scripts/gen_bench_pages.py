@@ -273,6 +273,7 @@ def dtype_of(config_name: str) -> str | None:
 # so a metric added on the TileOPs side appears here without a code change.
 # Longer suffixes come first: device_busy_p10_ms must not match as latency_ms.
 _METRIC_SUFFIXES = (
+    "eager_pool_ratio", "eager_pool_name", "eager_pool_note",
     "handwritten_ratio_in_selection_session", "handwritten_selection_regime",
     "device_busy_p10_ms", "device_busy_p90_ms", "device_busy_ms",
     "latency_p10_ms", "latency_p90_ms",
@@ -288,10 +289,11 @@ _METRIC_SUFFIXES = (
     # harness has written `_us` for the two runner-up/handwritten times and
     # `_latency_ms` for them at different points; both spellings are read, and
     # `pool_size` comes before `pool` for the same reason as above.
-    "name", "tier", "selection", "pool_size", "pool",
+    "measurement_note", "name", "tier", "selection", "pool_size", "pool_json", "pool", "refused",
     "runner_up_us", "runner_up", "handwritten_us", "handwritten",
 )
 _NUMERIC_METRICS = {
+    "eager_pool_ratio",
     "handwritten_ratio_in_selection_session",
     "device_busy_ms", "device_busy_p10_ms", "device_busy_p90_ms",
     "latency_ms", "latency_p10_ms", "latency_p90_ms", "gap_ms",
@@ -556,6 +558,20 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
     # --- D036: the pool behind the one baseline the ratio used --------------
     base = w["impls"].get(_LEGACY_TAG, {})
     m["pool"] = parse_pool(base.get("pool", ""))
+    if base.get("pool_json"):
+        # Structured evidence cannot be mistaken for a candidate by splitting
+        # semicolons, equals signs or parentheses inside a tier/refusal note.
+        m["pool"] = [
+            {"name": c["name"], "prov": c.get("tier"),
+             "ms": None if c.get("device_us") is None else c["device_us"] / 1000,
+             "tier_note": c.get("tier_note", ""), "raw_time": "",
+             "external": c.get("in_process") is False, "n": c.get("n")}
+            for c in json.loads(base["pool_json"])]
+    m["pool_refused"] = base.get("refused", "")
+    m["measurement_note"] = base.get("measurement_note", "")
+    m["eager_pool_ratio"] = base.get("eager_pool_ratio")
+    m["eager_pool_name"] = base.get("eager_pool_name")
+    m["eager_pool_note"] = base.get("eager_pool_note")
     m["pool_winner"] = base.get("name") or None
     m["pool_selection"] = base.get("selection") or None
     m["prov_tier"] = base.get("tier") or None
@@ -618,11 +634,13 @@ def op_summary(metrics: list[dict]) -> dict:
         and c.get("name", "").startswith("tilelang-ascend:")
         and c.get("ms") is not None
         for m in metrics for c in m.get("pool", []))
+    s["mlir_ref"] = any(c.get("external") for m in metrics for c in m.get("pool", []))
 
-    tag, ratio = best_rival(metrics, (TIER_LIB, TIER_TORCH))
+    rated_metrics = [m for m in metrics if not m.get("measurement_note")]
+    tag, ratio = best_rival(rated_metrics, (TIER_LIB, TIER_TORCH))
     ref_only = False
     if tag is None:
-        tag, ratio = best_rival(metrics, (TIER_REF,))
+        tag, ratio = best_rival(rated_metrics, (TIER_REF,))
         ref_only = tag is not None
     s.update(rival=tag, speedup=ratio, rival_ref_only=ref_only)
 
@@ -756,10 +774,9 @@ STRINGS = {
         "index.coverage.heading": "Coverage",
         "index.coverage.rated": (
             "**{rated} of {total} ops** are rated against a real alternative "
-            "measured on the identical workload. The denominator is the ops "
-            "**this snapshot benchmarked**, not everything TileOPs declares. The "
-            "rest run against an eager reference only, which is not a bar worth "
-            "reporting a win against."
+            "measured on the identical workload. The denominator is the displayed "
+            "target set; unconnected targets retain empty tables. Unrated rows "
+            "have no measured comparison or only an eager reference."
         ),
         "index.coverage.pool": (
             "**Each op is raced against a pool, not against one fixed opponent.** "
@@ -1098,7 +1115,7 @@ STRINGS = {
         "index.snapshot.run_link": " · [本次运行]({url})",
         "index.snapshot.rendered": "页面渲染于 {rendered}，数据取自[最新快照]({url})。",
         "index.coverage.heading": "覆盖情况",
-        "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是**本次快照实际跑过的算子数**，不是 TileOPs 声明的全部算子。其余只与 eager 参考实现比较，**赢过它不值得作为成绩报告**。",
+        "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是本页展示的目标集合；阶段一未接入的算子保留空表。未评级的行没有实测比较，或只有 eager 参考实现。",
         "index.coverage.pool": "**每个算子对的是一个候选池，不是一个事先定死的对手。** 一个工作负载上，harness 能建起来的每一个基线都在它上面实测一遍，**最快的那个**才成为比值的分母。整个候选池都列在对应那一行上，最快的在前。",
         "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 开源库基线 —— 也就是从第三方 Ascend 算子库的源码编出来的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「第三方算子库」的说法都应该引这个数**。",
         "index.coverage.tilelang_ref": "**{n_tl}/{total} 个算子**的已发布候选池中实测包含 `tilelang-ascend`（`tilelang_ref` 档位）；与上面的开源候选覆盖数可能重叠。",
@@ -1543,7 +1560,7 @@ _POOL_REACH = (" -> ", " / ")
 def _short_candidate(name: str, prov: str | None) -> str:
     if prov == PROV_TILELANG_REF and name.startswith("tilelang-ascend:"):
         return "tilelang-ascend"
-    short = name
+    short = name.split()[0] if ":" in name.split()[0] else name
     for sep in _POOL_REACH:
         short = short.split(sep)[0].strip()
     # `torch_npu eager (vendor)` carries its own tier in its name, and the badge
@@ -1584,7 +1601,12 @@ def _pool_name_cell(c: dict, is_pick: bool, lang: str) -> str:
         pick = (f' <span class="alt-pick"'
                 f' title="{html.escape(_S(lang, "alt.basis_title"), quote=True)}">'
                 f'{html.escape(_S(lang, "alt.basis"))}</span>')
-    return body + _tier_badge(c["prov"], lang, c["name"]) + pick
+    note = c.get("tier_note")
+    evidence = (f' <abbr title="{html.escape(note, quote=True)}">ⓘ</abbr>'
+                if note else "")
+    if c.get("external"):
+        evidence += f' <small>eager · n={c["n"]} &lt; 5 · provisional</small>'
+    return body + _tier_badge(c["prov"], lang, c["name"]) + evidence + pick
 
 
 def _pool_time_cell(c: dict, fallback_ms: float | None, lang: str) -> str:
@@ -1614,9 +1636,12 @@ def _pool_cells(m: dict, lang: str) -> tuple[str, str]:
     # taking the first line means the mark cannot drift from the number the
     # ratio used if the pool is ever written in another order.
     pick = names.index(m["pool_winner"]) if m["pool_winner"] in names else 0
+    refused = m.get("pool_refused")
+    evidence = (f' <abbr title="{html.escape(refused, quote=True)}">ⓘ</abbr>'
+                if refused else "")
     return (
         _stack([_pool_name_cell(c, i == pick, lang)
-                for i, c in enumerate(pool)], pick),
+                for i, c in enumerate(pool)], pick) + evidence,
         _stack([_pool_time_cell(c, m["baseline_ms"] if i == pick else None, lang)
                 for i, c in enumerate(pool)], pick),
     )
@@ -1644,7 +1669,15 @@ def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
     weak = [r for _, r in ordered if r["tier"] == TIER_REF and r["speedup"]]
     gap = _ratio_cell(real[0]["speedup"] if real else
                       weak[0]["speedup"] if weak else None,
-                      rated=bool(real))
+                      rated=bool(real) and not m.get("measurement_note"))
+    if m.get("measurement_note"):
+        gap += (f'<br><small title="{html.escape(m["measurement_note"], quote=True)}">'
+                'n=3 &lt; 5 · provisional</small>')
+    if m.get("eager_pool_ratio"):
+        title = html.escape(m.get("eager_pool_note") or "", quote=True)
+        name = html.escape(_short_candidate(m["eager_pool_name"], None))
+        gap += (f'<br><small title="{title}">Eager best pool: {name} '
+                f'{_speed(m["eager_pool_ratio"])} · MLIR n=3 &lt; 5</small>')
     # This auxiliary reading is explicitly labelled with its selection session
     # and uncaptured regime in visible text, not just a hover tooltip.
     # It never participates in the headline rating.
@@ -1720,6 +1753,12 @@ def method_block(lang: str = DEFAULT_LANG) -> list[str]:
         *("- " + _S(lang, k) for k in ("method.one_process", "method.budget",
                                        "method.excluded",
                                        "method.device_time")),
+        ("- MLIR 对手在子进程测量，以父子进程共同 case 标尺的中位数之比校正；"
+         "仅进入 eager 池。冻结收据 n=3 < N≥5，展示的比值为待验收结果，不计入达标数。"
+         if lang == "zh" else
+         "- MLIR opponents are measured in a subprocess and corrected by the ratio "
+         "of common case-yardstick medians. They enter the eager pool only. Frozen "
+         "receipts have n=3 < N≥5; their ratios are provisional and do not count as attainment."),
         "",
     ]
 
@@ -1769,7 +1808,8 @@ def index_page(args, meta: dict, rows: list[tuple],
                   "- " + _S(lang, "index.coverage.tilelang_ref",
                             n_tl=sum(bool(s.get("tilelang_ref")) for _, _, s, _, _ in rows),
                             total=total)]
-        n_vendor = sum(not s.get("handwritten") and not s.get("tilelang_ref")
+        n_vendor = sum(bool(s["workloads"]) and not s.get("handwritten")
+                       and not s.get("tilelang_ref") and not s.get("mlir_ref")
                        for _, _, s, _, _ in rows)
         if n_vendor:
             lines.append("- " + _S(lang, "index.coverage.vendor_only",
@@ -2016,6 +2056,11 @@ def main():
             meta = json.load(f)
 
     workloads, failures, skips = parse_bench_xml(args.bench_xml)
+    scope = json.loads(ET.parse(args.bench_xml).getroot().get("phase_one_ops", "null"))
+    if scope is not None:
+        workloads = [w for w in workloads if w["op"] in scope]
+        failures = [w for w in failures if w["op"] in scope]
+        skips = [w for w in skips if w["op"] in scope]
     tests = (parse_test_xml(args.test_xml)
              if args.test_xml and os.path.exists(args.test_xml) else {})
 
@@ -2063,6 +2108,10 @@ def main():
     metrics_by_op: dict[str, list[dict]] = defaultdict(list)
     workloads_of: dict[str, list[dict]] = defaultdict(list)
     module_of: dict[str, str | None] = {}
+    # An unconnected stage-one operator is progress information: render its
+    # heading and empty table even when no coverage file or passing case exists.
+    for op in scope or []:
+        metrics_by_op[op] = []
     for w in workloads:
         metrics_by_op[w["op"]].append(workload_metrics(w, sol_engine))
         workloads_of[w["op"]].append(w)
