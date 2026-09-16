@@ -1,0 +1,2685 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="High-performance LLM operator library built on TileLang">
+      
+      
+      
+        <link rel="canonical" href="https://yyttt6.github.io/TileOPs.github.io/benchmarks/mlir-frozen/">
+      
+      
+        <link rel="prev" href="../norm-conv-pool/">
+      
+      
+        <link rel="next" href="../../performance-guides/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+          <link rel="alternate" href="../../zh/benchmarks/mlir-frozen/" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>tilelang-mlir-ascend frozen measurements - TileOPs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Hanken+Grotesk:300,300i,400,400i,700,700i%7CSpace+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Hanken Grotesk";--md-code-font:"Space Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tilelang-mlir-ascend-frozen-measurements" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="TileOPs" class="md-header__button md-logo" aria-label="TileOPs" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TileOPs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              tilelang-mlir-ascend frozen measurements
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh/benchmarks/mlir-frozen/" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yyttt6/TileOPs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yyttt6/TileOPs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="TileOPs" class="md-nav__button md-logo" aria-label="TileOPs" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    TileOPs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yyttt6/TileOPs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yyttt6/TileOPs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../manifest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../new-op/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding an Op
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../timing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timing Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../torch-compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using torch.compile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GEMM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/rope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoPE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/linear-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear Attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/mamba/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mamba
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/mhc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MHC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/elementwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elementwise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/convolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/pool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/dropout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dropout
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/fft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FFT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/topk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Top-k
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How these numbers are taken
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../linear-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear Attention &amp; SSM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gemm-moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GEMM, MoE &amp; Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../elementwise-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elementwise &amp; Reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../norm-conv-pool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Norm, Conv, Pool &amp; Other
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tilelang-mlir-ascend frozen measurements
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tilelang-mlir-ascend frozen measurements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#absfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AbsFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adalayernormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AdaLayerNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adalayernormzerofwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AdaLayerNormZeroFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#addfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AddFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fusedaddrmsnormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FusedAddRMSNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gemmfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GemmFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardsigmoidfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HardsigmoidFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardtanhfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HardtanhFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layernormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LayerNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leakyrelufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LeakyReluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logsumexpfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LogSumExpFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mishfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MishFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rmsnormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RMSNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ReluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropellama31fwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RopeLlama31FwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropeneoxfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RopeNeoxFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#selufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SeluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sigmoidfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SigmoidFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#silufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SiluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#softmaxfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SoftmaxFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#softplusfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SoftplusFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frozen-workloads-not-displayed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frozen workloads not displayed
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../performance-guides/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Guides
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance-guides/trace-timeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timeline Trace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../performance-guides/memory-bound/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory-Bound Kernels
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Memory-Bound Kernels
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance-guides/memory-bound/global-memory-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global Memory Access
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance-guides/memory-bound/shared-memory-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Memory Access
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../design/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/manifest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/ops-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Op Interfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/ops-design-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Slot Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#absfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AbsFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adalayernormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AdaLayerNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adalayernormzerofwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AdaLayerNormZeroFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#addfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AddFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fusedaddrmsnormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FusedAddRMSNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gemmfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GemmFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardsigmoidfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HardsigmoidFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardtanhfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HardtanhFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layernormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LayerNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leakyrelufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LeakyReluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logsumexpfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LogSumExpFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mishfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MishFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rmsnormfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RMSNormFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ReluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropellama31fwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RopeLlama31FwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropeneoxfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RopeNeoxFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#selufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SeluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sigmoidfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SigmoidFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#silufwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SiluFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#softmaxfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SoftmaxFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#softplusfwdop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SoftplusFwdOp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frozen-workloads-not-displayed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frozen workloads not displayed
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="tilelang-mlir-ascend-frozen-measurements">tilelang-mlir-ascend frozen measurements<a class="headerlink" href="#tilelang-mlir-ascend-frozen-measurements" title="Permanent link">&para;</a></h1>
+<div class="mlir-scope-note"><p><strong>tilelang-mlir-ascend: cross-process frozen, pool-out absolute time.</strong> Measured 2026-09-14 UTC. T302 minimum device_us from three independent samples; minimum across variants of the same workload. Measured in separate profiler sessions from ours. Do not derive an MLIR/ours ratio; excluded from D036 candidates, headline ratios and grading. An empty cell means no publishable frozen measurement for that workload.</p></div>
+
+<p>Visible operators: 22/23; workloads: 51/53 (frozen-table denominators).</p>
+<p>Current coverage captured: 2026-09-15T11:56:12.122641+00:00</p>
+<p><a href="../t320-evidence/mlir_latency_table.json">T302 frozen table</a> · <a href="../t320-evidence/mlir_latency_receipts.json">Measurement receipts</a> · <a href="../t320-evidence/01-enumeration.json">Full enumeration</a> · <a href="../t320-evidence/input-manifest.json">Source hashes</a> · <a href="../t320-evidence/bench_results.xml">Published XML</a></p>
+<p>Table SHA256: <code>46bdefb32460e1ca1566c39dfef54574262c751e3986c449ee600774e7f27a05</code></p>
+<p>MLIR commit: <code>0f0809ddae52d661d2c2d5c7199930c33ec9a343</code></p>
+<h2 id="absfwdop">AbsFwdOp<a class="headerlink" href="#absfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>elementwise-16M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="AbsFwdOp[elementwise-16M-float16]" data-device-us="192.625" data-measured-at="2026-09-14T14:00:56.007138+00:00"><strong>192.625 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/abs/abs_2d.py</code></td></tr>
+<tr><td><code>elementwise-256M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="AbsFwdOp[elementwise-256M-float16]" data-device-us="3449.75" data-measured-at="2026-09-14T13:20:22.662238+00:00"><strong>3449.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/abs/abs_2d.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="adalayernormfwdop">AdaLayerNormFwdOp<a class="headerlink" href="#adalayernormfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="AdaLayerNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="4.0" data-measured-at="2026-09-14T12:49:06.859390+00:00"><strong>4.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>high_perf</code><br><code>examples/norm/ada_layer_norm_and_zero.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="adalayernormzerofwdop">AdaLayerNormZeroFwdOp<a class="headerlink" href="#adalayernormzerofwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="AdaLayerNormZeroFwdOp[llama-8b-decode-bfloat16]" data-device-us="4.75" data-measured-at="2026-09-14T12:50:55.109460+00:00"><strong>4.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>high_perf</code><br><code>examples/norm/ada_layer_norm_and_zero.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="addfwdop">AddFwdOp<a class="headerlink" href="#addfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>hidden-state-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="AddFwdOp[hidden-state-prefill-bfloat16]" data-device-us="313.625" data-measured-at="2026-09-14T12:56:52.013043+00:00"><strong>313.625 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>example</code><br><code>examples/elementwise/example_elementwise_add.py</code></td></tr>
+<tr><td><code>hidden-state-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="AddFwdOp[hidden-state-prefill-float16]" data-device-us="154.0" data-measured-at="2026-09-14T14:50:22.596720+00:00"><strong>154.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/add/add_2d.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="elufwdop">EluFwdOp<a class="headerlink" href="#elufwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>mlp-hidden</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="EluFwdOp[mlp-hidden-bfloat16]" data-device-us="34.25" data-measured-at="2026-09-14T14:43:02.634974+00:00"><strong>34.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_elu.py</code></td></tr>
+<tr><td><code>mlp-hidden</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="EluFwdOp[mlp-hidden-float16]" data-device-us="30.75" data-measured-at="2026-09-14T14:07:23.437469+00:00"><strong>30.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_elu.py</code></td></tr>
+<tr><td><code>mlp-hidden-wide</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="EluFwdOp[mlp-hidden-wide-float16]" data-device-us="59.5" data-measured-at="2026-09-14T13:29:22.463265+00:00"><strong>59.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_elu.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="fusedaddrmsnormfwdop">FusedAddRMSNormFwdOp<a class="headerlink" href="#fusedaddrmsnormfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-405b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-405b-prefill-bfloat16]" data-device-us="240.25" data-measured-at="2026-09-14T13:51:02.920549+00:00"><strong>240.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="2.0" data-measured-at="2026-09-14T13:00:54.479270+00:00"><strong>2.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-8b-prefill-bfloat16]" data-device-us="75.0" data-measured-at="2026-09-14T13:00:13.308224+00:00"><strong>75.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="FusedAddRMSNormFwdOp[llama-8b-prefill-float16]" data-device-us="64.25" data-measured-at="2026-09-14T13:49:40.060214+00:00"><strong>64.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>selector</code><br><code>examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="gemmfwdop">GemmFwdOp<a class="headerlink" href="#gemmfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>square-1k-nn</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="GemmFwdOp[square-1k-nn-bfloat16]" data-device-us="45.875" data-measured-at="2026-09-14T14:27:25.834928+00:00"><strong>45.875 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>example_gemm</code><br><code>examples/gemm/example_gemm.py</code></td></tr>
+<tr><td><code>square-1k-nn</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="GemmFwdOp[square-1k-nn-float16]" data-device-us="45.75" data-measured-at="2026-09-14T13:03:22.196230+00:00"><strong>45.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>example_gemm</code><br><code>examples/gemm/example_gemm.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="hardsigmoidfwdop">HardsigmoidFwdOp<a class="headerlink" href="#hardsigmoidfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>mbv3-se-gate-deep</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardsigmoidFwdOp[mbv3-se-gate-deep-float16]" data-device-us="16.375" data-measured-at="2026-09-14T13:35:49.622264+00:00"><strong>16.375 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardsigmoid.py</code></td></tr>
+<tr><td><code>mbv3-se-gate</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardsigmoidFwdOp[mbv3-se-gate-float16]" data-device-us="5.0" data-measured-at="2026-09-14T13:35:10.620951+00:00"><strong>5.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardsigmoid.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="hardtanhfwdop">HardtanhFwdOp<a class="headerlink" href="#hardtanhfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>bounded-conv-feat</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardtanhFwdOp[bounded-conv-feat-float16]" data-device-us="51.0" data-measured-at="2026-09-14T13:34:13.338760+00:00"><strong>51.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardtanh.py</code></td></tr>
+<tr><td><code>bounded-hidden</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="HardtanhFwdOp[bounded-hidden-float16]" data-device-us="27.25" data-measured-at="2026-09-14T14:46:42.762288+00:00"><strong>27.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_hardtanh.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="layernormfwdop">LayerNormFwdOp<a class="headerlink" href="#layernormfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LayerNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="33.5" data-measured-at="2026-09-14T13:53:24.442221+00:00"><strong>33.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>high_perf</code><br><code>examples/norm/layer_norm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LayerNormFwdOp[llama-8b-prefill-bfloat16]" data-device-us="95.25" data-measured-at="2026-09-14T13:52:57.270421+00:00"><strong>95.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>high_perf</code><br><code>examples/norm/layer_norm.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="leakyrelufwdop">LeakyReluFwdOp<a class="headerlink" href="#leakyrelufwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>gan-feat-deep</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LeakyReluFwdOp[gan-feat-deep-float16]" data-device-us="34.25" data-measured-at="2026-09-14T14:14:28.633142+00:00"><strong>34.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_leaky_relu.py</code></td></tr>
+<tr><td><code>gan-feat</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LeakyReluFwdOp[gan-feat-float16]" data-device-us="47.5" data-measured-at="2026-09-14T14:49:08.485871+00:00"><strong>47.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_leaky_relu.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="logsumexpfwdop">LogSumExpFwdOp<a class="headerlink" href="#logsumexpfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>3d-multidim-reduce</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[3d-multidim-reduce-float16]" data-device-us="23.5" data-measured-at="2026-09-14T13:56:30.302360+00:00"><strong>23.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>attn-weights-32k</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[attn-weights-32k-bfloat16]" data-device-us="118.75" data-measured-at="2026-09-14T13:55:07.963960+00:00"><strong>118.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>attn-weights-4k</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[attn-weights-4k-bfloat16]" data-device-us="16.75" data-measured-at="2026-09-14T13:09:07.493767+00:00"><strong>16.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>attn-weights-4k</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[attn-weights-4k-float16]" data-device-us="16.5" data-measured-at="2026-09-14T13:54:11.925972+00:00"><strong>16.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>lm-head-logits</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[lm-head-logits-bfloat16]" data-device-us="13.75" data-measured-at="2026-09-14T14:31:14.160598+00:00"><strong>13.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+<tr><td><code>lm-head-logits</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="LogSumExpFwdOp[lm-head-logits-float16]" data-device-us="13.75" data-measured-at="2026-09-14T13:10:43.771533+00:00"><strong>13.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>shipped</code><br><code>examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="mishfwdop">MishFwdOp<a class="headerlink" href="#mishfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>yolo-p3</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p3-bfloat16]" data-device-us="80.25" data-measured-at="2026-09-14T14:33:40.429612+00:00"><strong>80.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+<tr><td><code>yolo-p3</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p3-float16]" data-device-us="89.25" data-measured-at="2026-09-14T14:32:49.732298+00:00"><strong>89.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+<tr><td><code>yolo-p4</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p4-bfloat16]" data-device-us="47.0" data-measured-at="2026-09-14T14:35:21.315718+00:00"><strong>47.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+<tr><td><code>yolo-p4</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="MishFwdOp[yolo-p4-float16]" data-device-us="46.875" data-measured-at="2026-09-14T14:34:30.503780+00:00"><strong>46.875 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>stage4_opt</code><br><code>examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="rmsnormfwdop">RMSNormFwdOp<a class="headerlink" href="#rmsnormfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-405b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-405b-prefill-float16]" data-device-us="16638.625" data-measured-at="2026-09-14T14:19:01.306121+00:00"><strong>16638.625 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py</code></td></tr>
+<tr><td><code>llama-70b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-70b-prefill-float16]" data-device-us="65.75" data-measured-at="2026-09-14T14:52:10.294956+00:00"><strong>65.75 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+<tr><td><code>llama-8b-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-8b-decode-bfloat16]" data-device-us="2.0" data-measured-at="2026-09-14T13:41:23.071674+00:00"><strong>2.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-8b-prefill-bfloat16]" data-device-us="34.5" data-measured-at="2026-09-14T13:39:59.012034+00:00"><strong>34.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+<tr><td><code>llama-8b-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="RMSNormFwdOp[llama-8b-prefill-float16]" data-device-us="34.5" data-measured-at="2026-09-14T14:51:10.673744+00:00"><strong>34.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>plain</code><br><code>examples/norm/rms_norm.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="relufwdop">ReluFwdOp<a class="headerlink" href="#relufwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>hidden-state-decode</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="ReluFwdOp[hidden-state-decode-bfloat16]" data-device-us="3.5" data-measured-at="2026-09-14T13:25:29.617243+00:00"><strong>3.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_relu.py</code></td></tr>
+<tr><td><code>hidden-state-prefill</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="ReluFwdOp[hidden-state-prefill-bfloat16]" data-device-us="28.0" data-measured-at="2026-09-14T14:04:56.683238+00:00"><strong>28.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_relu.py</code></td></tr>
+<tr><td><code>hidden-state-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="ReluFwdOp[hidden-state-prefill-float16]" data-device-us="27.5" data-measured-at="2026-09-14T14:04:29.629216+00:00"><strong>27.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_relu.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="ropellama31fwdop">RopeLlama31FwdOp<a class="headerlink" href="#ropellama31fwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama31-1d-8k-d128</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RopeLlama31FwdOp[llama31-1d-8k-d128-bfloat16]" data-device-us="10.5" data-measured-at="2026-09-14T14:54:52.159164+00:00"><strong>10.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>rope_llama31</code><br><code>examples/posembedding/rope_llama31/rope_llama31.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="ropeneoxfwdop">RopeNeoxFwdOp<a class="headerlink" href="#ropeneoxfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>neox-1d-4k-d128</code></td><td>bfloat16</td><td class="mlir-frozen" data-mlir-key="RopeNeoxFwdOp[neox-1d-4k-d128-bfloat16]" data-device-us="6.25" data-measured-at="2026-09-14T14:55:36.224370+00:00"><strong>6.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>rope_llama31_sf1</code><br><code>examples/posembedding/rope_llama31/rope_llama31.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="selufwdop">SeluFwdOp<a class="headerlink" href="#selufwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>snn-fc</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SeluFwdOp[snn-fc-float16]" data-device-us="28.0" data-measured-at="2026-09-14T14:09:06.497366+00:00"><strong>28.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_selu.py</code></td></tr>
+<tr><td><code>snn-fc-wide</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SeluFwdOp[snn-fc-wide-float16]" data-device-us="61.25" data-measured-at="2026-09-14T14:44:43.766027+00:00"><strong>61.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_selu.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="sigmoidfwdop">SigmoidFwdOp<a class="headerlink" href="#sigmoidfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>elementwise-16M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SigmoidFwdOp[elementwise-16M-float16]" data-device-us="205.625" data-measured-at="2026-09-14T14:02:18.663956+00:00"><strong>205.625 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/Sigmoid/sigmoid_2d.py</code></td></tr>
+<tr><td><code>elementwise-256M</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SigmoidFwdOp[elementwise-256M-float16]" data-device-us="3722.375" data-measured-at="2026-09-14T14:38:05.600721+00:00"><strong>3722.375 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/Sigmoid/sigmoid_2d.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="silufwdop">SiluFwdOp<a class="headerlink" href="#silufwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>llama-8b-ffn-prefill</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SiluFwdOp[llama-8b-ffn-prefill-float16]" data-device-us="365.5" data-measured-at="2026-09-14T14:03:43.588863+00:00"><strong>365.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/Silu/silu_2d.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="softmaxfwdop">SoftmaxFwdOp<a class="headerlink" href="#softmaxfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>lm-head-logits</code></td><td>float32</td><td class="mlir-frozen" data-mlir-key="SoftmaxFwdOp[lm-head-logits-float32]" data-device-us="104.5" data-measured-at="2026-09-14T14:21:19.072509+00:00"><strong>104.5 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>autotune_2d</code><br><code>testing/autotune/softmax/softmax_2d.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="softplusfwdop">SoftplusFwdOp<a class="headerlink" href="#softplusfwdop" title="Permanent link">&para;</a></h2>
+<div class="datatable"><table><thead><tr><th>Workload</th><th>Dtype</th><th>tilelang-mlir-ascend (µs)</th><th>Variant / source</th></tr></thead><tbody>
+<tr><td><code>mlp-hidden</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SoftplusFwdOp[mlp-hidden-float16]" data-device-us="28.25" data-measured-at="2026-09-14T13:31:57.196126+00:00"><strong>28.25 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_softplus.py</code></td></tr>
+<tr><td><code>mlp-hidden-wide</code></td><td>float16</td><td class="mlir-frozen" data-mlir-key="SoftplusFwdOp[mlp-hidden-wide-float16]" data-device-us="51.0" data-measured-at="2026-09-14T13:32:36.755362+00:00"><strong>51.0 µs</strong><br><small>tilelang-mlir-ascend<br>Cross-process frozen; measured 2026-09-14 UTC<br>Absolute time</small></td><td><code>npuir_active</code><br><code>testing/npuir/active_ops/test_softplus.py</code></td></tr>
+</tbody></table></div>
+
+<h2 id="frozen-workloads-not-displayed">Frozen workloads not displayed<a class="headerlink" href="#frozen-workloads-not-displayed" title="Permanent link">&para;</a></h2>
+<table><thead><tr><th>Workload</th><th>Reason</th></tr></thead><tbody>
+<tr><td><code>Relu6FwdOp[hidden-state-prefill-bfloat16]</code></td><td>not in current published coverage</td></tr>
+<tr><td><code>Relu6FwdOp[hidden-state-prefill-float16]</code></td><td>not in current published coverage</td></tr>
+</tbody></table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 tile-ai
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yyttt6/TileOPs" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
