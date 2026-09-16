@@ -273,6 +273,7 @@ def dtype_of(config_name: str) -> str | None:
 # so a metric added on the TileOPs side appears here without a code change.
 # Longer suffixes come first: device_busy_p10_ms must not match as latency_ms.
 _METRIC_SUFFIXES = (
+    "external_pending_note",
     "eager_pool_ratio", "eager_pool_name", "eager_pool_note",
     "handwritten_ratio_in_selection_session", "handwritten_selection_regime",
     "device_busy_p10_ms", "device_busy_p90_ms", "device_busy_ms",
@@ -568,6 +569,7 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
              "external": c.get("in_process") is False, "n": c.get("n")}
             for c in json.loads(base["pool_json"])]
     m["pool_refused"] = base.get("refused", "")
+    m["external_pending_note"] = base.get("external_pending_note", "")
     m["measurement_note"] = base.get("measurement_note", "")
     # Older publishers hard-code n=3 in this one specific note. The receipt's
     # explicit count is authoritative; unrelated measurement warnings survive.
@@ -1619,6 +1621,8 @@ def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
             return html.escape(name or t)
         names = _stack([f"<code>{_rival_label(t)}</code>" for t, _ in ordered])
         times = _stack([_sig_ms(r["busy_ms"]) for _, r in ordered])
+    if m.get("external_pending_note"):
+        names += f'<br><small>{html.escape(m["external_pending_note"])}</small>'
     # Against the fastest non-reference alternative, so a win over an eager
     # reference is not painted as a win over a real one — see `_ratio_cell`.
     real = [r for _, r in ordered if r["tier"] != TIER_REF and r["speedup"]]
