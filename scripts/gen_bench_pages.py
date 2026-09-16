@@ -110,10 +110,13 @@ def tier_of(tag: str) -> str:
 # claim about speed. A open-source kernel losing to a vendor one is the
 # ordinary case here, not an error -- see the reading page.
 PROV_HANDWRITTEN, PROV_VENDOR = "handwritten", "vendor"
+PROV_TILELANG_REF = "tilelang_ref"
+PROV_AGENT_WRITTEN = "agent_written"
 # The css class each one is badged with. An unrecognised value keeps the neutral
 # badge and its own text, so a tier added on the harness side is shown as
 # written rather than silently painted as one of these two.
-PROV_CLASS = {PROV_HANDWRITTEN: "tier-hw", PROV_VENDOR: "tier-vendor"}
+PROV_CLASS = {PROV_HANDWRITTEN: "tier-hw", PROV_VENDOR: "tier-vendor",
+              PROV_TILELANG_REF: "tier-other", PROV_AGENT_WRITTEN: "tier-other"}
 # The reading page's explanation of the two, as an explicit anchor: the badges
 # link there, and a heading slug generated from Chinese text would not be the
 # same string in both locales.
@@ -126,7 +129,9 @@ PROV_HREF = f"../reading/#{PROV_ANCHOR}"
 # Kept as literal keys rather than built from the tier name, so the locale
 # tables can be checked for a key nothing renders.
 PROV_LABEL_KEY = {PROV_HANDWRITTEN: "tier.handwritten",
-                  PROV_VENDOR: "tier.vendor"}
+                  PROV_VENDOR: "tier.vendor",
+                  PROV_TILELANG_REF: "tier.tilelang_ref",
+                  PROV_AGENT_WRITTEN: "tier.agent_written"}
 
 # The tag the implementation under test publishes its metrics under. Upstream
 # writes `tileops_*`; the Ascend fork writes the provider that ran, since one
@@ -268,6 +273,7 @@ def dtype_of(config_name: str) -> str | None:
 # so a metric added on the TileOPs side appears here without a code change.
 # Longer suffixes come first: device_busy_p10_ms must not match as latency_ms.
 _METRIC_SUFFIXES = (
+    "handwritten_ratio_in_selection_session", "handwritten_selection_regime",
     "device_busy_p10_ms", "device_busy_p90_ms", "device_busy_ms",
     "latency_p10_ms", "latency_p90_ms",
     # The two D036 fields that end in `_latency_ms` themselves, so they are
@@ -286,6 +292,7 @@ _METRIC_SUFFIXES = (
     "runner_up_us", "runner_up", "handwritten_us", "handwritten",
 )
 _NUMERIC_METRICS = {
+    "handwritten_ratio_in_selection_session",
     "device_busy_ms", "device_busy_p10_ms", "device_busy_p90_ms",
     "latency_ms", "latency_p10_ms", "latency_p90_ms", "gap_ms",
     "uncounted_copy_ms", "tflops", "bandwidth_tbs", "ratio", "flops",
@@ -555,11 +562,15 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
     # The winner's own recorded time. It is the fallback for a winner whose pool
     # line says `not-timed`, which is a gap on the harness side, not a zero.
     m["baseline_ms"] = _busy_of(base)
-    # The tier-1-only reading D006 asks for: the fastest open-source candidate,
-    # whether or not it won the pool.
+    # Selection-session metadata: its uncaptured callable ratio is not
+    # comparable to the captured headline. Never splice session times.
     hw_ms = _ms_of(base, "handwritten_latency_ms", "handwritten_us")
     m["hw"] = {"name": base.get("handwritten") or None, "ms": hw_ms}
-    m["hw_ratio"] = (hw_ms / busy) if (hw_ms and busy) else None
+    m["hw_ratio"] = (
+        _pos(base.get("handwritten_ratio_in_selection_session"))
+        if base.get("handwritten_selection_regime") == "uncaptured_callable"
+        else None
+    )
     return m
 
 
@@ -602,6 +613,11 @@ def op_summary(metrics: list[dict]) -> dict:
     # says so with its own denominator rather than blurring the two.
     s["pooled"] = any(m.get("pool") for m in metrics)
     s["handwritten"] = any(m.get("hw", {}).get("ms") for m in metrics)
+    s["tilelang_ref"] = any(
+        c.get("prov") == PROV_TILELANG_REF
+        and c.get("name", "").startswith("tilelang-ascend:")
+        and c.get("ms") is not None
+        for m in metrics for c in m.get("pool", []))
 
     tag, ratio = best_rival(metrics, (TIER_LIB, TIER_TORCH))
     ref_only = False
@@ -654,6 +670,8 @@ STRINGS = {
         # --- D036: the comparison group, its members, and their provenance
         "tier.handwritten": "open-source",
         "tier.vendor": "vendor library",
+        "tier.tilelang_ref": "tilelang-ascend",
+        "tier.agent_written": "agent-written kernel",
         "tier.title": (
             "Where this kernel came from \u2014 not which one is faster. Click for "
             "what a tier means."
@@ -672,11 +690,11 @@ STRINGS = {
             "Not timed: the pool line recorded no time for this candidate, and the "
             "run published none elsewhere. Not a measurement of zero."
         ),
-        "alt.hw_ratio": "open-src",
+        "alt.hw_ratio": "open-src (selection session, uncaptured; separate from headline)",
         "alt.hw_ratio_title": (
-            "The tier-1 reading: the fastest open-source candidate's device time "
-            "divided by ours. It lost the pool, so it is not the number the colour "
-            "grades."
+            "Fastest open-source candidate divided by ours in the same selection "
+            "session, using uncaptured callables. Separate measurement regime "
+            "from the captured graph headline; excluded from headline grading."
         ),
         # --- The data pages' titles, in DATA_PAGES order
         "page.attention.title": "Attention",
@@ -757,6 +775,7 @@ STRINGS = {
             "readings, and the one to quote for a claim about open-source "
             "libraries."
         ),
+        "index.coverage.tilelang_ref": "**{n_tl}/{total} ops** have a measured `tilelang-ascend` candidate (tier `tilelang_ref`) in the published pool; this count can overlap the open-source count above.",
         "index.coverage.vendor_only": (
             "**For the other {n_vendor} of {total}**, the pool holds vendor "
             "implementations only — a CANN built-in, or torch_npu's own dispatch. "
@@ -832,6 +851,7 @@ STRINGS = {
             "timings plausible. So provenance here is established by tracing "
             "which binary the process opened, never by the call returning."
         ),
+        "reading.tier.tilelang_ref_row": "Original example or test kernel from tilelang-ascend (Tile-AI), compiled with the same DSL/compiler. Admitted only after the harness source-provenance and numeric gates. This tier describes kernel origin, not speed.",
         "reading.tier.vendor_row": (
             "A vendor implementation: a CANN built-in operator, or torch_npu's "
             "own dispatch for the op. A real implementation on the identical "
@@ -844,17 +864,9 @@ STRINGS = {
             "mistake this column exists to prevent."
         ),
         "reading.tier.inventory": (
-            "It has to be read that way, because the open-source coverage is "
-            "thin. As of 2026-09-04, of the 91 ops TileOPs declares, 58 have no "
-            "open-source Ascend baseline in existence for this device — not "
-            "unbuilt and not unwired: no source. Their comparison group falls "
-            "back to vendor implementations by necessity. Taking the strongest "
-            "opponent available, whatever its provenance, is deliberate; the "
-            "consequence is that **the tier badge on a row, not the page as a "
-            "whole, is what tells you whether that number is a result against a "
-            "open-source library.**"
+            "The historical inventory covers **91 elementwise, reduction, scan and dropout ops**. In the R321 full rerun, **24/91** had at least one timed source candidate (`handwritten` or `tilelang_ref`), **66/91** had none, and **1/91** could not be determined from complete results. These are measured pool observations after the shape/dtype contract gate, not an exhaustive source inventory or a numerical-correctness pass rate. Refusals and workload coverage remain case-specific; beating a vendor implementation alone does not establish a win over an open-source kernel."
         ),
-        # --- The reading page: the colour is the verdict
+
         "reading.colour.heading": "The colour is the verdict",
         "reading.colour.col_meaning": "Meaning",
         "reading.colour.behind": "Slower than the alternative — below {lo}×.",
@@ -1054,13 +1066,15 @@ STRINGS = {
         "table.sub.bound": "受限于",
         "tier.handwritten": "开源库",
         "tier.vendor": "厂商库",
+        "tier.tilelang_ref": "tilelang-ascend",
+        "tier.agent_written": "Agent 编写 kernel",
         "tier.title": "这一档说的是这个 kernel 的来源，不是谁更快。点击查看档位的定义。",
         "alt.basis": "基准",
         "alt.basis_title": "「比值」那一列除的就是它：这个工作负载上实测最快的那个候选。",
         "alt.untimed_title": "候选池那一行没有记下这个候选的时间。这里显示的（带 * 的）是本次运行另外发布的基线耗时。**它不是「测出来是零」。**",
         "alt.untimed_empty_title": "没有计时：候选池那一行没有记下这个候选的时间，本次运行别处也没有。**这不是「测出来是零」。**",
-        "alt.hw_ratio": "开源库",
-        "alt.hw_ratio_title": "tier-1 口径：最快的那个开源库候选的耗时除以我们的耗时。它没赢下候选池，所以不是颜色评的那个数。",
+        "alt.hw_ratio": "开源库（选择场次、未捕获；与主比值口径不同）",
+        "alt.hw_ratio_title": "最快开源库候选与我方在同一选择场次、未捕获 callable 下的耗时之比。与 graph 捕获后的主比值属于不同测量口径，不参与主比值评级。",
         "page.attention.title": "Attention",
         "page.linear-attention.title": "Linear Attention 与 SSM",
         "page.gemm-moe.title": "GEMM、MoE 与量化",
@@ -1087,6 +1101,7 @@ STRINGS = {
         "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是**本次快照实际跑过的算子数**，不是 TileOPs 声明的全部算子。其余只与 eager 参考实现比较，**赢过它不值得作为成绩报告**。",
         "index.coverage.pool": "**每个算子对的是一个候选池，不是一个事先定死的对手。** 一个工作负载上，harness 能建起来的每一个基线都在它上面实测一遍，**最快的那个**才成为比值的分母。整个候选池都列在对应那一行上，最快的在前。",
         "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 开源库基线 —— 也就是从第三方 Ascend 算子库的源码编出来的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「第三方算子库」的说法都应该引这个数**。",
+        "index.coverage.tilelang_ref": "**{n_tl}/{total} 个算子**的已发布候选池中实测包含 `tilelang-ascend`（`tilelang_ref` 档位）；与上面的开源候选覆盖数可能重叠。",
         "index.coverage.vendor_only": "**剩下 {total} 里的 {n_vendor} 个**，候选池里只有厂商库实现 —— CANN 内置算子，或 torch_npu 自己的分发。这些行仍然是在完全相同的工作负载上与一个真实实现比较，但**在那里赢了不等于赢过第三方算子库**。每一行的来源徽章会说清它到底是哪一档。",
         "index.coverage.absent": "**所有表格里都没出现的**：本次运行有 {n_failed} 个工作负载报错、{n_skipped} 个被跳过。",
         "index.data.heading": "数据页",
@@ -1105,9 +1120,10 @@ STRINGS = {
         "reading.tier.col_tier": "档位",
         "reading.tier.col_meaning": "含义",
         "reading.tier.handwritten_row": "从**第三方 Ascend 算子库的源码**编出来的 kernel，通过那个库自己的入口点调用。只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳：一个**缺 kernel 的自定义算子包会静默回落到 CANN 内置**，调用照样成功、输出照样正确、时间照样看着合理。所以这里的来源认定靠的是**追踪进程实际打开了哪个二进制**，绝不是「调用没报错」。",
+        "reading.tier.tilelang_ref_row": "tilelang-ascend（Tile-AI）原始示例或测试 kernel，与我们使用相同 DSL/编译器；通过源码来源证据和数值门禁后才进入实测候选池。此档位说明 kernel 来源，不代表速度排名。",
         "reading.tier.vendor_row": "厂商实现：CANN 内置算子，或 torch_npu 自己对这个算子的分发。它是**完全相同工作负载上的一个真实实现**，而且在这块硬件上**经常就是最快的那个**。",
         "reading.tier.not_faster": "所以同一行里 `开源库` 的时间**比 `厂商库` 慢**，**不是错误**；在这里的好几个算子族上，这就是常态。**把这个徽章读成强弱排名，正是这一列存在的目的所要防止的那个误解。**",
-        "reading.tier.inventory": "必须这样读，因为**开源库的覆盖本来就很薄**。截至 2026-09-04，TileOPs 声明的 91 个算子里，有 **58 个在这块硬件上根本不存在第三方 Ascend 基线** —— 不是没编、也不是没接线：**源码层面就没有**。它们的对照组只能回落到厂商实现。「不论来源、一律取现有最强的对手」是**有意的选择**；它的代价是：**判断某个数字算不算「赢过第三方算子库」，靠的是那一行上的档位徽章，而不是整页的标题。**",
+        "reading.tier.inventory": "历史普查的分母为 **91 个 elementwise、reduction、scan、dropout 算子**。本轮 R321 全量重测中，**24/91 个**至少有一个 `handwritten` 或 `tilelang_ref` 来源候选取得实测时间，**66/91 个**没有，另有 **1/91 个**因缺少完整结果无法判定。这是 shape/dtype 契约门之后的实测候选池覆盖，不是穷尽源码普查，也不是数值正确性通过率。逐 workload 的实际候选与拒绝原因以记录为准；只赢过厂商实现不能证明赢过开源 kernel。",
         "reading.colour.heading": "颜色就是结论",
         "reading.colour.col_meaning": "含义",
         "reading.colour.behind": "比对照实现慢 —— 低于 {lo}×。",
@@ -1525,6 +1541,8 @@ _POOL_REACH = (" -> ", " / ")
 
 
 def _short_candidate(name: str, prov: str | None) -> str:
+    if prov == PROV_TILELANG_REF and name.startswith("tilelang-ascend:"):
+        return "tilelang-ascend"
     short = name
     for sep in _POOL_REACH:
         short = short.split(sep)[0].strip()
@@ -1535,7 +1553,7 @@ def _short_candidate(name: str, prov: str | None) -> str:
     return short or name
 
 
-def _tier_badge(prov: str | None, lang: str) -> str:
+def _tier_badge(prov: str | None, lang: str, name: str = "") -> str:
     """The provenance tier, badged and linking to what a tier means.
 
     Clickable on purpose: a reader who meets `handwritten` beside a slower time
@@ -1545,6 +1563,10 @@ def _tier_badge(prov: str | None, lang: str) -> str:
     if not prov:
         return ""
     label = _S(lang, PROV_LABEL_KEY[prov]) if prov in PROV_LABEL_KEY else prov
+    # Historical snapshots also attach tilelang_ref to the separate MLIR replay.
+    # Keep its library identity; it is not a tilelang-ascend source candidate.
+    if prov == PROV_TILELANG_REF and name.startswith("tilelang-mlir-ascend"):
+        label = "tilelang-mlir-ascend"
     cls = PROV_CLASS.get(prov, "tier-other")
     return (f' <a class="tier {cls}" href="{PROV_HREF}"'
             f' title="{html.escape(_S(lang, "tier.title"), quote=True)}">'
@@ -1562,7 +1584,7 @@ def _pool_name_cell(c: dict, is_pick: bool, lang: str) -> str:
         pick = (f' <span class="alt-pick"'
                 f' title="{html.escape(_S(lang, "alt.basis_title"), quote=True)}">'
                 f'{html.escape(_S(lang, "alt.basis"))}</span>')
-    return body + _tier_badge(c["prov"], lang) + pick
+    return body + _tier_badge(c["prov"], lang, c["name"]) + pick
 
 
 def _pool_time_cell(c: dict, fallback_ms: float | None, lang: str) -> str:
@@ -1623,10 +1645,9 @@ def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
     gap = _ratio_cell(real[0]["speedup"] if real else
                       weak[0]["speedup"] if weak else None,
                       rated=bool(real))
-    # D006 asks for the tier-1-only reading as well, and it is a different
-    # number exactly when an open-source candidate ran and lost the pool. Shown
-    # under the graded one, muted and labelled, so the two can never be read as
-    # one figure.
+    # This auxiliary reading is explicitly labelled with its selection session
+    # and uncaptured regime in visible text, not just a hover tooltip.
+    # It never participates in the headline rating.
     if m.get("hw_ratio") and m.get("prov_tier") != PROV_HANDWRITTEN:
         gap = _stack([gap, f'<span class="perf-unrated"'
                            f' title="{html.escape(_S(lang, "alt.hw_ratio_title"), quote=True)}">'
@@ -1744,10 +1765,15 @@ def index_page(args, meta: dict, rows: list[tuple],
         n_hw = sum(1 for _, _, s, _, _ in rows if s.get("handwritten"))
         lines += ["- " + _S(lang, "index.coverage.pool", total=total),
                   "- " + _S(lang, "index.coverage.handwritten",
-                            n_hw=n_hw, total=total)]
-        if n_hw < total:
+                            n_hw=n_hw, total=total),
+                  "- " + _S(lang, "index.coverage.tilelang_ref",
+                            n_tl=sum(bool(s.get("tilelang_ref")) for _, _, s, _, _ in rows),
+                            total=total)]
+        n_vendor = sum(not s.get("handwritten") and not s.get("tilelang_ref")
+                       for _, _, s, _, _ in rows)
+        if n_vendor:
             lines.append("- " + _S(lang, "index.coverage.vendor_only",
-                                   n_vendor=total - n_hw, total=total))
+                                   n_vendor=n_vendor, total=total))
     if n_failed or n_skipped:
         lines.append("- " + _S(lang, "index.coverage.absent",
                                n_failed=n_failed, n_skipped=n_skipped))
@@ -1805,6 +1831,8 @@ def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG) -> str:
         "| --- | --- |",
         f'| <span class="tier tier-hw">{_S(lang, "tier.handwritten")}</span> | '
         + _S(lang, "reading.tier.handwritten_row") + " |",
+        f'| <span class="tier tier-other">{_S(lang, "tier.tilelang_ref")}</span> | '
+        + _S(lang, "reading.tier.tilelang_ref_row") + " |",
         f'| <span class="tier tier-vendor">{_S(lang, "tier.vendor")}</span> | '
         + _S(lang, "reading.tier.vendor_row") + " |",
         "",
