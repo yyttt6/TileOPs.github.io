@@ -65,8 +65,45 @@ _NB = "https://github.com/yyttt6/TileOPs/tree/nightly-bench"  # Ascend fork; dat
 # colour of the ratio is the verdict, so no separate status glyph is needed.
 AHEAD, PAR, BEHIND, UNRATED = "ahead", "par", "behind", "unrated"
 PAR_BAND = (0.95, 1.05)  # inside this the two implementations are level
+
+# R338 built a page bullet quoting the harness' 0.70 attainment tally (65 graph / 66
+# incl. eager, over a denominator of 127 rated ops).  PM turned it OFF 2026-09-18 and
+# did not delete it: the attainment number the team reports upward is on the *150-row*
+# denominator, and printing a second, differently-based "N attained" on the public page
+# would collide with that at exactly the moment someone reports it.  The census still
+# ships in meta.json (`regime_census`) for anyone who wants it; only the rendering is
+# withheld.  Flip to True to publish it -- that is a reporting decision, not a code one.
+RENDER_ATTAINMENT_LINE = False
 NA = "—"
 EMPTY = "·"  # a metric whose input was not recorded
+
+# --- The measurement regime a row's ratio was taken in ----------------------
+# A ratio is comparable with another ratio only if the two were taken the same
+# way. The snapshot names the regime per row (`<tag>_regime`) and names the one
+# it calls the headline in `meta.json`, and until now the page read neither: the
+# 2026-09-16 snapshot published 88 rows across 15 operators measured in `eager`
+# — schema 1.0.0 coverage files, which predate the regime split and were never
+# measured any other way — in the same Ratio column as 643 `graph` rows, with
+# nothing to tell a reader which was which.
+#
+# The fix is not to drop them. A row is one measured ratio; dropping 88 of them
+# would make the page shorter by an eighth with no explanation, and the numbers
+# are real. The fix is to say so: every off-headline row is badged, every op
+# whose rows are off-headline is badged in its heading, and the coverage counts
+# on the overview are given per regime and never added across regimes.
+DEFAULT_HEADLINE_REGIME = "graph"
+# Set from `meta.json`'s `environment.headline_regime` by `main`, so a snapshot
+# published with a different headline badges against its own, not against a
+# constant compiled into the renderer. Read through `headline_regime()`, never
+# directly, for the same reason `DEFAULT_LANG` is read late.
+_HEADLINE_REGIME: str | None = None
+# The reading page's explanation, as an explicit anchor: the badges link there.
+REGIME_ANCHOR = "measurement-regime"
+REGIME_HREF = f"../reading/#{REGIME_ANCHOR}"
+
+
+def headline_regime() -> str:
+    return _HEADLINE_REGIME or DEFAULT_HEADLINE_REGIME
 
 # --- Baseline tiers ---------------------------------------------------------
 # A tier decides how a comparison reads, not whether it is shown. An unknown tag
@@ -147,6 +184,68 @@ def ours_of(impls: dict) -> dict:
             return impls[tag]
     return {}
 
+
+
+# --- The historical source-coverage inventory ------------------------------
+# A fixed cohort of 91 elementwise / reduction / scan / dropout operators, first
+# enumerated in R250 and re-counted in R319 and R321. The reading page quotes how
+# many of them have a third-party source candidate that actually got a time, and
+# that sentence has carried a HAND-WRITTEN number three times now -- 58/91 as of
+# 2026-09-04, then 66/91 from R321, and the 2026-09-16 snapshot says 62/91. A
+# number a human retypes is a number that goes stale the next time coverage
+# moves, which is the failure this page is being audited for. So the cohort is
+# embedded and the counts are computed from the snapshot being rendered.
+#
+# The cohort itself is history and does not move: it is the list those three
+# recounts were over, and changing it would make the sentence answer a different
+# question under the same words. `docs/reports/R321-data/inventory91.json` in the
+# harness workspace is where it came from.
+_INVENTORY_91 = frozenset((
+    "AbsFwdOp AddFwdOp AlibiFwdOp AllFwdOp AmaxFwdOp AminFwdOp AnyFwdOp "
+    "ArgmaxFwdOp ArgminFwdOp BitwiseAndFwdOp BitwiseNotFwdOp BitwiseOrFwdOp "
+    "BitwiseXorFwdOp CeilFwdOp ClampFwdOp ClampScalarFwdOp CosFwdOp "
+    "CountNonzeroFwdOp CumprodFwdOp CumsumFwdOp DivFwdOp DropoutFwdOp "
+    "EluFwdOp EqFwdOp ErfFwdOp ExpFwdOp Expm1FwdOp FloorDivideFwdOp "
+    "FloorFwdOp GeFwdOp GeluAndMulFwdOp GeluFwdOp GeluTanhAndMulFwdOp GtFwdOp "
+    "HardsigmoidFwdOp HardswishFwdOp HardtanhFwdOp InfNormFwdOp IsfiniteFwdOp "
+    "IsinfFwdOp IsnanFwdOp L1NormFwdOp L2NormFwdOp LeFwdOp LeakyReluFwdOp "
+    "LerpFwdOp LerpTensorFwdOp Log1pFwdOp LogFwdOp LogSoftmaxFwdOp "
+    "LogSumExpFwdOp LogicalAndFwdOp LogicalNotFwdOp LogicalOrFwdOp LtFwdOp "
+    "MaskedFillFwdOp MaskedFillScalarFwdOp MaximumFwdOp MeanFwdOp "
+    "MinimumFwdOp MishFwdOp MulFwdOp NanToNumFwdOp NeFwdOp NegFwdOp PowFwdOp "
+    "PreluFwdOp ProdFwdOp ReciprocalFwdOp ReluFwdOp RemainderFwdOp RoundFwdOp "
+    "RsqrtFwdOp SeluFwdOp SigmoidFwdOp SignFwdOp SiluAndMulFwdOp SiluFwdOp "
+    "SinFwdOp SinusoidalFwdOp SoftmaxFwdOp SoftplusFwdOp SqrtFwdOp StdFwdOp "
+    "SubFwdOp SumFwdOp TanhFwdOp TruncFwdOp VarFwdOp VarMeanFwdOp WhereFwdOp"
+).split())
+
+# The provenance tiers that count as "a third-party source candidate": a kernel
+# built from someone else's source, not a vendor dispatch. It has to have been
+# TIMED -- a candidate admitted and then never measured proves nothing about
+# coverage, and rendering it as coverage is how 24/91 and 28/91 could both be
+# true of the same run.
+_SOURCE_TIERS = (PROV_HANDWRITTEN, PROV_TILELANG_REF)
+
+
+def inventory_counts(metrics_by_op: dict) -> dict:
+    """How the 91-op cohort stands on the snapshot being rendered.
+
+    `unknown` is an operator the cohort names that this run published no
+    workload for: it is not "has none", because nothing was measured either way,
+    and folding it into the other two is what would make the sentence overclaim.
+    """
+    got = none = unknown = 0
+    for op in sorted(_INVENTORY_91):
+        ms = metrics_by_op.get(op)
+        if not ms:
+            unknown += 1
+        elif any(c.get("prov") in _SOURCE_TIERS and c.get("ms") is not None
+                 for m in ms for c in m.get("pool", ())):
+            got += 1
+        else:
+            none += 1
+    return {"total": len(_INVENTORY_91), "got": got, "none": none,
+            "unknown": unknown}
 
 # --- Op families and the pages they group into -----------------------------
 # The section heading each family gets, by locale. Not in `STRINGS`, because
@@ -285,6 +384,12 @@ _METRIC_SUFFIXES = (
     "latency_ms", "gap_ms",
     "uncounted_copy_ms", "bandwidth_tbs", "tflops", "ratio", "n_kernels",
     "n_samples", "n_trials", "flops", "bytes", "compute_roof", "dtype", "timing",
+    # The regime the row was measured in. It sits after the two longer suffixes
+    # that end in it -- `handwritten_selection_regime` above -- so those keep
+    # being filed under `baseline` rather than under a tag named
+    # `baseline_handwritten_selection`. The publisher has written it since T269
+    # gate 2; reading it is what was missing.
+    "regime",
     "variant",
     # D036: who the comparison group was, who won it, and what it held. The
     # harness has written `_us` for the two runner-up/handwritten times and
@@ -529,6 +634,10 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
         "dtype": tl.get("dtype") or dtype_of(w["config"]),
         "n_samples": tl.get("n_samples"),
         "variant": tl.get("variant"),
+        # Absent in a snapshot published before the regime was written per row.
+        # Absent is not "headline": an unlabelled row is one the page cannot
+        # vouch for either way, and it renders with no badge exactly as before.
+        "regime": tl.get("regime") or None,
         "sol": sol_of(tl, sol_engine),
     }
 
@@ -623,6 +732,14 @@ def op_summary(metrics: list[dict]) -> dict:
     geometric-mean ratio here only orders the op sections.
     """
     s = {"workloads": len(metrics)}
+    # Which regimes this op's rows were measured in, and which of them are not
+    # the headline. Kept as the sorted list rather than a boolean, because an op
+    # whose rows straddle two regimes is a different and worse problem than one
+    # measured wholly in the other regime, and only the list can tell them apart.
+    # (In the 2026-09-16 snapshot none straddle: all 15 eager operators are
+    # wholly eager. The page must not depend on that staying true.)
+    s["regimes"] = sorted({m["regime"] for m in metrics if m.get("regime")})
+    s["off_headline"] = [r for r in s["regimes"] if r != headline_regime()]
     # Two coverage readings, both per D006: whether this op was raced against a
     # pool at all, and whether that pool held a tier-1 open-source candidate.
     # An op whose pool is vendor-only is still measured against a real rival --
@@ -695,6 +812,11 @@ STRINGS = {
             "Where this kernel came from \u2014 not which one is faster. Click for "
             "what a tier means."
         ),
+        "regime.title": (
+            "Measured in a different regime from this page's headline `{headline}`, "
+            "so the ratio is not comparable with the rows around it. Click for what "
+            "that means."
+        ),
         "alt.basis": "basis",
         'alt.basis_title': 'The candidate used as the baseline in the headline measurement regime.',
         "alt.untimed_title": (
@@ -763,6 +885,21 @@ STRINGS = {
             "target set; unconnected targets retain empty tables. Unrated rows "
             "have no measured comparison or only an eager reference."
         ),
+        "index.coverage.regime": (
+            "**Not one measurement regime.** **{n_headline} of {total} ops** were "
+            "measured in this run's headline regime `{headline}`; **{n_off}** were "
+            "not ({off}). A ratio taken in one regime is not comparable with a "
+            "ratio taken in another, so the two counts are given separately and "
+            "**never added**. Every row and every op heading measured outside "
+            "`{headline}` carries a badge saying which regime it was."
+        ),
+        "index.coverage.attained": (
+            "**Clearing the harness threshold, per regime**: {parts}. Quoted from "
+            "the snapshot's own census, not recomputed here. The headline regime "
+            "is `{headline}`; **the other regimes' counts are listed so they can "
+            "be read, not so they can be summed into it**."
+        ),
+        "index.coverage.attained_one": "`{regime}` {n}/{of} ops ≥ {threshold}",
         'index.coverage.pool': '**Each op is raced against a pool.** The fastest eligible candidate in the headline measurement regime becomes its baseline. The row lists all candidates with their individual times and provenance tiers.',
         "index.coverage.handwritten": (
             "**{n_hw} of {total} ops** have a tier-1 open-source baseline in "
@@ -845,7 +982,31 @@ STRINGS = {
             "mistake this column exists to prevent."
         ),
         "reading.tier.inventory": (
-            "The historical inventory covers **91 elementwise, reduction, scan and dropout ops**. In the R321 full rerun, **24/91** had at least one timed source candidate (`handwritten` or `tilelang_ref`), **66/91** had none, and **1/91** could not be determined from complete results. These are measured pool observations after the shape/dtype contract gate, not an exhaustive source inventory or a numerical-correctness pass rate. Refusals and workload coverage remain case-specific; beating a vendor implementation alone does not establish a win over an open-source kernel."
+            "The historical inventory covers **{total} elementwise, reduction, scan and dropout ops**. Counted on the snapshot this page is rendered from: **{got}/{total}** have at least one timed source candidate (`handwritten` or `tilelang_ref`), **{none}/{total}** have none, and **{unknown}/{total}** cannot be determined because this run publishes no workload for them. These are measured pool observations after the shape/dtype contract gate, not an exhaustive source inventory or a numerical-correctness pass rate. Refusals and workload coverage remain case-specific; beating a vendor implementation alone does not establish a win over an open-source kernel."
+        ),
+        "reading.regime.heading": "Which regime a row was measured in",
+        "reading.regime.intro": (
+            "A ratio is comparable with another ratio only if the two were taken "
+            "the same way. Every workload here is measured in a named "
+            "**regime**, and this run's headline regime is `{headline}` — the "
+            "regime the coverage bullets, the colours and the op orderings are "
+            "all about."
+        ),
+        "reading.regime.legacy": (
+            "A few operators have no measurement in that regime and are published "
+            "from an older record that only ever measured `eager`. Those rows are "
+            "**kept**: the number is a real measurement of a real workload, and "
+            "dropping them would shorten the page with no explanation. They are "
+            "**named** instead."
+        ),
+        "reading.regime.badge": (
+            "this row's ratio was taken in `eager`, not in `{headline}`. Read it "
+            "against other `eager` rows, never against the ones around it."
+        ),
+        "reading.regime.counts": (
+            "The same rule holds for every count on the overview: ops measured in "
+            "`{headline}` and ops measured otherwise are reported as two numbers "
+            "and are **never added into one**."
         ),
 
         "reading.colour.heading": "The colour is the verdict",
@@ -1037,6 +1198,7 @@ STRINGS = {
         "tier.tilelang_ref": "tilelang-ascend",
         "tier.agent_written": "Agent 编写 kernel",
         "tier.title": "这一档说的是这个 kernel 的来源，不是谁更快。点击查看档位的定义。",
+        "regime.title": "测量口径与本页主口径 `{headline}` 不同，比值与周围各行不可比。点击查看这意味着什么。",
         "alt.basis": "基准",
         'alt.basis_title': '主测量口径所选的基准候选。',
         "alt.untimed_title": "候选池那一行没有记下这个候选的时间。这里显示的（带 * 的）是本次运行另外发布的基线耗时。**它不是「测出来是零」。**",
@@ -1065,6 +1227,9 @@ STRINGS = {
         "index.snapshot.rendered": "页面渲染于 {rendered}，数据取自[最新快照]({url})。",
         "index.coverage.heading": "覆盖情况",
         "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是本页展示的目标集合；阶段一未接入的算子保留空表。未评级的行没有实测比较，或只有 eager 参考实现。",
+        "index.coverage.regime": "**不是一个测量口径。** **{total} 个算子里有 {n_headline} 个**是在本次运行的主口径 `{headline}` 下测的，**{n_off} 个不是**（{off}）。不同口径下的比值**不可比**，所以这两个数分开给，**绝不相加**。每一个不在 `{headline}` 口径下的行、以及每一个这样的算子标题，都带一个说明它是哪个口径的徽章。",
+        "index.coverage.attained": "**按口径分开的达标数**：{parts}。这是从快照自带的普查里**引用**的，不是本页重算的。主口径是 `{headline}`；**其它口径的数列在这里是为了能被读到，不是为了被加进主口径**。",
+        "index.coverage.attained_one": "`{regime}` {n}/{of} 个算子 ≥ {threshold}",
         'index.coverage.pool': '**每个算子对的是一个候选池。** 主测量口径下符合准入条件的最快候选成为基准。整行保留所有候选及其各自耗时和来源档位。',
         "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 开源库基线 —— 也就是从第三方 Ascend 算子库的源码编出来的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「第三方算子库」的说法都应该引这个数**。",
         "index.coverage.tilelang_ref": "**{n_tl}/{total} 个算子**的已发布候选池中实测包含 `tilelang-ascend`（`tilelang_ref` 档位）；与上面的开源候选覆盖数可能重叠。",
@@ -1089,7 +1254,12 @@ STRINGS = {
         "reading.tier.tilelang_ref_row": "tilelang-ascend（Tile-AI）原始示例或测试 kernel，与我们使用相同 DSL/编译器；通过源码来源证据和数值门禁后才进入实测候选池。此档位说明 kernel 来源，不代表速度排名。",
         "reading.tier.vendor_row": "厂商实现：CANN 内置算子，或 torch_npu 自己对这个算子的分发。它是**完全相同工作负载上的一个真实实现**，而且在这块硬件上**经常就是最快的那个**。",
         "reading.tier.not_faster": "所以同一行里 `开源库` 的时间**比 `厂商库` 慢**，**不是错误**；在这里的好几个算子族上，这就是常态。**把这个徽章读成强弱排名，正是这一列存在的目的所要防止的那个误解。**",
-        "reading.tier.inventory": "历史普查的分母为 **91 个 elementwise、reduction、scan、dropout 算子**。本轮 R321 全量重测中，**24/91 个**至少有一个 `handwritten` 或 `tilelang_ref` 来源候选取得实测时间，**66/91 个**没有，另有 **1/91 个**因缺少完整结果无法判定。这是 shape/dtype 契约门之后的实测候选池覆盖，不是穷尽源码普查，也不是数值正确性通过率。逐 workload 的实际候选与拒绝原因以记录为准；只赢过厂商实现不能证明赢过开源 kernel。",
+        "reading.tier.inventory": "历史普查的分母为 **{total} 个 elementwise、reduction、scan、dropout 算子**。**按本页所渲染的这份快照当场算出**：**{got}/{total} 个**至少有一个 `handwritten` 或 `tilelang_ref` 来源候选取得实测时间，**{none}/{total} 个**没有，另有 **{unknown}/{total} 个**因本次运行没有发布任何 workload 而无法判定。这是 shape/dtype 契约门之后的实测候选池覆盖，不是穷尽源码普查，也不是数值正确性通过率。逐 workload 的实际候选与拒绝原因以记录为准；只赢过厂商实现不能证明赢过开源 kernel。",
+        "reading.regime.heading": "这一行是在哪个口径下测的",
+        "reading.regime.intro": "一个比值只和**同口径**的另一个比值可比。这里每个工作负载都在一个具名的**测量口径（regime）**下测得，本次运行的主口径是 `{headline}` —— 覆盖情况那几条、颜色、算子排序，说的全是这个口径。",
+        "reading.regime.legacy": "有几个算子在这个口径下压根没有测量，发布出来的是一份只测过 `eager` 的旧记录。这些行**保留** —— 那是一次真实工作负载上的真实测量，删掉会让页面凭空变短而且不给理由。取而代之的做法是**把它标出来**。",
+        "reading.regime.badge": "这一行的比值是在 `eager` 下测的，不是 `{headline}`。它只能和其它 `eager` 行比，**绝不能**和它上下的那些行比。",
+        "reading.regime.counts": "概览页上的每一个计数都守同一条规矩：`{headline}` 口径下的算子数和其它口径下的算子数分成两个数报，**绝不合并成一个**。",
         "reading.colour.heading": "颜色就是结论",
         "reading.colour.col_meaning": "含义",
         "reading.colour.behind": "比对照实现慢 —— 低于 {lo}×。",
@@ -1539,6 +1709,26 @@ def _tier_badge(prov: str | None, lang: str, name: str = "") -> str:
             f"{html.escape(label)}</a>")
 
 
+def _regime_badge(regime: str | None, lang: str) -> str:
+    """The measurement regime, badged, when it is not the headline one.
+
+    Returns the empty string for the headline regime and for a row that never
+    said which regime it was: badging every row would make the badge scenery,
+    and the only thing a reader has to be stopped by is a number taken a
+    different way from the ones above and below it.
+
+    Off the verdict axis and off the tier axis on purpose -- it is neither a
+    result nor a provenance -- so it is an outline, in ink, in neither hue.
+    Clickable, because "this row is eager" means nothing without the sentence
+    saying eager and graph ratios are not comparable.
+    """
+    if not regime or regime == headline_regime():
+        return ""
+    return (f' <a class="regime-off" href="{REGIME_HREF}"'
+            f' title="{html.escape(_S(lang, "regime.title", headline=headline_regime()), quote=True)}">'
+            f"{html.escape(regime)}</a>")
+
+
 def _pool_name_cell(c: dict, is_pick: bool, lang: str) -> str:
     short = _short_candidate(c["name"], c["prov"])
     body = f"<code>{html.escape(short)}</code>"
@@ -1633,6 +1823,10 @@ def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
     if m.get("measurement_note"):
         gap += (f'<br><small title="{html.escape(m["measurement_note"], quote=True)}">'
                 f'{html.escape(m["measurement_note"])}</small>')
+    # On the Ratio cell rather than in a column of its own: the badge qualifies
+    # one number, and a column would make a reader scan sideways to find out
+    # that the number they just read is not on the same footing as the rest.
+    gap += _regime_badge(m.get("regime"), lang)
     return (
         "<tr>"
         f'<td class="colsep"><b>{code}</b></td>'
@@ -1743,6 +1937,38 @@ def index_page(args, meta: dict, rows: list[tuple],
     lines += [f'## {_S(lang, "index.coverage.heading")}', "",
               "- " + _S(lang, "index.coverage.rated",
                         rated=rated, total=total)]
+    # The regime split of that same denominator. Written only when the snapshot
+    # actually holds more than the headline regime: a run measured wholly one way
+    # needs no qualification, and a bullet that always fires would be the kind of
+    # standing disclaimer readers learn to skip.
+    off = sorted({r for _, _, s, _, _ in rows for r in s.get("off_headline", ())})
+    if off:
+        head = headline_regime()
+        n_head = sum(1 for _, _, s, _, _ in rows
+                     if head in s.get("regimes", ()) and not s.get("off_headline"))
+        per = {r: sum(1 for _, _, s, _, _ in rows if r in s.get("off_headline", ()))
+               for r in off}
+        lines.append("- " + _S(lang, "index.coverage.regime", headline=head,
+                               n_headline=n_head, total=total,
+                               n_off=sum(per.values()),
+                               off=" · ".join(f"`{r}` {n}" for r, n in per.items())))
+        # The publisher's own tally, rendered only where the snapshot carries it.
+        # The renderer does not own the attainment line -- the harness does, and
+        # every coverage record states it -- so this is quoted, never recomputed:
+        # a second implementation of "how many cleared 0.70" is a second answer.
+        census = meta.get("regime_census") or {}
+        att = census.get("attainment") or {}
+        if att and RENDER_ATTAINMENT_LINE:
+            parts = []
+            for reg in sorted(att):
+                a = att[reg]
+                parts.append(_S(lang, "index.coverage.attained_one", regime=reg,
+                                n=a["ops_at_or_above_threshold"],
+                                of=a["ops_with_published_ratio"],
+                                threshold=a["threshold"]))
+            lines.append("- " + _S(lang, "index.coverage.attained",
+                                   parts=" · ".join(parts),
+                                   headline=census.get("headline_regime") or head))
     # Two numbers over the same denominator, and the denominator said out loud:
     # how many ops were raced against a pool, and how many of those pools held a
     # tier-1 open-source candidate at all. They are far apart on this device,
@@ -1785,7 +2011,8 @@ def index_page(args, meta: dict, rows: list[tuple],
     return "\n".join(lines) + "\n"
 
 
-def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG) -> str:
+def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG,
+                 inventory: dict | None = None) -> str:
     lo, hi = PAR_BAND
     mod = sol_engine[0]
     # The at-ceiling lines belong to the roofline tool; quote them from it so
@@ -1826,7 +2053,22 @@ def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG) -> str:
         + _S(lang, "reading.tier.vendor_row") + " |",
         "",
         _S(lang, "reading.tier.not_faster"), "",
-        _S(lang, "reading.tier.inventory"), "",
+        # Computed, never retyped: see `inventory_counts`. A caller with no
+        # metrics to count reports the whole cohort as undetermined, which is
+        # what "nothing was measured" honestly reads as.
+        _S(lang, "reading.tier.inventory",
+           **(inventory or inventory_counts({}))), "",
+        # A third axis, and the one a reader cannot infer from anything else on
+        # the page: how the row was measured. An explicit id, for the same
+        # reason the tier heading has one -- the badge on every off-headline row
+        # links here, and a slug generated from the Chinese heading would not be
+        # this string in both locales.
+        f'## {_S(lang, "reading.regime.heading")} ' + "{#" + REGIME_ANCHOR + "}", "",
+        _S(lang, "reading.regime.intro", headline=headline_regime()), "",
+        _S(lang, "reading.regime.legacy"), "",
+        '<a class="regime-off" href="#">eager</a> — '
+        + _S(lang, "reading.regime.badge", headline=headline_regime()), "",
+        _S(lang, "reading.regime.counts", headline=headline_regime()), "",
         f'## {_S(lang, "reading.colour.heading")}', "",
         f'| | {_S(lang, "reading.colour.col_meaning")} |',
         "| --- | --- |",
@@ -1940,6 +2182,11 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
             # count is the length of the list under it, and a tick on every op
             # says nothing. Only a mark that warns survives.
             warn = f" <small>{tmark}</small>" if tmark in ("❌", "⏭️") else ""
+            # And on the heading as well as on each row: an op measured entirely
+            # in another regime would otherwise only say so once per row, which a
+            # reader scanning headings for "who is behind" never reaches.
+            for reg in _summary.get("off_headline", ()):
+                warn += _regime_badge(reg, lang)
             ordered = sorted(zip(workloads_of[op], metrics_by_op[op], strict=True),
                              key=lambda z: z[0]["config"])
             coded = [(f"{WORKLOAD_CODE}{i}", w)
@@ -2003,6 +2250,13 @@ def main():
     if args.meta and os.path.exists(args.meta):
         with open(args.meta, encoding="utf-8") as f:
             meta = json.load(f)
+    # The regime the run itself calls its headline, so the badge marks rows against
+    # the run's own answer rather than against a constant compiled in here. A
+    # snapshot that publishes no meta.json, or an older one that never wrote the
+    # field, falls back to the D032 default and badges nothing it cannot justify.
+    global _HEADLINE_REGIME
+    _HEADLINE_REGIME = ((meta.get("environment") or {}).get("headline_regime")
+                        or DEFAULT_HEADLINE_REGIME)
 
     workloads, failures, skips = parse_bench_xml(args.bench_xml)
     scope = json.loads(ET.parse(args.bench_xml).getroot().get("phase_one_ops", "null"))
@@ -2092,7 +2346,8 @@ def main():
         pages[f"index{suffix}"] = index_page(
             args, meta, all_rows, by_page, timing, len(workloads),
             len(failures), len(skips), lang=lang)
-        pages[f"reading{suffix}"] = reading_page(sol_engine, lang=lang)
+        pages[f"reading{suffix}"] = reading_page(
+            sol_engine, lang=lang, inventory=inventory_counts(metrics_by_op))
         for slug, title_key, fams in DATA_PAGES:
             if any(rows_by_fam.get(f) for f in fams):
                 pages[f"{slug}{suffix}"] = data_page(

@@ -779,6 +779,29 @@ html[lang="zh"] .md-typeset .keystone {
   background: rgba(106, 100, 120, 0.08);
 }
 
+/* The measurement regime, when it is not the page's headline one.
+ *
+ * A third axis, and it had to look like neither of the other two. Green and
+ * rose are the verdict; the two badge hues are provenance. This one is about
+ * how the number was taken, so it is an outline in ink and no fill at all: it
+ * reads as a qualifier on the figure beside it rather than as a result or as a
+ * label for someone else's kernel. It appears only on rows and headings that
+ * are NOT the headline regime, so a page measured one way carries none of them.
+ */
+.md-typeset .regime-off {
+  font-family: var(--tf-mono);
+  font-size: 0.84em;
+  font-weight: 400;
+  padding: 0.05em 0.35em;
+  margin-left: 0.3em;
+  border: 1px solid var(--tf-ink-tint);
+  border-radius: 2px;
+  color: var(--tf-ink);
+  background: none;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
 /* Which member of the pool the Ratio column divided by. Ink, not a verdict
  * colour: it marks where the number came from, not whether that is good.
  */
