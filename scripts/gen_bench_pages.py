@@ -431,12 +431,18 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
         name = tc.attrib.get("name", "")
         skipped = tc.find("skipped")
         bad = tc.find("failure") if tc.find("failure") is not None else tc.find("error")
+        # T364. `phase` is a property of the row, like `shape`, not a metric of one
+        # implementation, so it carries no `<tag>_` prefix and the loop below would
+        # drop it. The publisher writes it only on second-phase rows, so its absence
+        # is what a first-phase row looks like and a snapshot published before T364
+        # reads as all-phase-one -- which is what it is.
+        phase = props.get("phase")
         if skipped is not None:
-            skips.append({"name": name, "op": props.get("op"),
+            skips.append({"name": name, "op": props.get("op"), "phase": phase,
                           "message": skipped.attrib.get("message", "")})
             continue
         if bad is not None:
-            failures.append({"name": name, "op": props.get("op"),
+            failures.append({"name": name, "op": props.get("op"), "phase": phase,
                              "message": bad.attrib.get("message", "")})
             continue
         if "op" not in props:
@@ -447,7 +453,7 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
             # `shape` is the case's own record of what it ran on, not a metric
             # of one implementation, so it carries no `<tag>_` prefix and is
             # read straight off the testcase below.
-            if key in ("op", "op_module", "shape"):
+            if key in ("op", "op_module", "shape", "phase"):
                 continue
             for suf in _METRIC_SUFFIXES:
                 if key.endswith("_" + suf):
@@ -466,6 +472,7 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
             "op_module": props.get("op_module"),
             "impls": dict(impls),
             "shape": props.get("shape"),
+            "phase": phase,
         })
     return workloads, failures, skips
 
@@ -834,6 +841,27 @@ STRINGS = {
         "page.gemm-moe.title": "GEMM, MoE & Quantization",
         "page.elementwise-reduction.title": "Elementwise & Reduction",
         "page.norm-conv-pool.title": "Norm, Conv, Pool & Other",
+        # T364: the second phase, on its own page and with its own denominator.
+        "page.phase-two.title": "Second-phase operators",
+        "phase2.banner.title": "A separate set, and a separate denominator",
+        "phase2.banner.what": (
+            "These operators are **outside the first-phase list** "
+            "(`docs/tasks/OPS-178.md`) that every other Benchmarks page is scoped "
+            "to. They are shown here because the harness already measured a real "
+            "opponent against them, not because the first phase grew."
+        ),
+        "phase2.banner.denominator": (
+            "**Nothing on this page is added to any count on the other pages.** The "
+            "overview's coverage figures, the per-family tallies and the "
+            "attainment counts are all first-phase only, and stay first-phase only. "
+            "This page's own tally, below, counts these operators and nothing else."
+        ),
+        "phase2.banner.selection": (
+            "An operator reaches this page only when the snapshot publishes a "
+            "ratio for it. One with no timed opponent is left out rather than "
+            "shown as a row of blanks. Operators the first-phase list names but "
+            "D018 deferred are not here either: a deferral is not a result."
+        ),
         # --- A data page's own prose
         "data.tally": "**{n_ops} ops, {n_workloads} workloads** — {tally}.",
         "data.tally_single": "**{n_ops} ops, {n_workloads} workloads.**",
@@ -970,6 +998,20 @@ STRINGS = {
             "which binary the process opened, never by the call returning."
         ),
         "reading.tier.tilelang_ref_row": "Original example or test kernel from tilelang-ascend (Tile-AI), compiled with the same DSL/compiler. Admitted only after the harness source-provenance and numeric gates. This tier describes kernel origin, not speed.",
+        "reading.tier.torch_compile_row": (
+            "The same PyTorch program handed to `torch.compile` on this backend "
+            "(`aclgraph` or `ge`), timed as one more candidate in the pool. Not a "
+            "hand-written kernel and not a vendor dispatch: a compiler's answer to "
+            "the same problem. It carries the neutral badge because it is neither "
+            "of the two, and it wins often enough here that a reader should know "
+            "what beat us when it does."
+        ),
+        "reading.tier.agent_written_row": (
+            "A kernel an agent wrote, admitted to the pool by D060 under the same "
+            "source-provenance and numeric gates as the others. Like every tier "
+            "here it describes where the kernel came from, not how fast it is. No "
+            "row in the current snapshot carries it."
+        ),
         "reading.tier.vendor_row": (
             "A vendor implementation: a CANN built-in operator, or torch_npu's "
             "own dispatch for the op. A real implementation on the identical "
@@ -1208,6 +1250,24 @@ STRINGS = {
         "page.gemm-moe.title": "GEMM、MoE 与量化",
         "page.elementwise-reduction.title": "Elementwise 与归约",
         "page.norm-conv-pool.title": "Norm、Conv、Pool 及其它",
+        "page.phase-two.title": "第二阶段算子",
+        "phase2.banner.title": "独立的一组，独立的分母",
+        "phase2.banner.what": (
+            "这些算子**不在第一阶段名单**（`docs/tasks/OPS-178.md`）里，"
+            "而 Benchmarks 的其它每一页都只覆盖那份名单。"
+            "它们出现在这里，是因为 harness 已经为它们实测到了一个真实对手，"
+            "**不是因为第一阶段变大了**。"
+        ),
+        "phase2.banner.denominator": (
+            "**本页的任何数字都不会被加进其它页面的任何计数里。**"
+            "总览页的覆盖率、各家族小计、达标数，全部只统计第一阶段，并且继续只统计第一阶段。"
+            "下面那行本页自己的小计，只数这一组算子，不数别的。"
+        ),
+        "phase2.banner.selection": (
+            "只有快照真的为一个算子发布了比值，它才会出现在这一页；"
+            "没有实测到对手的算子会被留在页面之外，而不是渲染成一行空白。"
+            "第一阶段名单里被 D018 推迟的算子同样不在这里 —— **推迟不是成果**。"
+        ),
         "data.tally": "**{n_ops} 个算子，{n_workloads} 个工作负载** —— {tally}。",
         "data.tally_single": "**{n_ops} 个算子，{n_workloads} 个工作负载。**",
         'data.intro': '每个算子一张表，每个工作负载一行。`比值` 是同一测量口径下基准的耗时除以我们的耗时，所以 <span class="perf-ahead">绿色</span> 表示我们更快，<span class="perf-par">无色</span> 表示持平，<span class="perf-behind">红色</span> 表示我们更慢。时间单位是 ms。{reading_link}。',
@@ -1252,6 +1312,8 @@ STRINGS = {
         "reading.tier.col_meaning": "含义",
         "reading.tier.handwritten_row": "从**第三方 Ascend 算子库的源码**编出来的 kernel，通过那个库自己的入口点调用。只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳：一个**缺 kernel 的自定义算子包会静默回落到 CANN 内置**，调用照样成功、输出照样正确、时间照样看着合理。所以这里的来源认定靠的是**追踪进程实际打开了哪个二进制**，绝不是「调用没报错」。",
         "reading.tier.tilelang_ref_row": "tilelang-ascend（Tile-AI）原始示例或测试 kernel，与我们使用相同 DSL/编译器；通过源码来源证据和数值门禁后才进入实测候选池。此档位说明 kernel 来源，不代表速度排名。",
+        "reading.tier.torch_compile_row": "把同一段 PyTorch 程序交给这块后端上的 `torch.compile`（`aclgraph` 或 `ge`）编出来的实现，作为候选池里的一员一起实测。它既不是手写 kernel，也不是厂商分发，而是**编译器对同一个问题给出的答案**。正因为两边都不属于，它用的是中性徽章；而它在这里赢的次数不少，读者有必要知道赢我们的到底是什么。",
+        "reading.tier.agent_written_row": "由 agent 编写的 kernel，按 D060 与其它档位同样的源码来源证据和数值门禁进入候选池。和这张表里每一个档位一样，它说明的是 kernel 的**来源**，不是它的速度。当前快照中没有任何一行属于这个档位。",
         "reading.tier.vendor_row": "厂商实现：CANN 内置算子，或 torch_npu 自己对这个算子的分发。它是**完全相同工作负载上的一个真实实现**，而且在这块硬件上**经常就是最快的那个**。",
         "reading.tier.not_faster": "所以同一行里 `开源库` 的时间**比 `厂商库` 慢**，**不是错误**；在这里的好几个算子族上，这就是常态。**把这个徽章读成强弱排名，正是这一列存在的目的所要防止的那个误解。**",
         "reading.tier.inventory": "历史普查的分母为 **{total} 个 elementwise、reduction、scan、dropout 算子**。**按本页所渲染的这份快照当场算出**：**{got}/{total} 个**至少有一个 `handwritten` 或 `tilelang_ref` 来源候选取得实测时间，**{none}/{total} 个**没有，另有 **{unknown}/{total} 个**因本次运行没有发布任何 workload 而无法判定。这是 shape/dtype 契约门之后的实测候选池覆盖，不是穷尽源码普查，也不是数值正确性通过率。逐 workload 的实际候选与拒绝原因以记录为准；只赢过厂商实现不能证明赢过开源 kernel。",
@@ -2051,6 +2113,15 @@ def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG,
         + _S(lang, "reading.tier.tilelang_ref_row") + " |",
         f'| <span class="tier tier-vendor">{_S(lang, "tier.vendor")}</span> | '
         + _S(lang, "reading.tier.vendor_row") + " |",
+        # T364.  Two tiers the harness emits that this legend did not list, so a
+        # reader meeting either badge on a data row had nothing to click through to.
+        # `torch_compile` is the one that matters: it wins 196 of the published rows
+        # and its badge prints the raw tier name, so the cell below prints the SAME
+        # raw name rather than a prettier one a reader could not match to the badge.
+        '| <span class="tier tier-other">torch_compile</span> | '
+        + _S(lang, "reading.tier.torch_compile_row") + " |",
+        f'| <span class="tier tier-other">{_S(lang, "tier.agent_written")}</span> | '
+        + _S(lang, "reading.tier.agent_written_row") + " |",
         "",
         _S(lang, "reading.tier.not_faster"), "",
         # Computed, never retyped: see `inventory_counts`. A caller with no
@@ -2148,7 +2219,7 @@ def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG,
 
 def data_page(title: str, fams: list[str], rows_by_fam: dict,
               metrics_by_op: dict, workloads_of: dict, ref: str,
-              lang: str = DEFAULT_LANG) -> str:
+              lang: str = DEFAULT_LANG, banner: list[str] | None = None) -> str:
     # Widest lead first, then level, then behind, then the unrated. Every op is
     # listed either way; this only decides what a reader meets first.
     rank = {AHEAD: 0, PAR: 1, BEHIND: 2, UNRATED: 3}
@@ -2166,6 +2237,11 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
                 n_workloads=n_workloads), "",
              _S(lang, "data.intro",
                 reading_link=f'[{_S(lang, "link.reading")}](reading.md)'), ""]
+    # T364: the second phase's page says what it is before it shows a number. No
+    # caller passes one for the five pages that existed before, so those render the
+    # bytes they always did.
+    if banner:
+        lines += banner + [""]
     for fam in fams:
         rows = rows_by_fam.get(fam)
         if not rows:
@@ -2202,6 +2278,28 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
                 lines.append(detail_row(code, m, lang))
             lines += [*DETAIL_FOOTER, "</div>", ""]
     return "\n".join(lines) + "\n"
+
+
+# --- The second phase (T364) -----------------------------------------------
+# One page, outside `DATA_PAGES`, holding the operators the snapshot marks
+# `phase=2`.  Outside that list on purpose: `DATA_PAGES` is what the overview's
+# entry table iterates and what `page_of_family` routes a family to, and a second
+# phase that appeared in either would be a second phase folded into the first
+# phase's denominators -- the one thing this page exists not to do.  It reaches
+# the nav through `hooks.py`, which lists the generated files rather than this
+# table.
+PHASE_TWO_SLUG = "phase-two"
+# Every family, in the display order the five data pages use between them, so an
+# operator lands under the same heading it would have landed under there.
+PHASE_TWO_FAMILIES = [f for _slug, _key, fams in DATA_PAGES for f in fams]
+
+
+def phase_two_banner(lang: str = DEFAULT_LANG) -> list[str]:
+    """The admonition that has to be read before any number on that page."""
+    return [f'!!! warning "{_S(lang, "phase2.banner.title")}"', "",
+            "    " + _S(lang, "phase2.banner.what"), "",
+            "    " + _S(lang, "phase2.banner.denominator"), "",
+            "    " + _S(lang, "phase2.banner.selection")]
 
 
 # --- Main ------------------------------------------------------------------
@@ -2259,6 +2357,14 @@ def main():
                         or DEFAULT_HEADLINE_REGIME)
 
     workloads, failures, skips = parse_bench_xml(args.bench_xml)
+    # T364.  Taken off the front of the lists, before the phase-one scope filter
+    # below, and never put back: everything downstream of that filter -- the
+    # coverage counts, the family tallies, the attainment status, the inventory
+    # sentence, the five data pages -- is the first phase and only the first phase.
+    # The second phase gets its own copies of the same machinery further down.
+    p2_workloads = [w for w in workloads if w.get("phase") == "2"]
+    p2_failures = [w for w in failures if w.get("phase") == "2"]
+    p2_skips = [w for w in skips if w.get("phase") == "2"]
     scope = json.loads(ET.parse(args.bench_xml).getroot().get("phase_one_ops", "null"))
     if scope is not None:
         workloads = [w for w in workloads if w["op"] in scope]
@@ -2308,6 +2414,25 @@ def main():
             else:
                 undeclared.add(w["op"])
 
+    # The same resolution for the second phase, kept in a loop of its own so the
+    # `undeclared` / `from_snapshot` sets above -- which the run reports on stderr --
+    # stay first-phase sets and the notes they print do not move.
+    p2_undeclared = set()
+    for w in p2_workloads:
+        entry = manifest.get(w["op"])
+        w["spec"] = workload_shape.describe(entry, w["config"]) if entry else None
+        if not w["spec"]:
+            recorded = None
+            if w.get("shape"):
+                try:
+                    recorded = json.loads(w["shape"])
+                except (TypeError, ValueError):
+                    recorded = None
+            w["spec"] = workload_shape.describe_recorded(
+                entry, w["config"], recorded, ours_of(w["impls"]).get("dtype"))
+            if not w["spec"]:
+                p2_undeclared.add(w["op"])
+
     metrics_by_op: dict[str, list[dict]] = defaultdict(list)
     workloads_of: dict[str, list[dict]] = defaultdict(list)
     module_of: dict[str, str | None] = {}
@@ -2331,6 +2456,21 @@ def main():
         by_page[page_of_family(fam)].append(row)
         all_rows.append(row)
 
+    # The second phase's own copies. Separate dicts, not separate keys in the ones
+    # above: a single dict is a single denominator, and `op_summary` /
+    # `inventory_counts` / the coverage bullets all read whatever is in it.
+    p2_metrics_by_op: dict[str, list[dict]] = defaultdict(list)
+    p2_workloads_of: dict[str, list[dict]] = defaultdict(list)
+    p2_module_of: dict[str, str | None] = {}
+    for w in p2_workloads:
+        p2_metrics_by_op[w["op"]].append(workload_metrics(w, sol_engine))
+        p2_workloads_of[w["op"]].append(w)
+        p2_module_of.setdefault(w["op"], w["op_module"])
+    p2_rows_by_fam: dict[str, list[tuple]] = defaultdict(list)
+    for op, ms in p2_metrics_by_op.items():
+        p2_rows_by_fam[family_of(op, p2_module_of.get(op))].append(
+            (op, p2_module_of.get(op), op_summary(ms), _test_mark(tests.get(op)), ref))
+
     ratio_drift = []
     for op in metrics_by_op:
         ratio_drift += collect_ratio_drift(workloads_of[op], metrics_by_op[op])
@@ -2353,6 +2493,14 @@ def main():
                 pages[f"{slug}{suffix}"] = data_page(
                     _S(lang, title_key), fams, rows_by_fam, metrics_by_op,
                     workloads_of, ref, lang=lang)
+        # T364. Written only when the snapshot carries second-phase rows, so a
+        # snapshot published before T364 renders exactly the pages it always did
+        # -- no empty page, and no nav entry leading to one.
+        if p2_rows_by_fam:
+            pages[f"{PHASE_TWO_SLUG}{suffix}"] = data_page(
+                _S(lang, "page.phase-two.title"), PHASE_TWO_FAMILIES,
+                p2_rows_by_fam, p2_metrics_by_op, p2_workloads_of, ref, lang=lang,
+                banner=phase_two_banner(lang))
     for name, text in pages.items():
         with open(os.path.join(out_dir, name), "w", encoding="utf-8") as f:
             f.write(text)
@@ -2361,6 +2509,16 @@ def main():
           f"{len(LANG_SUFFIX)} locales: {len(all_rows)} ops, "
           f"{len(workloads)} workloads, {len(failures)} failed, "
           f"{len(skips)} skipped")
+    # A SECOND line, never folded into the one above: that line is what the deploy
+    # log is diffed on, and the whole point of T364 is that its numbers do not move.
+    if p2_workloads or p2_failures or p2_skips:
+        print(f"  phase 2 (own page, own denominator): {len(p2_metrics_by_op)} ops, "
+              f"{len(p2_workloads)} workloads, {len(p2_failures)} failed, "
+              f"{len(p2_skips)} skipped")
+        if p2_undeclared:
+            print("  note: phase-2 workloads with neither a manifest entry nor a "
+                  "recorded shape show their benchmark id and no shapes: "
+                  + ", ".join(sorted(p2_undeclared)), file=sys.stderr)
     if ratio_drift:
         print(f"warning: {len(ratio_drift)} workloads where the recorded ratio "
               "disagrees with the computed one", file=sys.stderr)
