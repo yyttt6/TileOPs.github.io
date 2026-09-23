@@ -1,6 +1,27 @@
 # How a benchmark is timed
 
-The nightly benchmark measures one row per workload per op, reporting `device_busy_ms`:
+## This fork's Ascend nightly
+
+The current nightly runs on **Ascend 910B1 (Atlas A2, 8 cards)** with
+**CANN 9.2.0-beta.1 / torch_npu 2.7.1.post8**. `device_busy_ms` is collected
+through `torch_npu.profiler`: the union of the device execution intervals
+of the kernels in one call, excluding host launch overhead and gaps between kernels.
+
+Sampling uses **WARMUP=10 / REPEATS=30**, with **192 MiB L2** evicted
+between iterations. The **headline regime is `graph`**. See
+[Benchmarks](benchmarks/index.md) for current results.
+
+## Upstream NVIDIA timing reference
+
+!!! note "The following describes the upstream H200 / CUPTI method only"
+
+    The following sections retain the upstream timing procedure, code and
+    H200 measurements to explain timing quantities and sources of error.
+    CUPTI, CUDA events, the 25/100 ms budgets and the readings in the tables
+    belong to that upstream experiment, not this fork's Ascend nightly.
+    They must not be interpreted as Ascend measurements.
+
+The upstream nightly benchmark measures one row per workload per op, reporting `device_busy_ms`:
 the union of the execution intervals of every kernel that call produces. CUPTI records each
 kernel's device-side start and end, an external correlation id attributes it to an
 iteration, L2 is cleared before every iteration, and 25 ms of warm-up plus 100 ms of
@@ -22,10 +43,10 @@ The rest is there when you need it:
 - [When to change how you measure](#when-to-change-how-you-measure) — only needed when
   writing a benchmark yourself; it covers what this method cannot measure.
 
-Every number below was measured on an H200, in the `tileops-runner:cu132-torch2.13`
+Every number in this reference was measured upstream on an H200, in the `tileops-runner:cu132-torch2.13`
 image.
 
-## How one measurement runs
+### How one measurement runs
 
 ```python
 from benchmarks.timing import bench_kernel
@@ -91,7 +112,7 @@ Five choices in it, each for a reason:
 | Nothing discarded, but a kernel carries no iteration number | `_OffThreadLaunchError` | a thread that never pushed an id launched it |
 | Nothing discarded, and one iteration has no kernels at all | `_CUPTIAttributionError` | that call never reached the device |
 
-## What is measured
+### What is measured
 
 **`device_busy_ms`: the union of the execution intervals of every kernel one call
 produces.** A CUPTI kernel record gives the device-side execution bounds, with none of the
@@ -118,7 +139,7 @@ call from 35 us to 2068 us while `device_busy_ms` stays at 19.1 us — a late ho
 change any kernel's execution time, it only pushes them apart on the timeline, and the
 union is the same.
 
-## Why not wall-clock time
+### Why not wall-clock time
 
 At decode sizes an op can finish faster than the Python call that launched it. Four
 methods, one 3 us kernel, four numbers:
@@ -136,7 +157,7 @@ TileOPs times with CUPTI**, and it is why a row that fell back to CUDA events ca
 compared with the others: there `device_busy_ms` and `latency_ms` carry the same number,
 and the `timing` field records `cuda-events`.
 
-## Comparing several implementations
+### Comparing several implementations
 
 Comparing implementations within one case, `compare()` times each twice, in the order
 A B C C B A, and takes the median over both passes.
@@ -153,7 +174,7 @@ second half of the case, cancelling monotonic drift to first order. Two details:
   fallen back to CUDA events raises rather than pooling, which would put one median over
   two kinds of measurement.
 
-## When to change how you measure
+### When to change how you measure
 
 The default case needs none of this: one kernel per call, through the Op interface, timed
 by `bench_kernel`, no other thread using the GPU — where most ops are today. Seven cases

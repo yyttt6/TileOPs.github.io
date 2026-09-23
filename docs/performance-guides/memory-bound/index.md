@@ -1,5 +1,15 @@
 # Tuning Memory-Bound Kernels
 
+!!! note "Upstream NVIDIA / H200 tuning reference"
+
+    This NVIDIA-platform tutorial is retained from
+    [tile-ai/TileOPs.github.io](https://github.com/tile-ai/TileOPs.github.io).
+    All measurements, figures, hardware parameters and rules involving SMs, warps
+    and shared memory belong to the original H200 / CUDA context. They are not
+    Ascend 910B1 results or hardware specifications. These cases illustrate tuning
+    methods; hardware rules and performance must be validated again when porting
+    to Ascend. See [Timing](../../timing.md) for this fork's Ascend measurements.
+
 ## What memory-bound means
 
 On a GPU, kernel speed is determined by whether compute or bandwidth becomes

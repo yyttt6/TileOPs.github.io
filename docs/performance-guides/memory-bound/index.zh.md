@@ -1,8 +1,16 @@
 # 优化访存受限的 kernel
 
+!!! note "上游 NVIDIA / H200 调优参考"
+
+    本页保留自 [tile-ai/TileOPs.github.io](https://github.com/tile-ai/TileOPs.github.io)
+    的 NVIDIA 平台教程。所有实测数字、图表、硬件参数及 SM、warp、shared memory 等
+    规则均属于原文的 H200 / CUDA 语境，不是 Ascend 910B1 的结果或硬件说明。
+    保留这些案例用于理解调优方法；向 Ascend 移植时须重新验证硬件规则与性能。
+    本 fork 的 Ascend 测量方法见[计时方法](../../timing.md)。
+
 ## 什么是访存受限
 
-在 GPU 上，一个 kernel 跑多快，取决于算力与带宽哪一个先成为瓶颈。TileOPs 用 [macro benchmark](https://github.com/tile-ai/TileOPs/tree/main/benchmarks/hardware) 测算出一个**[校准系数](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/perf/profiles/h200.yaml)**：硬件 spec 给出的理论峰值乘以校准系数，得到实际可达的有效值，以此作为性能优化的指导标准。我们在 H200 上实测出 [fp32 FMA 的算力为 **57.27** TFLOP/s，访存带宽为 **4.07** TB/s](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/perf/profiles/h200.yaml)。roofline 的**拐点**（ridge point）是带宽斜线与算力上限这两段的交点，两者相除给出它的横坐标，也就是拐点处的算术强度 **14.07 flop/byte** —— 算力与带宽同时用满时，每搬运一个字节对应的浮点运算次数：
+在 GPU 上，一个 kernel 跑多快，取决于算力与带宽哪一个先成为瓶颈。TileOPs 用 [macro benchmark](https://github.com/tile-ai/TileOPs/tree/main/benchmarks/hardware) 测算出一个**[校准系数](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/perf/profiles/h200.yaml)**：硬件 spec 给出的理论峰值乘以校准系数，得到实际可达的有效值，以此作为性能优化的指导标准。上游在 H200 上实测出 [fp32 FMA 的算力为 **57.27** TFLOP/s，访存带宽为 **4.07** TB/s](https://github.com/tile-ai/TileOPs/blob/main/src/tileops/perf/profiles/h200.yaml)。roofline 的**拐点**（ridge point）是带宽斜线与算力上限这两段的交点，两者相除给出它的横坐标，也就是拐点处的算术强度 **14.07 flop/byte** —— 算力与带宽同时用满时，每搬运一个字节对应的浮点运算次数：
 
 <figure class="roofline" markdown="1">
 

@@ -1,5 +1,14 @@
 # Bringing an op into torch.compile
 
+!!! note "Upstream NVIDIA platform reference"
+
+    This tutorial is retained from [tile-ai/TileOPs](https://github.com/tile-ai/TileOPs).
+    Its CUDA examples, APIs, errors, graph-capture constraints and H200 measurements
+    (where present) refer to the upstream NVIDIA platform. They do not establish
+    Ascend support or performance for these paths in this fork. Original terminology
+    is kept to explain the interface design; see [Timing](timing.md) for this fork's
+    measurement method.
+
 Bringing a TileOPs op into `torch.compile` makes it one node in the user's compiled
 graph, and that node's shape does not change with the backend serving it.
 
@@ -286,7 +295,7 @@ has already compiled, which inductor need not touch.
 
 ### What the boundary costs
 
-Measured on an idle H200 at 2048×4096, fp16. Per-call figures are the minimum of
+Measured upstream on an idle H200 at 2048×4096, fp16. Per-call figures are the minimum of
 three runs of 2000 iterations × 9 rounds:
 
 | | Boundary at the kernel layer | Boundary at the op layer |

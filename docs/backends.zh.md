@@ -1,5 +1,12 @@
 # 接入新硬件后端
 
+!!! note "上游 NVIDIA 平台参考"
+
+    本页保留自 [tile-ai/TileOPs](https://github.com/tile-ai/TileOPs) 的教程。
+    CUDA 示例、API、报错、graph 捕获约束及 H200 实测（如有）属于上游 NVIDIA 平台，
+    不代表本 fork 已在 Ascend 上验证这些调用路径或取得这些性能。
+    保留原术语用于解释接口设计；本 fork 的测量方法见[计时方法](timing.md)。
+
 TileLang 是多后端 DSL，每种硬件各有一套独立的 kernel，由各自的 Python 包发行。TileOPs 因此定了一套协议：仓外的 Python 包可以接管某个算子的 kernel，取代自带的实现，且不必改 TileOPs 的任何代码。
 
 本页讲怎么把一类新硬件接进来，让这类设备上的算子由自己的 kernel 执行。

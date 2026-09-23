@@ -1,5 +1,13 @@
 # 优化 shared memory 访问
 
+!!! note "上游 NVIDIA / H200 调优参考"
+
+    本页保留自 [tile-ai/TileOPs.github.io](https://github.com/tile-ai/TileOPs.github.io)
+    的 NVIDIA 平台教程。所有实测数字、图表、硬件参数及 SM、warp、shared memory 等
+    规则均属于原文的 H200 / CUDA 语境，不是 Ascend 910B1 的结果或硬件说明。
+    保留这些案例用于理解调优方法；向 Ascend 移植时须重新验证硬件规则与性能。
+    本 fork 的 Ascend 测量方法见[计时方法](../../timing.md)。
+
 数据经过 shared memory 中转时，多了一处需要考虑 access pattern 的地方：从 global memory 写进来、再从 shared memory 读进寄存器，两步都在访问 shared memory。这一页讲这两步上的 bank conflict —— 它由什么决定、怎么用 pad 消掉、以及 pad 该按什么算。
 
 这一页的实测都在 H200 上、SM 时钟锁在 1830 MHz、输入大于 L2 的 60 MiB、block 数足以填满整卡 —— 这组条件之外结论可能反转，判据见[优化 global memory 访问](global-memory-access.md#regime)。

@@ -1,6 +1,24 @@
 # benchmark 的计时方法
 
-nightly benchmark 给每个算子的每个 workload 各测一行，报出的 `device_busy_ms` 是这次调用产生的全部 kernel 在设备上执行区间的并集。CUPTI 记下每个 kernel 的执行起止，按 external correlation id 归到某次迭代；每次迭代之前清空 L2，25 ms 预热、100 ms 测量，取中位数。
+## 本 fork 的 Ascend nightly
+
+当前 nightly 使用 **Ascend 910B1（Atlas A2，8 卡）**，软件栈为
+**CANN 9.2.0-beta.1 / torch_npu 2.7.1.post8**。`device_busy_ms` 通过
+`torch_npu.profiler` 采集，取一次调用各 kernel 在设备上的执行区间并集，
+不含 host 发起调用的开销或 kernel 之间的空隙。
+
+采样设置为 **WARMUP=10 / REPEATS=30**，每次迭代间驱逐 **192 MiB L2**，
+**headline regime 为 `graph`**。当前结果见[性能数据](benchmarks/index.md)。
+
+## 上游 NVIDIA 计时参考
+
+!!! note "下文仅描述上游 H200 / CUPTI 方法"
+
+    以下各节保留上游的计时流程、代码及 H200 实测，供理解计时量与误差来源。
+    CUPTI、CUDA events、25/100 ms 时间预算和表中读数均属于上游实验，
+    不描述本 fork 的 Ascend nightly；不得将这些数字解释为 Ascend 实测。
+
+上游 nightly benchmark 给每个算子的每个 workload 各测一行，报出的 `device_busy_ms` 是这次调用产生的全部 kernel 在设备上执行区间的并集。CUPTI 记下每个 kernel 的执行起止，按 external correlation id 归到某次迭代；每次迭代之前清空 L2，25 ms 预热、100 ms 测量，取中位数。
 
 **所以表里的每个数都是设备执行 kernel 的时间：不含 CPU 发起调用的开销，也不含 kernel 之间的空隙。读表到这里就够了。**{ .keystone }
 
@@ -11,9 +29,9 @@ nightly benchmark 给每个算子的每个 workload 各测一行，报出的 `de
 - [为什么不是墙钟时间](#why-not-wall-clock) —— decode 尺度上 CUDA events 测不出小 kernel。
 - [什么时候要改测法](#when-to-change) —— 自己写 benchmark 时才用得上，含这套测法测不到的几种情形。
 
-下文的数字都在 H200 上实测，镜像为 `tileops-runner:cu132-torch2.13`。
+本参考部分的数字均由上游在 H200 上实测，镜像为 `tileops-runner:cu132-torch2.13`。
 
-## 一次测量的流程 {#how-it-runs}
+### 一次测量的流程 {#how-it-runs}
 
 ```python
 from benchmarks.timing import bench_kernel
@@ -68,7 +86,7 @@ for i in range(n_repeat):
 | 没有丢弃，但有 kernel 带不上迭代号 | `_OffThreadLaunchError` | 某个没有标记迭代号的线程发起了它 |
 | 没有丢弃，某次迭代一个 kernel 都没有 | `_CUPTIAttributionError` | 这次调用没上设备 |
 
-## 被测量的量 {#what-is-measured}
+### 被测量的量 {#what-is-measured}
 
 **`device_busy_ms`：一次调用产生的全部 kernel，在设备上执行区间的并集长度。** CUPTI 的 kernel 记录给出设备上的执行起止，不含 CPU 发起这次调用的开销。三种情形：
 
@@ -82,7 +100,7 @@ for i in range(n_repeat):
 
 这样定义的量对主机的快慢免疫。CUPTI 的采集缓冲从 256 KB 换成 32 MB，同一个三 kernel 调用的 `latency_ms` 中位数从 35 us 涨到 2068 us，`device_busy_ms` 始终 19.1 us —— 主机晚发不改变任何 kernel 的执行时长，只是把它们在时间轴上推远，并集不变。
 
-## 为什么不是墙钟时间 {#why-not-wall-clock}
+### 为什么不是墙钟时间 {#why-not-wall-clock}
 
 decode 尺度上，算子的执行时间可能短于发起它的那次 Python 调用。同一个 3 us 的 kernel，四种测法读出四个数：
 
@@ -95,7 +113,7 @@ decode 尺度上，算子的执行时间可能短于发起它的那次 Python �
 
 设备上实际执行 1.95 us，event 方案读出的 6 us 是 CPU 发起下一次调用的节奏，不是 kernel 的执行时间。**这是 TileOPs 用 CUPTI 计时的唯一理由**，也是为什么退回 CUDA events 之后那一行不能与其余行比较：`device_busy_ms` 与 `latency_ms` 记同一个数，`timing` 字段记为 `cuda-events`。
 
-## 比较多个实现
+### 比较多个实现
 
 同一个用例里比较几个实现，`compare()` 按 A B C C B A 各跑两段，两段样本合并后取中位数。
 
@@ -104,7 +122,7 @@ decode 尺度上，算子的执行时间可能短于发起它的那次 Python �
 - **预算是拆开的，不是翻倍。** 每段 12.5 ms 预热、50 ms 测量，迭代上下限各取一半 —— 要的是对称，不是更多样本，样本量与单实现计时相当。
 - **两段的计时方法必须一致。** 一段走 CUPTI、另一段退回 CUDA events 时直接报错，不合并，否则一个中位数横跨两种测量。
 
-## 什么时候要改测法 {#when-to-change}
+### 什么时候要改测法 {#when-to-change}
 
 默认情形什么都不用管：一次调用只发一个 kernel、经由 Op 接口、走 `bench_kernel`、进程里没有别的线程用 GPU —— 当前多数算子都是这样。下面七种要停下来处理：
 

@@ -1,5 +1,15 @@
 # Optimizing Global Memory Access
 
+!!! note "Upstream NVIDIA / H200 tuning reference"
+
+    This NVIDIA-platform tutorial is retained from
+    [tile-ai/TileOPs.github.io](https://github.com/tile-ai/TileOPs.github.io).
+    All measurements, figures, hardware parameters and rules involving SMs, warps
+    and shared memory belong to the original H200 / CUDA context. They are not
+    Ascend 910B1 results or hardware specifications. These cases illustrate tuning
+    methods; hardware rules and performance must be validated again when porting
+    to Ascend. See [Timing](../../timing.md) for this fork's Ascend measurements.
+
 When a thread reads several elements from a row, the access can be written four
 ways. This page measures all four on two workloads and explains how to choose
 among them.
@@ -485,7 +495,7 @@ bandwidth each reaches.
 
 ## Measurements
 
-Both workloads are measured on an H200. The comparison is the **memory
+Both workloads were measured upstream on an H200. The comparison is the **memory
 bandwidth** reached by each of the four access patterns: bytes moved divided by
 kernel time, in TB/s. The two workloads impose different requirements on the
 order in which elements are processed, and that requirement determines which

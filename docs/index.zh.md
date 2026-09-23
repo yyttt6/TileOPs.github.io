@@ -4,9 +4,17 @@ TileOPs 是一个面向大模型推理的算子库，构建在 [TileLang](https:
 
 它与手写算子库的不同之处在于组织方式：每个算子先以一份 spec 声明，再由 agent 依据这份 spec 生成实现。spec 既是代码生成的唯一依据，也是验收的标准 —— 正确性对照 spec 指定的参考实现，性能对照 roofline 模型给出的上界，两项都不依赖人的判断。因此一个实现可以随时从 spec 重新生成，而反过来做不到。
 
+**上游 NVIDIA API 概览。** 下段描述上游库的行为，不代表这些执行路径已获 Ascend 支持。
+
 对使用者而言，它就是一批可以直接调用的算子：形状与 dtype 在调用时确定，特化后的 kernel 在首次使用时自动调优并缓存，随后可以与 CUDA graph 配合使用；每个算子各自声明是否支持 `torch.compile(fullgraph=True)`。
 
 ## 安装
+
+!!! note "上游 NVIDIA 示例"
+
+    以下安装步骤和快速开始保留自 [tile-ai/TileOPs](https://github.com/tile-ai/TileOPs)，
+    使用 CUDA，不是 Ascend 安装或运行教程。本 fork 的 nightly 测量使用 Ascend 910B1；
+    当前平台与测量方法见[性能数据](benchmarks/index.md)和[计时方法](timing.md)。
 
 ```bash
 pip install tileops
@@ -32,7 +40,7 @@ flops, nbytes = op.eval_roofline()   # 本次调用所需的计算量与访存�
 
 - [使用指南](user-guide/index.md) —— 读写 manifest、接入 `torch.compile`、benchmark 怎么计时、接入新硬件后端
 - [API 参考](api/index.md) —— 各算子族的构造参数与调用方式
-- [性能数据](benchmarks/index.md) —— 每晚在 H200 上实测，逐个 workload 与其他实现对比
+- [性能数据](benchmarks/index.md) —— 每晚在 Ascend 910B1（Atlas A2）上实测，逐个 workload 与其他实现对比
 
 ## 相关链接
 

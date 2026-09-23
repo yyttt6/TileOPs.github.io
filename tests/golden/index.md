@@ -16,7 +16,7 @@ Not published by this run: `image`, `driver`, `cuda`, `torch`, `tilelang`.
 ## Method
 
 - **One process, common inputs.** Every implementation of an op is timed on the same tensors in the same process, in forward and then reversed order so drift does not land on whichever ran last.
-- **A fixed warmup and measurement budget** per implementation, reported as the median over however many samples fit in it, with L2 cleared between iterations.
+- **Ascend nightly sampling: WARMUP=10 / REPEATS=30** per implementation, reporting the median of the measured samples, with the 192 MiB L2 evicted between iterations.
 - **Compilation and workspace setup excluded.**
 - **Device time is what is compared** — the union of the intervals the device spent executing the call's kernels, collected through torch_npu.profiler. A run that cannot collect device activity fails rather than falling back to a different clock.
 

@@ -1,5 +1,14 @@
 # Adding a hardware backend
 
+!!! note "Upstream NVIDIA platform reference"
+
+    This tutorial is retained from [tile-ai/TileOPs](https://github.com/tile-ai/TileOPs).
+    Its CUDA examples, APIs, errors, graph-capture constraints and H200 measurements
+    (where present) refer to the upstream NVIDIA platform. They do not establish
+    Ascend support or performance for these paths in this fork. Original terminology
+    is kept to explain the interface design; see [Timing](timing.md) for this fork's
+    measurement method.
+
 TileLang is a multi-backend DSL: each kind of hardware has its own set of kernels,
 shipped as its own Python package. TileOPs therefore defines a protocol under which a
 package outside the repository takes over an op's kernel, replacing the implementation

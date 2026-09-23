@@ -1,5 +1,13 @@
 # 优化 global memory 访问
 
+!!! note "上游 NVIDIA / H200 调优参考"
+
+    本页保留自 [tile-ai/TileOPs.github.io](https://github.com/tile-ai/TileOPs.github.io)
+    的 NVIDIA 平台教程。所有实测数字、图表、硬件参数及 SM、warp、shared memory 等
+    规则均属于原文的 H200 / CUDA 语境，不是 Ascend 910B1 的结果或硬件说明。
+    保留这些案例用于理解调优方法；向 Ascend 移植时须重新验证硬件规则与性能。
+    本 fork 的 Ascend 测量方法见[计时方法](../../timing.md)。
+
 一个线程要读一行里的多个元素时，写法有四种。这一页给出它们在两个 workload 上的实测对比，以及怎么挑一种。
 
 ## 确认 DRAM 带宽是否为当前的瓶颈 {#regime}
@@ -431,7 +439,7 @@ for c in T.serial(V):
 
 ## 实测对比
 
-我们对两个 workload 在 H200 上进行实测，比较上面四种 access pattern 各自能跑到多少**访存带宽**（搬运的字节数除以 kernel 耗时，单位 TB/s），这两个 workload 的计算对元素的处理顺序有不同要求 —— 这个要求会决定哪几种 access pattern 可用。
+上游对两个 workload 在 H200 上进行实测，比较上面四种 access pattern 各自能跑到多少**访存带宽**（搬运的字节数除以 kernel 耗时，单位 TB/s），这两个 workload 的计算对元素的处理顺序有不同要求 —— 这个要求会决定哪几种 access pattern 可用。
 
 测试中 SM 时钟锁在 1830 MHz；输入 bf16 的 $65536 \times 4096$（512 MB，**必须大于 L2 的 60 MiB**，否则测到的是 L2 带宽）；每个配置跑三次，三次的结果一致到 ±0.5%。staged 在表里占两列：一列不加 pad（此时 stride 恰好是 $V$ 个 word，产生 bank 冲突，见[优化 shared memory 访问](shared-memory-access.md)），一列是在若干个 pad 取值中测到的最优值。
 

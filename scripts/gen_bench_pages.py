@@ -36,7 +36,7 @@ Rules this renderer follows:
 
 Usage:
     python scripts/gen_bench_pages.py --bench-xml <xml> [--test-xml <xml>] \
-        [--meta <meta.json>] --commit <sha> --date <YYYY-MM-DD> --gpu "NVIDIA H200"
+        [--meta <meta.json>] --commit <sha> --date <YYYY-MM-DD> --gpu "<device recorded in snapshot>"
 """
 from __future__ import annotations
 
@@ -111,6 +111,7 @@ def headline_regime() -> str:
 TIER_LIB, TIER_TORCH, TIER_REF = "lib", "torch", "ref"
 _TORCH_NATIVE = {"torch", "torch-autograd", "torch-dequantized-matmul"}
 _KNOWN_TAGS = _TORCH_NATIVE | {
+    # Upstream NVIDIA snapshot identifiers; keep these for schema compatibility.
     "fa3", "flashinfer", "flashinfer-bmm-fp8", "flashinfer-fp8-blockscale-sm90",
     "fla", "mamba", "vllm", "vllm-triton", "triton", "triton-tma", "deepgemm",
     "marlin-fp16", "marlin-fp32", "torch-cublas", "torch-cudnn", "torch-cufft",
@@ -898,9 +899,9 @@ STRINGS = {
             "reversed order so drift does not land on whichever ran last."
         ),
         "method.budget": (
-            "**A fixed warmup and measurement budget** per implementation, "
-            "reported as the median over however many samples fit in it, with L2 "
-            "cleared between iterations."
+            "**Ascend nightly sampling: WARMUP=10 / REPEATS=30** per "
+            "implementation, reporting the median of the measured samples, "
+            "with the 192 MiB L2 evicted between iterations."
         ),
         "method.excluded": "**Compilation and workspace setup excluded.**",
         "method.device_time": (
@@ -1321,7 +1322,7 @@ STRINGS = {
         "env.not_published": "本次运行未发布：{keys}。",
         "method.heading": "测量方法",
         "method.one_process": "**同一个进程、同一批输入。** 一个算子的所有实现都在同一个进程里、用同一批张量计时，先正序再逆序各跑一遍 —— 这样漂移不会只落在最后跑的那个实现上。",
-        "method.budget": "**每个实现有固定的 warmup 与测量预算**，报告的是预算内跑完的若干次采样的**中位数**，并在**每次迭代之间清 L2** —— 这块硬件的 L2 是 192 MiB，用一个 384 MiB 的 buffer 驱逐它，所以能放进 cache 的工作负载不会读到高于稳态的速率。",
+        "method.budget": "**Ascend nightly 每个实现的采样设置为 WARMUP=10 / REPEATS=30**，报告测量样本的**中位数**，并在**每次迭代之间驱逐 192 MiB L2**。",
         "method.excluded": "**编译和 workspace 准备的时间不计入。**",
         "method.device_time": "**被比较的是 device 时间** —— 一次调用在 device 上执行它各个 kernel 的**区间并集**，通过 `torch_npu.profiler` 采集。取不到 device 活动的运行会**失败**，而不是退回另一个时钟。每个工作负载另外保留一份 host 挂钟读数作端到端参考，但**比值用的是 device 时间**：这台机器上 host 与 device 之差是每次测量、两侧各约 40–50 µs 的常数，用 host 计时会把便宜工作负载的比值**推向 1.0**（我们输时遮丑、赢时削峰）。",
         "index.title": "Benchmark",

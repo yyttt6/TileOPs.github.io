@@ -2,7 +2,7 @@
 
 ## Nightly measurements
 
-1. [Benchmarks](../benchmarks/index.md) — a nightly run on an H200, reporting
+1. [Benchmarks](../benchmarks/index.md) — a nightly run on Ascend 910B1 (Atlas A2), reporting
    device time per op per workload against the fastest other implementation of
    the same op. How the numbers are taken and how to read the ratio is set out
    in "How these numbers are taken" in that section.
@@ -16,7 +16,8 @@
 
 ## Tuning practice for TileLang
 
-1. [Tuning Memory-Bound Kernels](memory-bound/index.md) — what memory-bound
+1. [Tuning Memory-Bound Kernels](memory-bound/index.md) — upstream NVIDIA / H200
+   reference measurements, not Ascend results: what memory-bound
    means on the roofline, and measured guidance on the two places an access
    pattern decides the bandwidth a kernel reaches: global memory and shared
    memory.
