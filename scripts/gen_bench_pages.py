@@ -862,6 +862,21 @@ STRINGS = {
             "shown as a row of blanks. Operators the first-phase list names but "
             "D018 deferred are not here either: a deferral is not a result."
         ),
+        # T366: the same two sentences for a snapshot that names the list its first
+        # phase is drawn from. The two keys above are what a snapshot written before
+        # T366 -- whose first phase is OPS-178's -- still renders with.
+        "phase2.banner.what_list": (
+            "These operators are **not in `{name}`**, the first-phase acceptance "
+            "list (`{source}`) that the overview and the per-family data pages are "
+            "scoped to and that progress is reported against. They are shown here "
+            "because the harness already measured a real opponent against them, "
+            "not because the first phase grew."
+        ),
+        "phase2.banner.selection_list": (
+            "An operator reaches this page only when the snapshot publishes a "
+            "ratio for it. One with no timed opponent is left out rather than "
+            "shown as a row of blanks."
+        ),
         # --- A data page's own prose
         "data.tally": "**{n_ops} ops, {n_workloads} workloads** — {tally}.",
         "data.tally_single": "**{n_ops} ops, {n_workloads} workloads.**",
@@ -905,6 +920,25 @@ STRINGS = {
         "index.snapshot.run_link": "· [nightly run]({url})",
         "index.snapshot.rendered": (
             "Page rendered {rendered} from the [latest snapshot]({url})."
+        ),
+        # T366: every count below moved on the day the first phase changed lists.
+        "index.scope.title": "The first phase is the acceptance list now",
+        "index.scope.body": (
+            "Since 2026-09-23 this overview and the per-family data pages are "
+            "scoped to **the {n_ops} operators of `{name}`**, the first-phase "
+            "acceptance list (`{source}`, {n_rows} rows; an operator that fills two "
+            "rows is counted once) — the list progress is reported against. Until "
+            "then these pages were scoped to the 158 operators of "
+            "`docs/tasks/OPS-178.md` that D018 kept. **What changed in these "
+            "counts on that day is the scope, not performance** — neither a "
+            "regression nor a gain: no ratio was re-measured for the change, and "
+            "moving an operator from one page to another changes none of its "
+            "numbers."
+        ),
+        "index.scope.moved": (
+            "Operators outside the list, Attention among them, are on the "
+            "[second-phase page]({link}) when the snapshot publishes a ratio for "
+            "them."
         ),
         "index.coverage.heading": "Coverage",
         "index.coverage.rated": (
@@ -1268,6 +1302,16 @@ STRINGS = {
             "没有实测到对手的算子会被留在页面之外，而不是渲染成一行空白。"
             "第一阶段名单里被 D018 推迟的算子同样不在这里 —— **推迟不是成果**。"
         ),
+        "phase2.banner.what_list": (
+            "这些算子**不在 `{name}` 这份第一阶段验收清单**（`{source}`）里 —— "
+            "总览页和各家族数据页都只覆盖这份清单，对上汇报的进度也以它为准。"
+            "它们出现在这里，是因为 harness 已经为它们实测到了一个真实对手，"
+            "**不是因为第一阶段变大了**。"
+        ),
+        "phase2.banner.selection_list": (
+            "只有快照真的为一个算子发布了比值，它才会出现在这一页；"
+            "没有实测到对手的算子会被留在页面之外，而不是渲染成一行空白。"
+        ),
         "data.tally": "**{n_ops} 个算子，{n_workloads} 个工作负载** —— {tally}。",
         "data.tally_single": "**{n_ops} 个算子，{n_workloads} 个工作负载。**",
         'data.intro': '每个算子一张表，每个工作负载一行。`比值` 是同一测量口径下基准的耗时除以我们的耗时，所以 <span class="perf-ahead">绿色</span> 表示我们更快，<span class="perf-par">无色</span> 表示持平，<span class="perf-behind">红色</span> 表示我们更慢。时间单位是 ms。{reading_link}。',
@@ -1285,6 +1329,19 @@ STRINGS = {
         "index.snapshot.line": "**硬件** {gpu} · **提交** [`{sha}`]({commit_url}) · **运行日期** {date} · **{n_ops} 个算子**，{n_workloads} 个工作负载",
         "index.snapshot.run_link": " · [本次运行]({url})",
         "index.snapshot.rendered": "页面渲染于 {rendered}，数据取自[最新快照]({url})。",
+        "index.scope.title": "第一阶段现在就是那份验收清单",
+        "index.scope.body": (
+            "自 2026-09-23 起，总览页和各家族数据页都只覆盖 "
+            "**`{name}` 这份第一阶段验收清单的 {n_ops} 个算子**（`{source}`，{n_rows} 行，"
+            "占两行的算子只算一次）—— 对上汇报进度用的就是这份清单。"
+            "在此之前，这些页面覆盖的是 `docs/tasks/OPS-178.md` 里 D018 保留下来的 158 个算子。"
+            "**那一天这些计数的变化，是口径变了，不是性能退了（也不是性能进了）**："
+            "这次调整没有重测任何一个比值，一个算子从一页挪到另一页，它的任何数字都不会变。"
+        ),
+        "index.scope.moved": (
+            "清单之外的算子（Attention 也在其中）只要快照为它发布了比值，"
+            "就在[第二阶段页]({link})上。"
+        ),
         "index.coverage.heading": "覆盖情况",
         "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是本页展示的目标集合；阶段一未接入的算子保留空表。未评级的行没有实测比较，或只有 eager 参考实现。",
         "index.coverage.regime": "**不是一个测量口径。** **{total} 个算子里有 {n_headline} 个**是在本次运行的主口径 `{headline}` 下测的，**{n_off} 个不是**（{off}）。不同口径下的比值**不可比**，所以这两个数分开给，**绝不相加**。每一个不在 `{headline}` 口径下的行、以及每一个这样的算子标题，都带一个说明它是哪个口径的徽章。",
@@ -1971,7 +2028,7 @@ def method_block(lang: str = DEFAULT_LANG) -> list[str]:
 def index_page(args, meta: dict, rows: list[tuple],
                by_page: dict, timing: str | None,
                n_workloads: int, n_failed: int, n_skipped: int,
-               lang: str = DEFAULT_LANG) -> str:
+               lang: str = DEFAULT_LANG, notice: list[str] | None = None) -> str:
     run_id = meta.get("run_id")
     head = [
         f'# {_S(lang, "index.title")}', "",
@@ -1988,6 +2045,8 @@ def index_page(args, meta: dict, rows: list[tuple],
         head += ["", "    " + _S(lang, "index.snapshot.rendered",
                                  rendered=args.rendered, url=_NB)]
     head.append("")
+    # T366: right under the snapshot box, above every count it qualifies.
+    head += notice or []
 
     lines = head + env_block(meta, timing, lang) + method_block(lang)
 
@@ -2294,12 +2353,49 @@ PHASE_TWO_SLUG = "phase-two"
 PHASE_TWO_FAMILIES = [f for _slug, _key, fams in DATA_PAGES for f in fams]
 
 
-def phase_two_banner(lang: str = DEFAULT_LANG) -> list[str]:
-    """The admonition that has to be read before any number on that page."""
+def phase_two_banner(lang: str = DEFAULT_LANG, source: str | None = None) -> list[str]:
+    """The admonition that has to be read before any number on that page.
+
+    `source` is the list the snapshot's first phase is drawn from. A snapshot that
+    names none predates T366, and gets the banner it was published under.
+    """
+    what = (_S(lang, "phase2.banner.what_list", name=_list_name(source), source=source)
+            if source else _S(lang, "phase2.banner.what"))
+    selection = _S(lang, "phase2.banner.selection_list" if source
+                   else "phase2.banner.selection")
     return [f'!!! warning "{_S(lang, "phase2.banner.title")}"', "",
-            "    " + _S(lang, "phase2.banner.what"), "",
+            "    " + what, "",
             "    " + _S(lang, "phase2.banner.denominator"), "",
-            "    " + _S(lang, "phase2.banner.selection")]
+            "    " + selection]
+
+
+# --- The first phase's list (T366) -----------------------------------------
+# The list `phase_one_ops` was drawn from, as the snapshot names it in
+# `phase_one_source`. A snapshot written before T366 names none; its first phase is
+# `docs/tasks/OPS-178.md`'s, and it renders the pages it always did. The overview's
+# notice is tied to this one list rather than to any list, because what it says --
+# the counts left OPS-178's 158 operators on 2026-09-23 -- is true of the move to
+# this list and of no other.
+PHASE_ONE_OPLIST150 = "docs/reports/R267-data/oplist150.json"
+
+
+def _list_name(source: str) -> str:
+    """`docs/reports/R267-data/oplist150.json` -> `oplist150`."""
+    return os.path.splitext(os.path.basename(source))[0]
+
+
+def phase_one_notice(source: str | None, n_ops: int, n_rows: str | None,
+                     phase_two: bool, lang: str = DEFAULT_LANG) -> list[str]:
+    """The overview's admonition that the first phase changed lists, or nothing."""
+    if source != PHASE_ONE_OPLIST150:
+        return []
+    lines = [f'!!! warning "{_S(lang, "index.scope.title")}"', "",
+             "    " + _S(lang, "index.scope.body", n_ops=n_ops, n_rows=n_rows,
+                         name=_list_name(source), source=source), ""]
+    # The link only where the page it points at was written.
+    if phase_two:
+        lines += ["    " + _S(lang, "index.scope.moved", link=f"{PHASE_TWO_SLUG}.md"), ""]
+    return lines
 
 
 # --- Main ------------------------------------------------------------------
@@ -2359,14 +2455,34 @@ def main():
     workloads, failures, skips = parse_bench_xml(args.bench_xml)
     # T364.  Taken off the front of the lists, before the phase-one scope filter
     # below, and never put back: everything downstream of that filter -- the
-    # coverage counts, the family tallies, the attainment status, the inventory
-    # sentence, the five data pages -- is the first phase and only the first phase.
-    # The second phase gets its own copies of the same machinery further down.
+    # coverage counts, the family tallies, the attainment status, the five data
+    # pages -- is the first phase and only the first phase.  (The inventory
+    # sentence is not a phase count; see where it is computed.)  The second phase
+    # gets its own copies of the same machinery further down.
     p2_workloads = [w for w in workloads if w.get("phase") == "2"]
     p2_failures = [w for w in failures if w.get("phase") == "2"]
     p2_skips = [w for w in skips if w.get("phase") == "2"]
-    scope = json.loads(ET.parse(args.bench_xml).getroot().get("phase_one_ops", "null"))
+    suite = ET.parse(args.bench_xml).getroot()
+    scope = json.loads(suite.get("phase_one_ops", "null"))
+    # T366: the list that scope was drawn from, where the snapshot names it.
+    scope_source = suite.get("phase_one_source")
     if scope is not None:
+        # T366.  The publisher's `phase` mark and this scope are two gates over one
+        # snapshot, and together they have to partition it: a row in neither would
+        # be published and shown on no page, and a second-phase row inside the
+        # scope would be shown on two.  A snapshot the publisher wrote holds
+        # neither, so one that does is refused here rather than rendered with rows
+        # silently lost or doubled -- and the deploy keeps the page it had.
+        every = workloads + failures + skips
+        stray = sorted({str(w["op"]) for w in every
+                        if w.get("phase") != "2" and w["op"] not in scope})
+        twice = sorted({str(w["op"]) for w in every
+                        if w.get("phase") == "2" and w["op"] in scope})
+        if stray or twice:
+            raise SystemExit(
+                "the snapshot's two phase gates disagree -- outside phase_one_ops "
+                f"and not marked phase 2: {stray}; marked phase 2 but inside "
+                f"phase_one_ops: {twice}")
         workloads = [w for w in workloads if w["op"] in scope]
         failures = [w for w in failures if w["op"] in scope]
         skips = [w for w in skips if w["op"] in scope]
@@ -2474,8 +2590,17 @@ def main():
     ratio_drift = []
     for op in metrics_by_op:
         ratio_drift += collect_ratio_drift(workloads_of[op], metrics_by_op[op])
+    # T366 moved operators between the phases; a check that followed only the first
+    # would have stopped looking at every one that left it.
+    for op in p2_metrics_by_op:
+        ratio_drift += collect_ratio_drift(p2_workloads_of[op], p2_metrics_by_op[op])
     out_dir = args.out_dir or os.path.join(REPO, "docs", "benchmarks")
     os.makedirs(out_dir, exist_ok=True)
+    # The 91-op cohort is a fixed historical list, not a phase: T366 took 24 of its
+    # operators out of the first phase, and counting the cohort there alone would
+    # report them as "cannot be determined" while the second-phase page shows them
+    # measured. The phases share no operator, so the merge loses nothing.
+    cohort = {**p2_metrics_by_op, **metrics_by_op}
     # One file per page per locale: `<slug>.md` for the default language and
     # `<slug>.zh.md` beside it, which is the layout mkdocs-static-i18n reads in
     # `docs_structure: suffix` mode. A locale still carrying English
@@ -2485,9 +2610,12 @@ def main():
     for lang, suffix in LANG_SUFFIX.items():
         pages[f"index{suffix}"] = index_page(
             args, meta, all_rows, by_page, timing, len(workloads),
-            len(failures), len(skips), lang=lang)
+            len(failures), len(skips), lang=lang,
+            notice=phase_one_notice(scope_source, len(scope or ()),
+                                    suite.get("phase_one_rows"),
+                                    bool(p2_rows_by_fam), lang))
         pages[f"reading{suffix}"] = reading_page(
-            sol_engine, lang=lang, inventory=inventory_counts(metrics_by_op))
+            sol_engine, lang=lang, inventory=inventory_counts(cohort))
         for slug, title_key, fams in DATA_PAGES:
             if any(rows_by_fam.get(f) for f in fams):
                 pages[f"{slug}{suffix}"] = data_page(
@@ -2500,7 +2628,7 @@ def main():
             pages[f"{PHASE_TWO_SLUG}{suffix}"] = data_page(
                 _S(lang, "page.phase-two.title"), PHASE_TWO_FAMILIES,
                 p2_rows_by_fam, p2_metrics_by_op, p2_workloads_of, ref, lang=lang,
-                banner=phase_two_banner(lang))
+                banner=phase_two_banner(lang, scope_source))
     for name, text in pages.items():
         with open(os.path.join(out_dir, name), "w", encoding="utf-8") as f:
             f.write(text)
