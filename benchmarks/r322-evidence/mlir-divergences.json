@@ -1,0 +1,95 @@
+[
+  {
+    "op": "AdaLayerNormZeroFwdOp",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-405b-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-8b-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-8b-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "Relu6FwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "coverage file"
+  },
+  {
+    "op": "Relu6FwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "missing": "coverage file"
+  },
+  {
+    "op": "RopeLlama31FwdOp",
+    "label": "llama31-1d-8k-d128",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "RopeNeoxFwdOp",
+    "label": "neox-1d-4k-d128",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "SeluFwdOp",
+    "label": "snn-fc",
+    "dtype": "float16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "SeluFwdOp",
+    "label": "snn-fc-wide",
+    "dtype": "float16",
+    "n": 3,
+    "missing": "perf case or pool"
+  }
+]

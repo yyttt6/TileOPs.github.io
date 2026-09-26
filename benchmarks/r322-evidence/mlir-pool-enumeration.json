@@ -1,0 +1,977 @@
+[
+  {
+    "op": "AbsFwdOp",
+    "label": "elementwise-16M",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-ascend:test_..._elementwise.vec_abs",
+      "ratio": 0.9976689976689976,
+      "baseline_us": 53.5,
+      "tested_us": 53.625,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 53.5,
+    "old_selection_ratio": 0.9976689976689976,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.975
+  },
+  {
+    "op": "AbsFwdOp",
+    "label": "elementwise-256M",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-ascend:test_..._elementwise.vec_abs",
+      "ratio": 1.0134376845835795,
+      "baseline_us": 857.875,
+      "tested_us": 846.5,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 857.875,
+    "old_selection_ratio": 1.0134376845835795,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.9467321997874601
+  },
+  {
+    "op": "AdaLayerNormFwdOp",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:high_perf",
+      "ratio": 0.2428717948717949,
+      "baseline_us": 3.9466666666666668,
+      "tested_us": 16.25,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 9.25,
+    "old_selection_ratio": 0.5692307692307692,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.6875
+  },
+  {
+    "op": "AdaLayerNormZeroFwdOp",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "AddFwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 1.1323529411764706,
+      "baseline_us": 57.75,
+      "tested_us": 51.0,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 57.75,
+    "old_selection_ratio": 1.1323529411764706,
+    "ratio_worse": false,
+    "old_headline_ratio": 1.0977777777777777
+  },
+  {
+    "op": "AddFwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-ascend:elementwise_add.vec_add",
+      "ratio": 1.015228426395939,
+      "baseline_us": 50.0,
+      "tested_us": 49.25,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 50.0,
+    "old_selection_ratio": 1.015228426395939,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.9592760180995475
+  },
+  {
+    "op": "EluFwdOp",
+    "label": "mlp-hidden",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 0.906896551724138,
+      "baseline_us": 32.875,
+      "tested_us": 36.25,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 32.875,
+    "old_selection_ratio": 0.906896551724138,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.7802197802197802
+  },
+  {
+    "op": "EluFwdOp",
+    "label": "mlp-hidden",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.8591231463571889,
+      "baseline_us": 30.28409090909091,
+      "tested_us": 35.25,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 32.5,
+    "old_selection_ratio": 0.9219858156028369,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.7621621621621621
+  },
+  {
+    "op": "EluFwdOp",
+    "label": "mlp-hidden-wide",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.8830299542659842,
+      "baseline_us": 60.48755186721991,
+      "tested_us": 68.5,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 61.25,
+    "old_selection_ratio": 0.8941605839416058,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.7925117004680188
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-405b-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-8b-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "label": "llama-8b-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": null,
+    "external_refused": [
+      "MLIR: parent/child case yardstick kernel identity/count differ; parent=[10], child=[9]"
+    ],
+    "in_pool": false
+  },
+  {
+    "op": "GemmFwdOp",
+    "label": "square-1k-nn",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "ops-nn-gemm:aclnnMm / aclnnMmGetWorkspaceSize",
+      "ratio": 0.8375,
+      "baseline_us": 16.75,
+      "tested_us": 20.0,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 16.75,
+    "old_selection_ratio": 0.8375,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.6293103448275862
+  },
+  {
+    "op": "GemmFwdOp",
+    "label": "square-1k-nn",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "ops-nn-gemm:aclnnMm / aclnnMmGetWorkspaceSize",
+      "ratio": 0.8461538461538461,
+      "baseline_us": 16.5,
+      "tested_us": 19.5,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 16.5,
+    "old_selection_ratio": 0.8461538461538461,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.6206896551724138
+  },
+  {
+    "op": "HardsigmoidFwdOp",
+    "label": "mbv3-se-gate",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 0.75,
+      "baseline_us": 1.5,
+      "tested_us": 2.0,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 1.5,
+    "old_selection_ratio": 0.75,
+    "ratio_worse": false,
+    "old_headline_ratio": 1.125
+  },
+  {
+    "op": "HardsigmoidFwdOp",
+    "label": "mbv3-se-gate-deep",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 1.2857142857142858,
+      "baseline_us": 2.25,
+      "tested_us": 1.75,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 2.25,
+    "old_selection_ratio": 1.2857142857142858,
+    "ratio_worse": false,
+    "old_headline_ratio": 2.0
+  },
+  {
+    "op": "HardtanhFwdOp",
+    "label": "bounded-conv-feat",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 1.141439956447442,
+      "baseline_us": 50.79407806191117,
+      "tested_us": 44.5,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 92.5,
+    "old_selection_ratio": 2.0786516853932584,
+    "ratio_worse": true,
+    "old_headline_ratio": 2.0283018867924527
+  },
+  {
+    "op": "HardtanhFwdOp",
+    "label": "bounded-hidden",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.7002352515381831,
+      "baseline_us": 22.05741042345277,
+      "tested_us": 31.5,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 62.125,
+    "old_selection_ratio": 1.9722222222222223,
+    "ratio_worse": true,
+    "old_headline_ratio": 1.7278481012658229
+  },
+  {
+    "op": "LayerNormFwdOp",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "ops-nn:aclnnLayerNorm / aclnnLayerNormGetWorkspaceSize -> LayerNormV4",
+      "ratio": 0.2,
+      "baseline_us": 3.5,
+      "tested_us": 17.5,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 3.5,
+    "old_selection_ratio": 0.2,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.2714285714285714
+  },
+  {
+    "op": "LayerNormFwdOp",
+    "label": "llama-8b-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 0.5023696682464455,
+      "baseline_us": 53.0,
+      "tested_us": 105.5,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 53.0,
+    "old_selection_ratio": 0.5023696682464455,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.49737670514165794
+  },
+  {
+    "op": "LeakyReluFwdOp",
+    "label": "gan-feat",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.8365825360899253,
+      "baseline_us": 54.16871921182266,
+      "tested_us": 64.75,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 57.875,
+    "old_selection_ratio": 0.8938223938223938,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.8135593220338984
+  },
+  {
+    "op": "LeakyReluFwdOp",
+    "label": "gan-feat-deep",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.8690298507462687,
+      "baseline_us": 29.1125,
+      "tested_us": 33.5,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 29.75,
+    "old_selection_ratio": 0.8880597014925373,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.75
+  },
+  {
+    "op": "LogSumExpFwdOp",
+    "label": "3d-multidim-reduce",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:shipped",
+      "ratio": 0.5863894139886578,
+      "baseline_us": 23.455576559546312,
+      "tested_us": 40.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 66.0,
+    "old_selection_ratio": 1.65,
+    "ratio_worse": true,
+    "old_headline_ratio": 1.698224852071006
+  },
+  {
+    "op": "LogSumExpFwdOp",
+    "label": "attn-weights-32k",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:shipped",
+      "ratio": 0.7829187013211168,
+      "baseline_us": 128.985856042654,
+      "tested_us": 164.75,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 458.375,
+    "old_selection_ratio": 2.7822458270106223,
+    "ratio_worse": true,
+    "old_headline_ratio": 2.7503660322108345
+  },
+  {
+    "op": "LogSumExpFwdOp",
+    "label": "attn-weights-4k",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:shipped",
+      "ratio": 0.7613636363636362,
+      "baseline_us": 18.27272727272727,
+      "tested_us": 24.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 97.5,
+    "old_selection_ratio": 4.0625,
+    "ratio_worse": true,
+    "old_headline_ratio": 2.769230769230769
+  },
+  {
+    "op": "LogSumExpFwdOp",
+    "label": "attn-weights-4k",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:shipped",
+      "ratio": 0.692402262109663,
+      "baseline_us": 16.963855421686745,
+      "tested_us": 24.5,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 96.0,
+    "old_selection_ratio": 3.9183673469387754,
+    "ratio_worse": true,
+    "old_headline_ratio": 2.7872340425531914
+  },
+  {
+    "op": "LogSumExpFwdOp",
+    "label": "lm-head-logits",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:shipped",
+      "ratio": 1.542755991285403,
+      "baseline_us": 13.884803921568627,
+      "tested_us": 9.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 51.5,
+    "old_selection_ratio": 5.722222222222222,
+    "ratio_worse": true,
+    "old_headline_ratio": 2.792682926829268
+  },
+  {
+    "op": "LogSumExpFwdOp",
+    "label": "lm-head-logits",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:shipped",
+      "ratio": 1.5997673065735893,
+      "baseline_us": 14.397905759162304,
+      "tested_us": 9.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 50.0,
+    "old_selection_ratio": 5.555555555555555,
+    "ratio_worse": true,
+    "old_headline_ratio": 3.5634920634920637
+  },
+  {
+    "op": "MishFwdOp",
+    "label": "yolo-p3",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:stage4_opt",
+      "ratio": 0.42429645738444116,
+      "baseline_us": 80.4041786743516,
+      "tested_us": 189.5,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 260.75,
+    "old_selection_ratio": 1.3759894459102902,
+    "ratio_worse": true,
+    "old_headline_ratio": 1.3661792752701845
+  },
+  {
+    "op": "MishFwdOp",
+    "label": "yolo-p3",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:stage4_opt",
+      "ratio": 0.4772727272727273,
+      "baseline_us": 89.25,
+      "tested_us": 187.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 259.75,
+    "old_selection_ratio": 1.38903743315508,
+    "ratio_worse": true,
+    "old_headline_ratio": 1.3663682864450128
+  },
+  {
+    "op": "MishFwdOp",
+    "label": "yolo-p4",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:stage4_opt",
+      "ratio": 0.4862481403179078,
+      "baseline_us": 47.04450757575758,
+      "tested_us": 96.75,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 132.125,
+    "old_selection_ratio": 1.3656330749354004,
+    "ratio_worse": true,
+    "old_headline_ratio": 1.346938775510204
+  },
+  {
+    "op": "MishFwdOp",
+    "label": "yolo-p4",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:stage4_opt",
+      "ratio": 0.4924171503463771,
+      "baseline_us": 46.964285714285715,
+      "tested_us": 95.375,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 131.5,
+    "old_selection_ratio": 1.3787680209698558,
+    "ratio_worse": true,
+    "old_headline_ratio": 1.3293556085918854
+  },
+  {
+    "op": "RMSNormFwdOp",
+    "label": "llama-405b-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "ops-nn:aclnnRmsNorm / aclnnRmsNormGetWorkspaceSize",
+      "ratio": 0.8247549019607843,
+      "baseline_us": 168.25,
+      "tested_us": 204.0,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 168.25,
+    "old_selection_ratio": 0.8247549019607843,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.8333333333333334
+  },
+  {
+    "op": "RMSNormFwdOp",
+    "label": "llama-70b-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:plain",
+      "ratio": 0.7721271236744582,
+      "baseline_us": 64.08655126498003,
+      "tested_us": 83.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 67.125,
+    "old_selection_ratio": 0.8087349397590361,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.8387978142076503
+  },
+  {
+    "op": "RMSNormFwdOp",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:plain",
+      "ratio": 0.7180667433831991,
+      "baseline_us": 1.9746835443037976,
+      "tested_us": 2.75,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 2.5,
+    "old_selection_ratio": 0.9090909090909091,
+    "ratio_worse": true,
+    "old_headline_ratio": 1.4545454545454546
+  },
+  {
+    "op": "RMSNormFwdOp",
+    "label": "llama-8b-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:plain",
+      "ratio": 0.75244140625,
+      "baseline_us": 36.1171875,
+      "tested_us": 48.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 45.25,
+    "old_selection_ratio": 0.9427083333333334,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.9120370370370371
+  },
+  {
+    "op": "RMSNormFwdOp",
+    "label": "llama-8b-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:plain",
+      "ratio": 0.7356279582739763,
+      "baseline_us": 34.574514038876885,
+      "tested_us": 47.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 45.25,
+    "old_selection_ratio": 0.9627659574468085,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.9728506787330317
+  },
+  {
+    "op": "Relu6FwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "coverage file"
+  },
+  {
+    "op": "Relu6FwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "missing": "coverage file"
+  },
+  {
+    "op": "ReluFwdOp",
+    "label": "hidden-state-decode",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 0.7142857142857143,
+      "baseline_us": 1.25,
+      "tested_us": 1.75,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 1.25,
+    "old_selection_ratio": 0.7142857142857143,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.9333333333333333
+  },
+  {
+    "op": "ReluFwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "bfloat16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.9303613457012322,
+      "baseline_us": 28.841201716738198,
+      "tested_us": 31.0,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 30.0,
+    "old_selection_ratio": 0.967741935483871,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.8490566037735849
+  },
+  {
+    "op": "ReluFwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.9090909090909091,
+      "baseline_us": 27.5,
+      "tested_us": 30.25,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 28.0,
+    "old_selection_ratio": 0.9256198347107438,
+    "ratio_worse": true,
+    "old_headline_ratio": 0.7861635220125787
+  },
+  {
+    "op": "RopeLlama31FwdOp",
+    "label": "llama31-1d-8k-d128",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "RopeNeoxFwdOp",
+    "label": "neox-1d-4k-d128",
+    "dtype": "bfloat16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "SeluFwdOp",
+    "label": "snn-fc",
+    "dtype": "float16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "SeluFwdOp",
+    "label": "snn-fc-wide",
+    "dtype": "float16",
+    "n": 3,
+    "missing": "perf case or pool"
+  },
+  {
+    "op": "SigmoidFwdOp",
+    "label": "elementwise-16M",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 1.0,
+      "baseline_us": 58.5,
+      "tested_us": 58.5,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 58.5,
+    "old_selection_ratio": 1.0,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.9613899613899614
+  },
+  {
+    "op": "SigmoidFwdOp",
+    "label": "elementwise-256M",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 1.0292052794158943,
+      "baseline_us": 916.25,
+      "tested_us": 890.25,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 916.25,
+    "old_selection_ratio": 1.0292052794158943,
+    "ratio_worse": false,
+    "old_headline_ratio": 1.0080421519689406
+  },
+  {
+    "op": "SiluFwdOp",
+    "label": "llama-8b-ffn-prefill",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 0.781496062992126,
+      "baseline_us": 99.25,
+      "tested_us": 127.0,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 99.25,
+    "old_selection_ratio": 0.781496062992126,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.7591911764705882
+  },
+  {
+    "op": "SoftmaxFwdOp",
+    "label": "lm-head-logits",
+    "dtype": "float32",
+    "n": 3,
+    "comparison": {
+      "winner": "torch_npu eager (vendor)",
+      "ratio": 0.09410326917201345,
+      "baseline_us": 38.5,
+      "tested_us": 409.125,
+      "external_won": false,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 38.5,
+    "old_selection_ratio": 0.09410326917201345,
+    "ratio_worse": false,
+    "old_headline_ratio": 0.0941140404659718
+  },
+  {
+    "op": "SoftplusFwdOp",
+    "label": "mlp-hidden",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.566808634825671,
+      "baseline_us": 28.198729582577133,
+      "tested_us": 49.75,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 137.5,
+    "old_selection_ratio": 2.763819095477387,
+    "ratio_worse": true,
+    "old_headline_ratio": 2.5352697095435683
+  },
+  {
+    "op": "SoftplusFwdOp",
+    "label": "mlp-hidden-wide",
+    "dtype": "float16",
+    "n": 3,
+    "comparison": {
+      "winner": "tilelang-mlir-ascend:npuir_active",
+      "ratio": 0.532430654402354,
+      "baseline_us": 51.04678899082569,
+      "tested_us": 95.875,
+      "external_won": true,
+      "external_n": 3,
+      "basis": "eager selection session with calibrated MLIR subprocess receipt"
+    },
+    "external_refused": [],
+    "in_pool": true,
+    "old_selection_baseline_us": 272.75,
+    "old_selection_ratio": 2.844850065189048,
+    "ratio_worse": true,
+    "old_headline_ratio": 2.7163120567375887
+  }
+]
