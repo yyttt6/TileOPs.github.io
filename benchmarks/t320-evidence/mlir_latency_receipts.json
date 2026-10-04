@@ -1,0 +1,4674 @@
+[
+  {
+    "round": "R278",
+    "op": "AdaLayerNormFwdOp",
+    "variant": "high_perf",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "device_us_min": 4.0,
+    "n": 3,
+    "device_us_samples": [
+      4.0,
+      4.0,
+      4.0
+    ],
+    "measured_at": "2026-09-14T12:49:06.859390+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/ada_layer_norm_and_zero.py",
+    "kernel_source_sha256": "92f8997335a88f0908b379ceb901083f42c3e8c26f0deddc9eb876f5b81eb8ae",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/ada_layer_norm_and_zero.py",
+      "kernel_source_sha256": "92f8997335a88f0908b379ceb901083f42c3e8c26f0deddc9eb876f5b81eb8ae",
+      "generated_kernel_sha256": "substitute:59893b31e9ebaa9e3c8cdbd9425195fdf6a85472faebf773530ee4a9c198ebd5",
+      "in_process": false,
+      "pid": 4122914,
+      "params_changed": {
+        "block_m": [
+          2,
+          1
+        ],
+        "block_n": [
+          2048,
+          2048
+        ],
+        "eps": [
+          "1e-5 (their run_adaln_test default)",
+          1e-05
+        ],
+        "dtype": [
+          "float16 (example default)",
+          "bfloat16"
+        ],
+        "M/N": [
+          "1024/16384 (their run_adaln_test default)",
+          [
+            1,
+            4096
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 4122914,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/AdaLayerNormFwdOp-llama-8b-decode-bfloat16-high_perf-4120703-1789390121025.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 4.0,
+        "measured_at": "2026-09-14T12:49:06.859390+00:00",
+        "child_pid": 4122914
+      },
+      {
+        "rep": 2,
+        "device_us": 4.0,
+        "measured_at": "2026-09-14T13:46:57.712170+00:00",
+        "child_pid": 184864
+      },
+      {
+        "rep": 3,
+        "device_us": 4.0,
+        "measured_at": "2026-09-14T14:22:03.864237+00:00",
+        "child_pid": 657009
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "AdaLayerNormZeroFwdOp",
+    "variant": "high_perf",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "device_us_min": 4.75,
+    "n": 3,
+    "device_us_samples": [
+      4.75,
+      4.75,
+      4.75
+    ],
+    "measured_at": "2026-09-14T12:50:55.109460+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/ada_layer_norm_and_zero.py",
+    "kernel_source_sha256": "92f8997335a88f0908b379ceb901083f42c3e8c26f0deddc9eb876f5b81eb8ae",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/ada_layer_norm_and_zero.py",
+      "kernel_source_sha256": "92f8997335a88f0908b379ceb901083f42c3e8c26f0deddc9eb876f5b81eb8ae",
+      "generated_kernel_sha256": "substitute:d3b16f7243995a77f7abc5363a2e1af247e7cad1991eb56cb64011cce97aa474",
+      "in_process": false,
+      "pid": 4126731,
+      "params_changed": {
+        "block_m": [
+          2,
+          1
+        ],
+        "block_n": [
+          2048,
+          2048
+        ],
+        "eps": [
+          "1e-5 (their run_adaln_test default)",
+          1e-05
+        ],
+        "dtype": [
+          "float16 (example default)",
+          "bfloat16"
+        ],
+        "M/N": [
+          "1024/16384 (their run_adaln_test default)",
+          [
+            1,
+            4096
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 4126731,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/AdaLayerNormZeroFwdOp-llama-8b-decode-bfloat16-high_perf-4125102-1789390180434.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 4.75,
+        "measured_at": "2026-09-14T12:50:55.109460+00:00",
+        "child_pid": 4126731
+      },
+      {
+        "rep": 2,
+        "device_us": 4.75,
+        "measured_at": "2026-09-14T13:47:41.627831+00:00",
+        "child_pid": 186947
+      },
+      {
+        "rep": 3,
+        "device_us": 4.75,
+        "measured_at": "2026-09-14T14:22:48.712388+00:00",
+        "child_pid": 667802
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "AddFwdOp",
+    "variant": "example",
+    "label": "hidden-state-prefill",
+    "dtype": "bfloat16",
+    "device_us_min": 313.625,
+    "n": 3,
+    "device_us_samples": [
+      313.625,
+      335.5,
+      313.75
+    ],
+    "measured_at": "2026-09-14T12:56:52.013043+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/elementwise/example_elementwise_add.py",
+    "kernel_source_sha256": "fa37cc1846d51aa989f9507db995a968603b957c8138f4a21053f48b516749ad",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/elementwise/example_elementwise_add.py",
+      "kernel_source_sha256": "fa37cc1846d51aa989f9507db995a968603b957c8138f4a21053f48b516749ad",
+      "generated_kernel_sha256": "substitute:5e462e067b624a859ac106ea9b9d3d2c800e865c862ee800e681c465beddcbdc",
+      "in_process": false,
+      "pid": 4148454,
+      "params_changed": {
+        "block_M": [
+          32,
+          32
+        ],
+        "block_N": [
+          32,
+          32
+        ],
+        "in_dtype/out_dtype": [
+          "float32 (example default)",
+          "bfloat16"
+        ],
+        "M/N": [
+          "1024/1024 (their main() default)",
+          [
+            2048,
+            4096
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 4148454,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/AddFwdOp-hidden-state-prefill-bfloat16-example-4129979-1789390538083.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 313.625,
+        "measured_at": "2026-09-14T12:56:52.013043+00:00",
+        "child_pid": 4148454
+      },
+      {
+        "rep": 2,
+        "device_us": 335.5,
+        "measured_at": "2026-09-14T13:48:54.966728+00:00",
+        "child_pid": 190370
+      },
+      {
+        "rep": 3,
+        "device_us": 313.75,
+        "measured_at": "2026-09-14T14:24:04.169667+00:00",
+        "child_pid": 684517
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "AddFwdOp",
+    "variant": "example",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "device_us_min": 269.0,
+    "n": 3,
+    "device_us_samples": [
+      313.75,
+      269.0,
+      291.875
+    ],
+    "measured_at": "2026-09-14T13:48:27.045575+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/elementwise/example_elementwise_add.py",
+    "kernel_source_sha256": "fa37cc1846d51aa989f9507db995a968603b957c8138f4a21053f48b516749ad",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/elementwise/example_elementwise_add.py",
+      "kernel_source_sha256": "fa37cc1846d51aa989f9507db995a968603b957c8138f4a21053f48b516749ad",
+      "generated_kernel_sha256": "substitute:5e462e067b624a859ac106ea9b9d3d2c800e865c862ee800e681c465beddcbdc",
+      "in_process": false,
+      "pid": 188579,
+      "params_changed": {
+        "block_M": [
+          32,
+          32
+        ],
+        "block_N": [
+          32,
+          32
+        ],
+        "in_dtype/out_dtype": [
+          "float32 (example default)",
+          "float16"
+        ],
+        "M/N": [
+          "1024/1024 (their main() default)",
+          [
+            2048,
+            4096
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 188579,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/AddFwdOp-hidden-state-prefill-float16-example-187874-1789393684998.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 313.75,
+        "measured_at": "2026-09-14T12:55:22.291911+00:00",
+        "child_pid": 4143979
+      },
+      {
+        "rep": 2,
+        "device_us": 269.0,
+        "measured_at": "2026-09-14T13:48:27.045575+00:00",
+        "child_pid": 188579
+      },
+      {
+        "rep": 3,
+        "device_us": 291.875,
+        "measured_at": "2026-09-14T14:23:35.314008+00:00",
+        "child_pid": 675454
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "FusedAddRMSNormFwdOp",
+    "variant": "selector",
+    "label": "llama-405b-prefill",
+    "dtype": "bfloat16",
+    "device_us_min": 240.25,
+    "n": 3,
+    "device_us_samples": [
+      244.0,
+      240.25,
+      244.25
+    ],
+    "measured_at": "2026-09-14T13:51:02.920549+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+    "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+      "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+      "generated_kernel_sha256": "substitute:d13a18030830506d32fe1805e09bbbdcdadb78efd1761c0fef1bde1d9652ec24",
+      "in_process": false,
+      "pid": 198092,
+      "params_changed": {
+        "scale": [
+          "0.5 (their example default)",
+          1.0
+        ],
+        "eps": [
+          "1e-6 (their default)",
+          1e-06
+        ],
+        "impl/block_m/block_n": [
+          "their own selector.select_config(M,N,dtype)",
+          "unchanged -- their tuned selector decides"
+        ],
+        "M/N": [
+          "128/4096 (their example default)",
+          [
+            2048,
+            16384
+          ]
+        ],
+        "selector_chose": [
+          null,
+          {
+            "impl": "split_d",
+            "block_m": 4,
+            "block_n": 2048
+          }
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 198092,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/FusedAddRMSNormFwdOp-llama-405b-prefill-bfloat16-selector-191210-1789393840866.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 244.0,
+        "measured_at": "2026-09-14T13:01:37.936989+00:00",
+        "child_pid": 4180008
+      },
+      {
+        "rep": 2,
+        "device_us": 240.25,
+        "measured_at": "2026-09-14T13:51:02.920549+00:00",
+        "child_pid": 198092
+      },
+      {
+        "rep": 3,
+        "device_us": 244.25,
+        "measured_at": "2026-09-14T14:26:16.105876+00:00",
+        "child_pid": 728189
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "FusedAddRMSNormFwdOp",
+    "variant": "selector",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "device_us_min": 2.0,
+    "n": 3,
+    "device_us_samples": [
+      2.0,
+      2.0,
+      2.0
+    ],
+    "measured_at": "2026-09-14T13:00:54.479270+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+    "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+      "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+      "generated_kernel_sha256": "substitute:d13a18030830506d32fe1805e09bbbdcdadb78efd1761c0fef1bde1d9652ec24",
+      "in_process": false,
+      "pid": 4175119,
+      "params_changed": {
+        "scale": [
+          "0.5 (their example default)",
+          1.0
+        ],
+        "eps": [
+          "1e-6 (their default)",
+          1e-06
+        ],
+        "impl/block_m/block_n": [
+          "their own selector.select_config(M,N,dtype)",
+          "unchanged -- their tuned selector decides"
+        ],
+        "M/N": [
+          "128/4096 (their example default)",
+          [
+            1,
+            4096
+          ]
+        ],
+        "selector_chose": [
+          null,
+          {
+            "impl": "single_n",
+            "block_m": 1,
+            "block_n": 4096
+          }
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 4175119,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/FusedAddRMSNormFwdOp-llama-8b-decode-bfloat16-selector-4155412-1789390828555.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 2.0,
+        "measured_at": "2026-09-14T13:00:54.479270+00:00",
+        "child_pid": 4175119
+      },
+      {
+        "rep": 2,
+        "device_us": 2.0,
+        "measured_at": "2026-09-14T13:50:34.406786+00:00",
+        "child_pid": 196526
+      },
+      {
+        "rep": 3,
+        "device_us": 2.0,
+        "measured_at": "2026-09-14T14:25:47.478093+00:00",
+        "child_pid": 719089
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "FusedAddRMSNormFwdOp",
+    "variant": "selector",
+    "label": "llama-8b-prefill",
+    "dtype": "bfloat16",
+    "device_us_min": 75.0,
+    "n": 3,
+    "device_us_samples": [
+      75.0,
+      75.0,
+      75.75
+    ],
+    "measured_at": "2026-09-14T13:00:13.308224+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+    "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+      "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+      "generated_kernel_sha256": "substitute:d13a18030830506d32fe1805e09bbbdcdadb78efd1761c0fef1bde1d9652ec24",
+      "in_process": false,
+      "pid": 4166475,
+      "params_changed": {
+        "scale": [
+          "0.5 (their example default)",
+          1.0
+        ],
+        "eps": [
+          "1e-6 (their default)",
+          1e-06
+        ],
+        "impl/block_m/block_n": [
+          "their own selector.select_config(M,N,dtype)",
+          "unchanged -- their tuned selector decides"
+        ],
+        "M/N": [
+          "128/4096 (their example default)",
+          [
+            2048,
+            4096
+          ]
+        ],
+        "selector_chose": [
+          null,
+          {
+            "impl": "normal_row_one_auto_multibuffer",
+            "block_m": 43,
+            "block_n": 4096
+          }
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 4166475,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/FusedAddRMSNormFwdOp-llama-8b-prefill-bfloat16-selector-4155412-1789390737469.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 75.0,
+        "measured_at": "2026-09-14T13:00:13.308224+00:00",
+        "child_pid": 4166475
+      },
+      {
+        "rep": 2,
+        "device_us": 75.0,
+        "measured_at": "2026-09-14T13:50:07.858177+00:00",
+        "child_pid": 193650
+      },
+      {
+        "rep": 3,
+        "device_us": 75.75,
+        "measured_at": "2026-09-14T14:25:19.450757+00:00",
+        "child_pid": 708311
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "FusedAddRMSNormFwdOp",
+    "variant": "selector",
+    "label": "llama-8b-prefill",
+    "dtype": "float16",
+    "device_us_min": 64.25,
+    "n": 3,
+    "device_us_samples": [
+      74.5,
+      64.25,
+      66.375
+    ],
+    "measured_at": "2026-09-14T13:49:40.060214+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+    "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/fused_add_rms_norm/fused_add_rmsnorm.py",
+      "kernel_source_sha256": "68e6d3930d7fb6bf4eda733b54a64f9815624423d18bcf60787357772825a4b7",
+      "generated_kernel_sha256": "substitute:d13a18030830506d32fe1805e09bbbdcdadb78efd1761c0fef1bde1d9652ec24",
+      "in_process": false,
+      "pid": 192408,
+      "params_changed": {
+        "scale": [
+          "0.5 (their example default)",
+          1.0
+        ],
+        "eps": [
+          "1e-6 (their default)",
+          1e-06
+        ],
+        "impl/block_m/block_n": [
+          "their own selector.select_config(M,N,dtype)",
+          "unchanged -- their tuned selector decides"
+        ],
+        "M/N": [
+          "128/4096 (their example default)",
+          [
+            2048,
+            4096
+          ]
+        ],
+        "selector_chose": [
+          null,
+          {
+            "impl": "multi_n",
+            "block_m": 43,
+            "block_n": 4096
+          }
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 192408,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/FusedAddRMSNormFwdOp-llama-8b-prefill-float16-selector-191210-1789393758230.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 74.5,
+        "measured_at": "2026-09-14T12:58:41.947936+00:00",
+        "child_pid": 4158810
+      },
+      {
+        "rep": 2,
+        "device_us": 64.25,
+        "measured_at": "2026-09-14T13:49:40.060214+00:00",
+        "child_pid": 192408
+      },
+      {
+        "rep": 3,
+        "device_us": 66.375,
+        "measured_at": "2026-09-14T14:24:51.364668+00:00",
+        "child_pid": 699283
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "GemmFwdOp",
+    "variant": "example_gemm",
+    "label": "square-1k-nn",
+    "dtype": "bfloat16",
+    "device_us_min": 45.875,
+    "n": 3,
+    "device_us_samples": [
+      46.0,
+      46.0,
+      45.875
+    ],
+    "measured_at": "2026-09-14T14:27:25.834928+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/gemm/example_gemm.py",
+    "kernel_source_sha256": "6c907ab00aa3085c49701519008711b0abb2f37d6d2243ef7573986f6fc22152",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/gemm/example_gemm.py",
+      "kernel_source_sha256": "6c907ab00aa3085c49701519008711b0abb2f37d6d2243ef7573986f6fc22152",
+      "generated_kernel_sha256": "substitute:4b0da1f26241662ed8ac8db93aa7dbe657ed1567a5d1482001da4eca40c71ee1",
+      "in_process": false,
+      "pid": 746129,
+      "params_changed": {
+        "block_M": [
+          128,
+          128
+        ],
+        "block_N": [
+          128,
+          128
+        ],
+        "block_K": [
+          32,
+          32
+        ],
+        "dtype": [
+          "float16 (example default)",
+          "bfloat16"
+        ],
+        "M/N/K": [
+          "1024/1024/1024 (their main() default)",
+          [
+            1024,
+            1024,
+            1024
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 746129,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep3/GemmFwdOp-square-1k-nn-bfloat16-example_gemm-736651-1789396025318.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 46.0,
+        "measured_at": "2026-09-14T13:04:50.218945+00:00",
+        "child_pid": 1819
+      },
+      {
+        "rep": 2,
+        "device_us": 46.0,
+        "measured_at": "2026-09-14T13:52:11.574345+00:00",
+        "child_pid": 201625
+      },
+      {
+        "rep": 3,
+        "device_us": 45.875,
+        "measured_at": "2026-09-14T14:27:25.834928+00:00",
+        "child_pid": 746129
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "GemmFwdOp",
+    "variant": "example_gemm",
+    "label": "square-1k-nn",
+    "dtype": "float16",
+    "device_us_min": 45.75,
+    "n": 3,
+    "device_us_samples": [
+      45.75,
+      46.0,
+      46.25
+    ],
+    "measured_at": "2026-09-14T13:03:22.196230+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/gemm/example_gemm.py",
+    "kernel_source_sha256": "6c907ab00aa3085c49701519008711b0abb2f37d6d2243ef7573986f6fc22152",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/gemm/example_gemm.py",
+      "kernel_source_sha256": "6c907ab00aa3085c49701519008711b0abb2f37d6d2243ef7573986f6fc22152",
+      "generated_kernel_sha256": "substitute:4b0da1f26241662ed8ac8db93aa7dbe657ed1567a5d1482001da4eca40c71ee1",
+      "in_process": false,
+      "pid": 4187035,
+      "params_changed": {
+        "block_M": [
+          128,
+          128
+        ],
+        "block_N": [
+          128,
+          128
+        ],
+        "block_K": [
+          32,
+          32
+        ],
+        "dtype": [
+          "float16 (example default)",
+          "float16"
+        ],
+        "M/N/K": [
+          "1024/1024/1024 (their main() default)",
+          [
+            1024,
+            1024,
+            1024
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 4187035,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/GemmFwdOp-square-1k-nn-float16-example_gemm-4183939-1789390930115.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 45.75,
+        "measured_at": "2026-09-14T13:03:22.196230+00:00",
+        "child_pid": 4187035
+      },
+      {
+        "rep": 2,
+        "device_us": 46.0,
+        "measured_at": "2026-09-14T13:51:45.014915+00:00",
+        "child_pid": 200337
+      },
+      {
+        "rep": 3,
+        "device_us": 46.25,
+        "measured_at": "2026-09-14T14:26:59.308027+00:00",
+        "child_pid": 740559
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LayerNormFwdOp",
+    "variant": "high_perf",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "device_us_min": 33.5,
+    "n": 3,
+    "device_us_samples": [
+      33.75,
+      33.5,
+      33.5
+    ],
+    "measured_at": "2026-09-14T13:53:24.442221+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/layer_norm.py",
+    "kernel_source_sha256": "75a6f1361a4a7aa9fdec34e2456c097eeec930777775c2db629343416827e497",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/layer_norm.py",
+      "kernel_source_sha256": "75a6f1361a4a7aa9fdec34e2456c097eeec930777775c2db629343416827e497",
+      "generated_kernel_sha256": "substitute:f6f6a99368ad4280d4b50b72b3e8f84bc4d8bc9fd0ec759aeae6fa036283426e",
+      "in_process": false,
+      "pid": 212183,
+      "params_changed": {
+        "block_m": [
+          64,
+          1
+        ],
+        "block_n": [
+          64,
+          64
+        ],
+        "eps": [
+          "1e-5 (example run_test default)",
+          1e-05
+        ],
+        "dtype": [
+          "float16 (example default)",
+          "bfloat16"
+        ],
+        "M/N": [
+          "4096/4096 (example run_test default)",
+          [
+            1,
+            4096
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 212183,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/LayerNormFwdOp-llama-8b-decode-bfloat16-high_perf-203192-1789393983246.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 33.75,
+        "measured_at": "2026-09-14T13:07:23.138977+00:00",
+        "child_pid": 19472
+      },
+      {
+        "rep": 2,
+        "device_us": 33.5,
+        "measured_at": "2026-09-14T13:53:24.442221+00:00",
+        "child_pid": 212183
+      },
+      {
+        "rep": 3,
+        "device_us": 33.5,
+        "measured_at": "2026-09-14T14:28:40.813362+00:00",
+        "child_pid": 757969
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LayerNormFwdOp",
+    "variant": "high_perf",
+    "label": "llama-8b-prefill",
+    "dtype": "bfloat16",
+    "device_us_min": 95.25,
+    "n": 3,
+    "device_us_samples": [
+      95.875,
+      95.25,
+      104.125
+    ],
+    "measured_at": "2026-09-14T13:52:57.270421+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/layer_norm.py",
+    "kernel_source_sha256": "75a6f1361a4a7aa9fdec34e2456c097eeec930777775c2db629343416827e497",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/layer_norm.py",
+      "kernel_source_sha256": "75a6f1361a4a7aa9fdec34e2456c097eeec930777775c2db629343416827e497",
+      "generated_kernel_sha256": "substitute:f6f6a99368ad4280d4b50b72b3e8f84bc4d8bc9fd0ec759aeae6fa036283426e",
+      "in_process": false,
+      "pid": 205133,
+      "params_changed": {
+        "block_m": [
+          64,
+          64
+        ],
+        "block_n": [
+          64,
+          64
+        ],
+        "eps": [
+          "1e-5 (example run_test default)",
+          1e-05
+        ],
+        "dtype": [
+          "float16 (example default)",
+          "bfloat16"
+        ],
+        "M/N": [
+          "4096/4096 (example run_test default)",
+          [
+            2048,
+            4096
+          ]
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 205133,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/LayerNormFwdOp-llama-8b-prefill-bfloat16-high_perf-203192-1789393956362.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 95.875,
+        "measured_at": "2026-09-14T13:06:41.502389+00:00",
+        "child_pid": 12428
+      },
+      {
+        "rep": 2,
+        "device_us": 95.25,
+        "measured_at": "2026-09-14T13:52:57.270421+00:00",
+        "child_pid": 205133
+      },
+      {
+        "rep": 3,
+        "device_us": 104.125,
+        "measured_at": "2026-09-14T14:28:14.170835+00:00",
+        "child_pid": 752648
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LogSumExpFwdOp",
+    "variant": "shipped",
+    "label": "3d-multidim-reduce",
+    "dtype": "float16",
+    "device_us_min": 23.5,
+    "n": 3,
+    "device_us_samples": [
+      25.125,
+      23.5,
+      27.25
+    ],
+    "measured_at": "2026-09-14T13:56:30.302360+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+    "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+      "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+      "generated_kernel_sha256": "substitute:c2f89a7b257e667d45bb4c530902b4afb2e78968eb480b0871b09765d319ded5",
+      "in_process": false,
+      "pid": 250603,
+      "params_changed": {
+        "shape": [
+          "their manifest lists this exact shape/label",
+          "unchanged"
+        ],
+        "dim": [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "keepdim": [
+          false,
+          false
+        ],
+        "block_m/tile_n": [
+          "their own default_config heuristic",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 250603,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/LogSumExpFwdOp-3d-multidim-reduce-float16-shipped-218690-1789394167265.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 25.125,
+        "measured_at": "2026-09-14T13:12:18.462062+00:00",
+        "child_pid": 48362
+      },
+      {
+        "rep": 2,
+        "device_us": 23.5,
+        "measured_at": "2026-09-14T13:56:30.302360+00:00",
+        "child_pid": 250603
+      },
+      {
+        "rep": 3,
+        "device_us": 27.25,
+        "measured_at": "2026-09-14T14:31:41.887590+00:00",
+        "child_pid": 787904
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LogSumExpFwdOp",
+    "variant": "shipped",
+    "label": "attn-weights-32k",
+    "dtype": "bfloat16",
+    "device_us_min": 118.75,
+    "n": 3,
+    "device_us_samples": [
+      121.25,
+      118.75,
+      118.75
+    ],
+    "measured_at": "2026-09-14T13:55:07.963960+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+    "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+      "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+      "generated_kernel_sha256": "substitute:faa364cf9fb2c5e6e22c16b5b8a48951dad3aa0bdd8ddf2ea73ab9a2f0209320",
+      "in_process": false,
+      "pid": 235440,
+      "params_changed": {
+        "shape": [
+          "their manifest lists this exact shape/label",
+          "unchanged"
+        ],
+        "dim": [
+          -1,
+          -1
+        ],
+        "keepdim": [
+          false,
+          false
+        ],
+        "block_m/tile_n": [
+          "their own default_config heuristic",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 235440,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/LogSumExpFwdOp-attn-weights-32k-bfloat16-shipped-218690-1789394086066.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 121.25,
+        "measured_at": "2026-09-14T13:09:50.650577+00:00",
+        "child_pid": 32808
+      },
+      {
+        "rep": 2,
+        "device_us": 118.75,
+        "measured_at": "2026-09-14T13:55:07.963960+00:00",
+        "child_pid": 235440
+      },
+      {
+        "rep": 3,
+        "device_us": 118.75,
+        "measured_at": "2026-09-14T14:30:18.830321+00:00",
+        "child_pid": 772257
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LogSumExpFwdOp",
+    "variant": "shipped",
+    "label": "attn-weights-4k",
+    "dtype": "bfloat16",
+    "device_us_min": 16.75,
+    "n": 3,
+    "device_us_samples": [
+      16.75,
+      16.75,
+      16.75
+    ],
+    "measured_at": "2026-09-14T13:09:07.493767+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+    "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+      "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+      "generated_kernel_sha256": "substitute:faa364cf9fb2c5e6e22c16b5b8a48951dad3aa0bdd8ddf2ea73ab9a2f0209320",
+      "in_process": false,
+      "pid": 28905,
+      "params_changed": {
+        "shape": [
+          "their manifest lists this exact shape/label",
+          "unchanged"
+        ],
+        "dim": [
+          -1,
+          -1
+        ],
+        "keepdim": [
+          false,
+          false
+        ],
+        "block_m/tile_n": [
+          "their own default_config heuristic",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 28905,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/LogSumExpFwdOp-attn-weights-4k-bfloat16-shipped-22397-1789391320579.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 16.75,
+        "measured_at": "2026-09-14T13:09:07.493767+00:00",
+        "child_pid": 28905
+      },
+      {
+        "rep": 2,
+        "device_us": 16.75,
+        "measured_at": "2026-09-14T13:54:39.961459+00:00",
+        "child_pid": 229601
+      },
+      {
+        "rep": 3,
+        "device_us": 16.75,
+        "measured_at": "2026-09-14T14:29:51.726929+00:00",
+        "child_pid": 766976
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LogSumExpFwdOp",
+    "variant": "shipped",
+    "label": "attn-weights-4k",
+    "dtype": "float16",
+    "device_us_min": 16.5,
+    "n": 3,
+    "device_us_samples": [
+      16.75,
+      16.5,
+      16.75
+    ],
+    "measured_at": "2026-09-14T13:54:11.925972+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+    "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+      "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+      "generated_kernel_sha256": "substitute:faa364cf9fb2c5e6e22c16b5b8a48951dad3aa0bdd8ddf2ea73ab9a2f0209320",
+      "in_process": false,
+      "pid": 222470,
+      "params_changed": {
+        "shape": [
+          "their manifest lists this exact shape/label",
+          "unchanged"
+        ],
+        "dim": [
+          -1,
+          -1
+        ],
+        "keepdim": [
+          false,
+          false
+        ],
+        "block_m/tile_n": [
+          "their own default_config heuristic",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 222470,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/LogSumExpFwdOp-attn-weights-4k-float16-shipped-218690-1789394030050.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 16.75,
+        "measured_at": "2026-09-14T13:08:24.403161+00:00",
+        "child_pid": 24776
+      },
+      {
+        "rep": 2,
+        "device_us": 16.5,
+        "measured_at": "2026-09-14T13:54:11.925972+00:00",
+        "child_pid": 222470
+      },
+      {
+        "rep": 3,
+        "device_us": 16.75,
+        "measured_at": "2026-09-14T14:29:25.002470+00:00",
+        "child_pid": 762827
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LogSumExpFwdOp",
+    "variant": "shipped",
+    "label": "lm-head-logits",
+    "dtype": "bfloat16",
+    "device_us_min": 13.75,
+    "n": 3,
+    "device_us_samples": [
+      13.875,
+      13.875,
+      13.75
+    ],
+    "measured_at": "2026-09-14T14:31:14.160598+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+    "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+      "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+      "generated_kernel_sha256": "substitute:faa364cf9fb2c5e6e22c16b5b8a48951dad3aa0bdd8ddf2ea73ab9a2f0209320",
+      "in_process": false,
+      "pid": 782737,
+      "params_changed": {
+        "shape": [
+          "their manifest lists this exact shape/label",
+          "unchanged"
+        ],
+        "dim": [
+          -1,
+          -1
+        ],
+        "keepdim": [
+          false,
+          false
+        ],
+        "block_m/tile_n": [
+          "their own default_config heuristic",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 782737,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep3/LogSumExpFwdOp-lm-head-logits-bfloat16-shipped-760444-1789396252380.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 13.875,
+        "measured_at": "2026-09-14T13:11:36.780271+00:00",
+        "child_pid": 43844
+      },
+      {
+        "rep": 2,
+        "device_us": 13.875,
+        "measured_at": "2026-09-14T13:56:01.329502+00:00",
+        "child_pid": 247581
+      },
+      {
+        "rep": 3,
+        "device_us": 13.75,
+        "measured_at": "2026-09-14T14:31:14.160598+00:00",
+        "child_pid": 782737
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "LogSumExpFwdOp",
+    "variant": "shipped",
+    "label": "lm-head-logits",
+    "dtype": "float16",
+    "device_us_min": 13.75,
+    "n": 3,
+    "device_us_samples": [
+      13.75,
+      13.75,
+      14.0
+    ],
+    "measured_at": "2026-09-14T13:10:43.771533+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+    "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/reduction/logsumexp/logsumexp.py",
+      "kernel_source_sha256": "24e9a88aefa956bca3b759c40db733a102e8fd9c3996f56e28fb3674e710d6bf",
+      "generated_kernel_sha256": "substitute:faa364cf9fb2c5e6e22c16b5b8a48951dad3aa0bdd8ddf2ea73ab9a2f0209320",
+      "in_process": false,
+      "pid": 38022,
+      "params_changed": {
+        "shape": [
+          "their manifest lists this exact shape/label",
+          "unchanged"
+        ],
+        "dim": [
+          -1,
+          -1
+        ],
+        "keepdim": [
+          false,
+          false
+        ],
+        "block_m/tile_n": [
+          "their own default_config heuristic",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 38022,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/LogSumExpFwdOp-lm-head-logits-float16-shipped-22397-1789391416904.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 13.75,
+        "measured_at": "2026-09-14T13:10:43.771533+00:00",
+        "child_pid": 38022
+      },
+      {
+        "rep": 2,
+        "device_us": 13.75,
+        "measured_at": "2026-09-14T13:55:34.477863+00:00",
+        "child_pid": 242888
+      },
+      {
+        "rep": 3,
+        "device_us": 14.0,
+        "measured_at": "2026-09-14T14:30:46.401234+00:00",
+        "child_pid": 777624
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage3",
+    "label": "yolo-p3",
+    "dtype": "bfloat16",
+    "device_us_min": 417.625,
+    "n": 3,
+    "device_us_samples": [
+      486.125,
+      417.625,
+      488.125
+    ],
+    "measured_at": "2026-09-14T13:58:28.872359+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+    "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+      "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+      "generated_kernel_sha256": "substitute:f254919b662ce2746fae331a4155e36c637bc552edda0d0aeb035b396ec4f911",
+      "in_process": false,
+      "pid": 274374,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          2048,
+          2048
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 274374,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/MishFwdOp-yolo-p3-bfloat16-stage3-258742-1789394264933.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 486.125,
+        "measured_at": "2026-09-14T13:16:29.418456+00:00",
+        "child_pid": 63281
+      },
+      {
+        "rep": 2,
+        "device_us": 417.625,
+        "measured_at": "2026-09-14T13:58:28.872359+00:00",
+        "child_pid": 274374
+      },
+      {
+        "rep": 3,
+        "device_us": 488.125,
+        "measured_at": "2026-09-14T14:33:40.429612+00:00",
+        "child_pid": 804806
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage3",
+    "label": "yolo-p3",
+    "dtype": "float16",
+    "device_us_min": 418.625,
+    "n": 3,
+    "device_us_samples": [
+      418.875,
+      418.625,
+      517.75
+    ],
+    "measured_at": "2026-09-14T13:57:38.669457+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+    "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+      "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+      "generated_kernel_sha256": "substitute:f254919b662ce2746fae331a4155e36c637bc552edda0d0aeb035b396ec4f911",
+      "in_process": false,
+      "pid": 263227,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          2048,
+          2048
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 263227,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/MishFwdOp-yolo-p3-float16-stage3-258742-1789394214779.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 418.875,
+        "measured_at": "2026-09-14T13:14:33.768386+00:00",
+        "child_pid": 54468
+      },
+      {
+        "rep": 2,
+        "device_us": 418.625,
+        "measured_at": "2026-09-14T13:57:38.669457+00:00",
+        "child_pid": 263227
+      },
+      {
+        "rep": 3,
+        "device_us": 517.75,
+        "measured_at": "2026-09-14T14:32:49.732298+00:00",
+        "child_pid": 795355
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage3",
+    "label": "yolo-p4",
+    "dtype": "bfloat16",
+    "device_us_min": 210.0,
+    "n": 3,
+    "device_us_samples": [
+      210.0,
+      259.875,
+      210.125
+    ],
+    "measured_at": "2026-09-14T13:18:38.378742+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+    "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+      "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+      "generated_kernel_sha256": "substitute:f254919b662ce2746fae331a4155e36c637bc552edda0d0aeb035b396ec4f911",
+      "in_process": false,
+      "pid": 73703,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          2048,
+          2048
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 73703,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep1/MishFwdOp-yolo-p4-bfloat16-stage3-51858-1789391868985.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 210.0,
+        "measured_at": "2026-09-14T13:18:38.378742+00:00",
+        "child_pid": 73703
+      },
+      {
+        "rep": 2,
+        "device_us": 259.875,
+        "measured_at": "2026-09-14T14:00:08.531604+00:00",
+        "child_pid": 300631
+      },
+      {
+        "rep": 3,
+        "device_us": 210.125,
+        "measured_at": "2026-09-14T14:35:21.315718+00:00",
+        "child_pid": 831869
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage3",
+    "label": "yolo-p4",
+    "dtype": "float16",
+    "device_us_min": 210.25,
+    "n": 3,
+    "device_us_samples": [
+      260.0,
+      210.25,
+      259.75
+    ],
+    "measured_at": "2026-09-14T13:59:19.393535+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+    "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel/mish.py",
+      "kernel_source_sha256": "c577a6eb6f4dfbfa819c8676b9b50a5c9f153760204fb0324d55a6ac3feec00b",
+      "generated_kernel_sha256": "substitute:f254919b662ce2746fae331a4155e36c637bc552edda0d0aeb035b396ec4f911",
+      "in_process": false,
+      "pid": 287549,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          2048,
+          2048
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 287549,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep2/MishFwdOp-yolo-p4-float16-stage3-258742-1789394314919.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 260.0,
+        "measured_at": "2026-09-14T13:17:33.819697+00:00",
+        "child_pid": 70310
+      },
+      {
+        "rep": 2,
+        "device_us": 210.25,
+        "measured_at": "2026-09-14T13:59:19.393535+00:00",
+        "child_pid": 287549
+      },
+      {
+        "rep": 3,
+        "device_us": 259.75,
+        "measured_at": "2026-09-14T14:34:30.503780+00:00",
+        "child_pid": 819530
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage4_opt",
+    "label": "yolo-p3",
+    "dtype": "bfloat16",
+    "device_us_min": 80.25,
+    "n": 3,
+    "device_us_samples": [
+      84.75,
+      92.625,
+      80.25
+    ],
+    "measured_at": "2026-09-14T14:33:40.429612+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+    "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+      "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+      "generated_kernel_sha256": "substitute:9396898af923b3893f59759d78d3f193dbe9f70767e38dedc7e689d25e99b2f3",
+      "in_process": false,
+      "pid": 811732,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          "their tuned default (None -> 8192/8192)",
+          "unchanged"
+        ],
+        "num_cores": [
+          "their tuned default 48",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 811732,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep3/MishFwdOp-yolo-p3-bfloat16-stage4_opt-792078-1789396398309.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 84.75,
+        "measured_at": "2026-09-14T13:16:29.418456+00:00",
+        "child_pid": 67716
+      },
+      {
+        "rep": 2,
+        "device_us": 92.625,
+        "measured_at": "2026-09-14T13:58:28.872359+00:00",
+        "child_pid": 279743
+      },
+      {
+        "rep": 3,
+        "device_us": 80.25,
+        "measured_at": "2026-09-14T14:33:40.429612+00:00",
+        "child_pid": 811732
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage4_opt",
+    "label": "yolo-p3",
+    "dtype": "float16",
+    "device_us_min": 89.25,
+    "n": 3,
+    "device_us_samples": [
+      93.25,
+      93.0,
+      89.25
+    ],
+    "measured_at": "2026-09-14T14:32:49.732298+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+    "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+      "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+      "generated_kernel_sha256": "substitute:9396898af923b3893f59759d78d3f193dbe9f70767e38dedc7e689d25e99b2f3",
+      "in_process": false,
+      "pid": 799066,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          "their tuned default (None -> 8192/8192)",
+          "unchanged"
+        ],
+        "num_cores": [
+          "their tuned default 48",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 799066,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep3/MishFwdOp-yolo-p3-float16-stage4_opt-792078-1789396348408.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 93.25,
+        "measured_at": "2026-09-14T13:14:33.768386+00:00",
+        "child_pid": 59971
+      },
+      {
+        "rep": 2,
+        "device_us": 93.0,
+        "measured_at": "2026-09-14T13:57:38.669457+00:00",
+        "child_pid": 266467
+      },
+      {
+        "rep": 3,
+        "device_us": 89.25,
+        "measured_at": "2026-09-14T14:32:49.732298+00:00",
+        "child_pid": 799066
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage4_opt",
+    "label": "yolo-p4",
+    "dtype": "bfloat16",
+    "device_us_min": 47.0,
+    "n": 3,
+    "device_us_samples": [
+      51.375,
+      47.75,
+      47.0
+    ],
+    "measured_at": "2026-09-14T14:35:21.315718+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+    "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+      "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+      "generated_kernel_sha256": "substitute:9396898af923b3893f59759d78d3f193dbe9f70767e38dedc7e689d25e99b2f3",
+      "in_process": false,
+      "pid": 837489,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          "their tuned default (None -> 8192/8192)",
+          "unchanged"
+        ],
+        "num_cores": [
+          "their tuned default 48",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 837489,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep3/MishFwdOp-yolo-p4-bfloat16-stage4_opt-792078-1789396499346.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 51.375,
+        "measured_at": "2026-09-14T13:18:38.378742+00:00",
+        "child_pid": 75041
+      },
+      {
+        "rep": 2,
+        "device_us": 47.75,
+        "measured_at": "2026-09-14T14:00:08.531604+00:00",
+        "child_pid": 308121
+      },
+      {
+        "rep": 3,
+        "device_us": 47.0,
+        "measured_at": "2026-09-14T14:35:21.315718+00:00",
+        "child_pid": 837489
+      }
+    ]
+  },
+  {
+    "round": "R278",
+    "op": "MishFwdOp",
+    "variant": "stage4_opt",
+    "label": "yolo-p4",
+    "dtype": "float16",
+    "device_us_min": 46.875,
+    "n": 3,
+    "device_us_samples": [
+      50.75,
+      47.625,
+      46.875
+    ],
+    "measured_at": "2026-09-14T14:34:30.503780+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+    "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/TileOPs/tileops/kernels/elementwise/mish/mish_kernel_opt/mish.py",
+      "kernel_source_sha256": "caeca93dd02cf93eed7aedb8e1d657e00d4956c43dfbb2048a03a00ab4ad08bc",
+      "generated_kernel_sha256": "substitute:9396898af923b3893f59759d78d3f193dbe9f70767e38dedc7e689d25e99b2f3",
+      "in_process": false,
+      "pid": 825304,
+      "params_changed": {
+        "shape": [
+          "their manifest already lists this exact shape",
+          "unchanged"
+        ],
+        "block_size": [
+          "their tuned default (None -> 8192/8192)",
+          "unchanged"
+        ],
+        "num_cores": [
+          "their tuned default 48",
+          "unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 825304,
+    "child_log": "/home/dyq/workspace/docs/reports/R302-data/work/r278/rep3/MishFwdOp-yolo-p4-float16-stage4_opt-792078-1789396448546.log",
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 50.75,
+        "measured_at": "2026-09-14T13:17:33.819697+00:00",
+        "child_pid": 71632
+      },
+      {
+        "rep": 2,
+        "device_us": 47.625,
+        "measured_at": "2026-09-14T13:59:19.393535+00:00",
+        "child_pid": 290366
+      },
+      {
+        "rep": 3,
+        "device_us": 46.875,
+        "measured_at": "2026-09-14T14:34:30.503780+00:00",
+        "child_pid": 825304
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "AbsFwdOp",
+    "variant": "autotune_2d",
+    "label": "elementwise-16M",
+    "dtype": "float16",
+    "device_us_min": 192.625,
+    "n": 3,
+    "device_us_samples": [
+      196.25,
+      192.625,
+      194.625
+    ],
+    "measured_at": "2026-09-14T14:00:56.007138+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/abs/abs_2d.py",
+    "kernel_source_sha256": "39de11be0caf43ef78ea00c2932a341d7146966ed87544eb669db5e369eaa7c9",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/abs/abs_2d.py",
+      "kernel_source_sha256": "39de11be0caf43ef78ea00c2932a341d7146966ed87544eb669db5e369eaa7c9",
+      "generated_kernel_sha256": "substitute:f2a81f71e2513fef11072c25a6b2ca6b91061fad8b14c761dc34cb67663a972c",
+      "in_process": false,
+      "pid": 319438,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=4096 N=4096 (our workload, reshaped from [4096, 4096] -- a view on contiguous memory, no copy)"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 319438,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 196.25,
+        "measured_at": "2026-09-14T13:19:36.186252+00:00",
+        "child_pid": 77587
+      },
+      {
+        "rep": 2,
+        "device_us": 192.625,
+        "measured_at": "2026-09-14T14:00:56.007138+00:00",
+        "child_pid": 319438
+      },
+      {
+        "rep": 3,
+        "device_us": 194.625,
+        "measured_at": "2026-09-14T14:36:09.077395+00:00",
+        "child_pid": 845431
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "AbsFwdOp",
+    "variant": "autotune_2d",
+    "label": "elementwise-256M",
+    "dtype": "float16",
+    "device_us_min": 3449.75,
+    "n": 3,
+    "device_us_samples": [
+      3449.75,
+      3469.875,
+      3453.625
+    ],
+    "measured_at": "2026-09-14T13:20:22.662238+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/abs/abs_2d.py",
+    "kernel_source_sha256": "39de11be0caf43ef78ea00c2932a341d7146966ed87544eb669db5e369eaa7c9",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/abs/abs_2d.py",
+      "kernel_source_sha256": "39de11be0caf43ef78ea00c2932a341d7146966ed87544eb669db5e369eaa7c9",
+      "generated_kernel_sha256": "substitute:f2a81f71e2513fef11072c25a6b2ca6b91061fad8b14c761dc34cb67663a972c",
+      "in_process": false,
+      "pid": 79592,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=16384 N=16384 (our workload, reshaped from [16384, 16384] -- a view on contiguous memory, no copy)"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 79592,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 3449.75,
+        "measured_at": "2026-09-14T13:20:22.662238+00:00",
+        "child_pid": 79592
+      },
+      {
+        "rep": 2,
+        "device_us": 3469.875,
+        "measured_at": "2026-09-14T14:01:31.202281+00:00",
+        "child_pid": 326585
+      },
+      {
+        "rep": 3,
+        "device_us": 3453.625,
+        "measured_at": "2026-09-14T14:36:44.389446+00:00",
+        "child_pid": 848678
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "AddFwdOp",
+    "variant": "autotune_2d",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "device_us_min": 154.0,
+    "n": 3,
+    "device_us_samples": [
+      155.625,
+      155.25,
+      154.0
+    ],
+    "measured_at": "2026-09-14T14:50:22.596720+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/add/add_2d.py",
+    "kernel_source_sha256": "db6f8d4c13ccb696137dd602e511f2be1ab4ca515d87da1171f84576a2c8b7ff",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/add/add_2d.py",
+      "kernel_source_sha256": "db6f8d4c13ccb696137dd602e511f2be1ab4ca515d87da1171f84576a2c8b7ff",
+      "generated_kernel_sha256": "substitute:5078b85fbbd5eddaee898d1496375c8ba1053dc4977320e8fa105f0ea70f359b",
+      "in_process": false,
+      "pid": 902617,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=2048 N=4096"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 902617,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 155.625,
+        "measured_at": "2026-09-14T13:38:15.835710+00:00",
+        "child_pid": 132515
+      },
+      {
+        "rep": 2,
+        "device_us": 155.25,
+        "measured_at": "2026-09-14T14:15:16.283639+00:00",
+        "child_pid": 547684
+      },
+      {
+        "rep": 3,
+        "device_us": 154.0,
+        "measured_at": "2026-09-14T14:50:22.596720+00:00",
+        "child_pid": 902617
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "EluFwdOp",
+    "variant": "npuir_active",
+    "label": "mlp-hidden",
+    "dtype": "bfloat16",
+    "device_us_min": 34.25,
+    "n": 3,
+    "device_us_samples": [
+      35.0,
+      34.5,
+      34.25
+    ],
+    "measured_at": "2026-09-14T14:43:02.634974+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_elu.py",
+    "kernel_source_sha256": "32aeb7aab1d3327eff058c444a5f738947e240bd30c427a813040a8cbd6ed523",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_elu.py",
+      "kernel_source_sha256": "32aeb7aab1d3327eff058c444a5f738947e240bd30c427a813040a8cbd6ed523",
+      "generated_kernel_sha256": "substitute:83094cf9fa4962331be68c6c2d3851649738474a154e4e3d456927cc85e3f2cc",
+      "in_process": false,
+      "pid": 876545,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "bfloat16  -- OUTSIDE their declared DTYPES list.  It is still only a parameter value, not an edit; whether it compiles and passes is measured, not assumed"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[64, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [1.0]",
+          "[1.0] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 876545,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 35.0,
+        "measured_at": "2026-09-14T13:28:42.842591+00:00",
+        "child_pid": 103850
+      },
+      {
+        "rep": 2,
+        "device_us": 34.5,
+        "measured_at": "2026-09-14T14:07:52.592571+00:00",
+        "child_pid": 416754
+      },
+      {
+        "rep": 3,
+        "device_us": 34.25,
+        "measured_at": "2026-09-14T14:43:02.634974+00:00",
+        "child_pid": 876545
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "EluFwdOp",
+    "variant": "npuir_active",
+    "label": "mlp-hidden",
+    "dtype": "float16",
+    "device_us_min": 30.75,
+    "n": 3,
+    "device_us_samples": [
+      31.0,
+      30.75,
+      30.75
+    ],
+    "measured_at": "2026-09-14T14:07:23.437469+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_elu.py",
+    "kernel_source_sha256": "32aeb7aab1d3327eff058c444a5f738947e240bd30c427a813040a8cbd6ed523",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_elu.py",
+      "kernel_source_sha256": "32aeb7aab1d3327eff058c444a5f738947e240bd30c427a813040a8cbd6ed523",
+      "generated_kernel_sha256": "substitute:83094cf9fa4962331be68c6c2d3851649738474a154e4e3d456927cc85e3f2cc",
+      "in_process": false,
+      "pid": 409818,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [1.0]",
+          "[1.0] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 409818,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 31.0,
+        "measured_at": "2026-09-14T13:28:02.217335+00:00",
+        "child_pid": 101964
+      },
+      {
+        "rep": 2,
+        "device_us": 30.75,
+        "measured_at": "2026-09-14T14:07:23.437469+00:00",
+        "child_pid": 409818
+      },
+      {
+        "rep": 3,
+        "device_us": 30.75,
+        "measured_at": "2026-09-14T14:42:33.872497+00:00",
+        "child_pid": 873939
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "EluFwdOp",
+    "variant": "npuir_active",
+    "label": "mlp-hidden-wide",
+    "dtype": "float16",
+    "device_us_min": 59.5,
+    "n": 3,
+    "device_us_samples": [
+      59.5,
+      62.625,
+      62.25
+    ],
+    "measured_at": "2026-09-14T13:29:22.463265+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_elu.py",
+    "kernel_source_sha256": "32aeb7aab1d3327eff058c444a5f738947e240bd30c427a813040a8cbd6ed523",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_elu.py",
+      "kernel_source_sha256": "32aeb7aab1d3327eff058c444a5f738947e240bd30c427a813040a8cbd6ed523",
+      "generated_kernel_sha256": "substitute:83094cf9fa4962331be68c6c2d3851649738474a154e4e3d456927cc85e3f2cc",
+      "in_process": false,
+      "pid": 105572,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=8192 -- our workload [2048, 8192] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [1.0]",
+          "[1.0] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 105572,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 59.5,
+        "measured_at": "2026-09-14T13:29:22.463265+00:00",
+        "child_pid": 105572
+      },
+      {
+        "rep": 2,
+        "device_us": 62.625,
+        "measured_at": "2026-09-14T14:08:19.738167+00:00",
+        "child_pid": 428032
+      },
+      {
+        "rep": 3,
+        "device_us": 62.25,
+        "measured_at": "2026-09-14T14:43:30.579091+00:00",
+        "child_pid": 878397
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "HardsigmoidFwdOp",
+    "variant": "npuir_active",
+    "label": "mbv3-se-gate",
+    "dtype": "float16",
+    "device_us_min": 5.0,
+    "n": 3,
+    "device_us_samples": [
+      5.0,
+      5.0,
+      5.375
+    ],
+    "measured_at": "2026-09-14T13:35:10.620951+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_hardsigmoid.py",
+    "kernel_source_sha256": "ee9bfda221d315d38e2ecd8b8e4dfaba0464a0dd0862b4f12ef349473f522357",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_hardsigmoid.py",
+      "kernel_source_sha256": "ee9bfda221d315d38e2ecd8b8e4dfaba0464a0dd0862b4f12ef349473f522357",
+      "generated_kernel_sha256": "substitute:926d816048e28196ce30eb2afc0d22857a749a2fa7cd570a5269a890db51f39e",
+      "in_process": false,
+      "pid": 124265,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=15 N=512 -- our workload [32, 240, 1, 1] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[1, 64] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 124265,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 5.0,
+        "measured_at": "2026-09-14T13:35:10.620951+00:00",
+        "child_pid": 124265
+      },
+      {
+        "rep": 2,
+        "device_us": 5.0,
+        "measured_at": "2026-09-14T14:12:49.873359+00:00",
+        "child_pid": 509607
+      },
+      {
+        "rep": 3,
+        "device_us": 5.375,
+        "measured_at": "2026-09-14T14:47:56.214212+00:00",
+        "child_pid": 896189
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "HardsigmoidFwdOp",
+    "variant": "npuir_active",
+    "label": "mbv3-se-gate-deep",
+    "dtype": "float16",
+    "device_us_min": 16.375,
+    "n": 3,
+    "device_us_samples": [
+      16.375,
+      19.25,
+      17.75
+    ],
+    "measured_at": "2026-09-14T13:35:49.622264+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_hardsigmoid.py",
+    "kernel_source_sha256": "ee9bfda221d315d38e2ecd8b8e4dfaba0464a0dd0862b4f12ef349473f522357",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_hardsigmoid.py",
+      "kernel_source_sha256": "ee9bfda221d315d38e2ecd8b8e4dfaba0464a0dd0862b4f12ef349473f522357",
+      "generated_kernel_sha256": "substitute:926d816048e28196ce30eb2afc0d22857a749a2fa7cd570a5269a890db51f39e",
+      "in_process": false,
+      "pid": 126329,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=15 N=2048 -- our workload [32, 960, 1, 1] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[1, 64] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 126329,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 16.375,
+        "measured_at": "2026-09-14T13:35:49.622264+00:00",
+        "child_pid": 126329
+      },
+      {
+        "rep": 2,
+        "device_us": 19.25,
+        "measured_at": "2026-09-14T14:13:16.598819+00:00",
+        "child_pid": 513572
+      },
+      {
+        "rep": 3,
+        "device_us": 17.75,
+        "measured_at": "2026-09-14T14:48:22.859168+00:00",
+        "child_pid": 897233
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "HardtanhFwdOp",
+    "variant": "npuir_active",
+    "label": "bounded-conv-feat",
+    "dtype": "float16",
+    "device_us_min": 51.0,
+    "n": 3,
+    "device_us_samples": [
+      51.0,
+      55.375,
+      51.5
+    ],
+    "measured_at": "2026-09-14T13:34:13.338760+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_hardtanh.py",
+    "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_hardtanh.py",
+      "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+      "generated_kernel_sha256": "substitute:4732d10cb58420f27032142fdfc5bb50387000b1bc4b2c9d6aaaafd9ca648529",
+      "in_process": false,
+      "pid": 121540,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=6272 N=2048 -- our workload [16, 256, 56, 56] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [-1.0, 1.0]",
+          "[-1.0, 1.0] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 121540,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 51.0,
+        "measured_at": "2026-09-14T13:34:13.338760+00:00",
+        "child_pid": 121540
+      },
+      {
+        "rep": 2,
+        "device_us": 55.375,
+        "measured_at": "2026-09-14T14:12:04.001946+00:00",
+        "child_pid": 497583
+      },
+      {
+        "rep": 3,
+        "device_us": 51.5,
+        "measured_at": "2026-09-14T14:47:11.813588+00:00",
+        "child_pid": 894057
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "HardtanhFwdOp",
+    "variant": "npuir_active",
+    "label": "bounded-hidden",
+    "dtype": "float16",
+    "device_us_min": 27.25,
+    "n": 3,
+    "device_us_samples": [
+      29.5,
+      28.5,
+      27.25
+    ],
+    "measured_at": "2026-09-14T14:46:42.762288+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_hardtanh.py",
+    "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_hardtanh.py",
+      "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+      "generated_kernel_sha256": "substitute:4732d10cb58420f27032142fdfc5bb50387000b1bc4b2c9d6aaaafd9ca648529",
+      "in_process": false,
+      "pid": 892846,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [-1.0, 1.0]",
+          "[-1.0, 1.0] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 892846,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 29.5,
+        "measured_at": "2026-09-14T13:33:33.912524+00:00",
+        "child_pid": 119192
+      },
+      {
+        "rep": 2,
+        "device_us": 28.5,
+        "measured_at": "2026-09-14T14:11:34.457558+00:00",
+        "child_pid": 490284
+      },
+      {
+        "rep": 3,
+        "device_us": 27.25,
+        "measured_at": "2026-09-14T14:46:42.762288+00:00",
+        "child_pid": 892846
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "LeakyReluFwdOp",
+    "variant": "npuir_active",
+    "label": "gan-feat",
+    "dtype": "float16",
+    "device_us_min": 47.5,
+    "n": 3,
+    "device_us_samples": [
+      56.0,
+      53.0,
+      47.5
+    ],
+    "measured_at": "2026-09-14T14:49:08.485871+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_leaky_relu.py",
+    "kernel_source_sha256": "8edc5b8c87b7f6dfb47ee945f1044f26d57e6b1e7b4a9c1dbbfb546a3d608788",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_leaky_relu.py",
+      "kernel_source_sha256": "8edc5b8c87b7f6dfb47ee945f1044f26d57e6b1e7b4a9c1dbbfb546a3d608788",
+      "generated_kernel_sha256": "substitute:c1e3cda6ed7ca3e5171169037ade11909fa2667729e7b3074c225b01f464131c",
+      "in_process": false,
+      "pid": 899411,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=8192 N=2048 -- our workload [16, 256, 64, 64] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [0.01]",
+          "[0.01] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 899411,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 56.0,
+        "measured_at": "2026-09-14T13:36:47.174598+00:00",
+        "child_pid": 128781
+      },
+      {
+        "rep": 2,
+        "device_us": 53.0,
+        "measured_at": "2026-09-14T14:14:01.751107+00:00",
+        "child_pid": 524451
+      },
+      {
+        "rep": 3,
+        "device_us": 47.5,
+        "measured_at": "2026-09-14T14:49:08.485871+00:00",
+        "child_pid": 899411
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "LeakyReluFwdOp",
+    "variant": "npuir_active",
+    "label": "gan-feat-deep",
+    "dtype": "float16",
+    "device_us_min": 34.25,
+    "n": 3,
+    "device_us_samples": [
+      35.25,
+      34.25,
+      36.375
+    ],
+    "measured_at": "2026-09-14T14:14:28.633142+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_leaky_relu.py",
+    "kernel_source_sha256": "8edc5b8c87b7f6dfb47ee945f1044f26d57e6b1e7b4a9c1dbbfb546a3d608788",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_leaky_relu.py",
+      "kernel_source_sha256": "8edc5b8c87b7f6dfb47ee945f1044f26d57e6b1e7b4a9c1dbbfb546a3d608788",
+      "generated_kernel_sha256": "substitute:c1e3cda6ed7ca3e5171169037ade11909fa2667729e7b3074c225b01f464131c",
+      "in_process": false,
+      "pid": 533476,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=4096 N=2048 -- our workload [16, 512, 32, 32] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [0.01]",
+          "[0.01] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 533476,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 35.25,
+        "measured_at": "2026-09-14T13:37:26.681901+00:00",
+        "child_pid": 130172
+      },
+      {
+        "rep": 2,
+        "device_us": 34.25,
+        "measured_at": "2026-09-14T14:14:28.633142+00:00",
+        "child_pid": 533476
+      },
+      {
+        "rep": 3,
+        "device_us": 36.375,
+        "measured_at": "2026-09-14T14:49:36.265013+00:00",
+        "child_pid": 900908
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RMSNormFwdOp",
+    "variant": "autotune_2d",
+    "label": "llama-405b-prefill",
+    "dtype": "float16",
+    "device_us_min": 16638.625,
+    "n": 3,
+    "device_us_samples": [
+      16671.75,
+      16638.625,
+      16643.625
+    ],
+    "measured_at": "2026-09-14T14:19:01.306121+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py",
+    "kernel_source_sha256": "f97bc076ec64c84b54f3f8b6bcd68d6b604743142dddc9aa56f5bf0f3c01ff86",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py",
+      "kernel_source_sha256": "f97bc076ec64c84b54f3f8b6bcd68d6b604743142dddc9aa56f5bf0f3c01ff86",
+      "generated_kernel_sha256": "substitute:27373df685268ec0707daec27df26d8587a83b8c4d55cfc36d54424ac32bf0c6",
+      "in_process": false,
+      "pid": 608479,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=2048 N=16384"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "eps": [
+          "1e-5, written as a literal inside their prim_func (rms_norm_kernel)",
+          "UNCHANGED -- our manifest uses 1e-6 and their kernel has no eps parameter; changing the literal would be an edit to their kernel (G4).  The difference shifts rstd by (eps_theirs - eps_ours)/(2*mean(x^2)) ~ 4.5e-6 relative for unit-variance input, which is below the fp16 resolution of 2^-11 = 4.9e-4; the numeric gate below is what actually decides"
+        ],
+        "accumulator dtype": [
+          "float16 (local_reduce / row_rms / row_rstd are all alloc_shared(..., 'float16'))",
+          "unchanged -- our own kernel accumulates in fp32; this is their design, and it is what the numeric gate is measuring"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 608479,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 16671.75,
+        "measured_at": "2026-09-14T13:43:14.049781+00:00",
+        "child_pid": 154243
+      },
+      {
+        "rep": 2,
+        "device_us": 16638.625,
+        "measured_at": "2026-09-14T14:19:01.306121+00:00",
+        "child_pid": 608479
+      },
+      {
+        "rep": 3,
+        "device_us": 16643.625,
+        "measured_at": "2026-09-14T14:54:05.696364+00:00",
+        "child_pid": 913436
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RMSNormFwdOp",
+    "variant": "autotune_2d",
+    "label": "llama-70b-prefill",
+    "dtype": "float16",
+    "device_us_min": 8237.125,
+    "n": 3,
+    "device_us_samples": [
+      8266.875,
+      8237.125,
+      8265.75
+    ],
+    "measured_at": "2026-09-14T14:18:30.589324+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py",
+    "kernel_source_sha256": "f97bc076ec64c84b54f3f8b6bcd68d6b604743142dddc9aa56f5bf0f3c01ff86",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py",
+      "kernel_source_sha256": "f97bc076ec64c84b54f3f8b6bcd68d6b604743142dddc9aa56f5bf0f3c01ff86",
+      "generated_kernel_sha256": "substitute:27373df685268ec0707daec27df26d8587a83b8c4d55cfc36d54424ac32bf0c6",
+      "in_process": false,
+      "pid": 602964,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=2048 N=8192"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "eps": [
+          "1e-5, written as a literal inside their prim_func (rms_norm_kernel)",
+          "UNCHANGED -- our manifest uses 1e-6 and their kernel has no eps parameter; changing the literal would be an edit to their kernel (G4).  The difference shifts rstd by (eps_theirs - eps_ours)/(2*mean(x^2)) ~ 4.5e-6 relative for unit-variance input, which is below the fp16 resolution of 2^-11 = 4.9e-4; the numeric gate below is what actually decides"
+        ],
+        "accumulator dtype": [
+          "float16 (local_reduce / row_rms / row_rstd are all alloc_shared(..., 'float16'))",
+          "unchanged -- our own kernel accumulates in fp32; this is their design, and it is what the numeric gate is measuring"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 602964,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 8266.875,
+        "measured_at": "2026-09-14T13:42:30.559464+00:00",
+        "child_pid": 150569
+      },
+      {
+        "rep": 2,
+        "device_us": 8237.125,
+        "measured_at": "2026-09-14T14:18:30.589324+00:00",
+        "child_pid": 602964
+      },
+      {
+        "rep": 3,
+        "device_us": 8265.75,
+        "measured_at": "2026-09-14T14:53:35.705440+00:00",
+        "child_pid": 912049
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RMSNormFwdOp",
+    "variant": "autotune_2d",
+    "label": "llama-8b-prefill",
+    "dtype": "float16",
+    "device_us_min": 4114.25,
+    "n": 3,
+    "device_us_samples": [
+      4114.25,
+      4136.0,
+      4129.625
+    ],
+    "measured_at": "2026-09-14T13:41:56.824316+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py",
+    "kernel_source_sha256": "f97bc076ec64c84b54f3f8b6bcd68d6b604743142dddc9aa56f5bf0f3c01ff86",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/fused_add_mean_mul_pow_rsqrt/fused_add_mean_mul_pow_rsqrt.py",
+      "kernel_source_sha256": "f97bc076ec64c84b54f3f8b6bcd68d6b604743142dddc9aa56f5bf0f3c01ff86",
+      "generated_kernel_sha256": "substitute:27373df685268ec0707daec27df26d8587a83b8c4d55cfc36d54424ac32bf0c6",
+      "in_process": false,
+      "pid": 147840,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=2048 N=4096"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "eps": [
+          "1e-5, written as a literal inside their prim_func (rms_norm_kernel)",
+          "UNCHANGED -- our manifest uses 1e-6 and their kernel has no eps parameter; changing the literal would be an edit to their kernel (G4).  The difference shifts rstd by (eps_theirs - eps_ours)/(2*mean(x^2)) ~ 4.5e-6 relative for unit-variance input, which is below the fp16 resolution of 2^-11 = 4.9e-4; the numeric gate below is what actually decides"
+        ],
+        "accumulator dtype": [
+          "float16 (local_reduce / row_rms / row_rstd are all alloc_shared(..., 'float16'))",
+          "unchanged -- our own kernel accumulates in fp32; this is their design, and it is what the numeric gate is measuring"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 147840,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 4114.25,
+        "measured_at": "2026-09-14T13:41:56.824316+00:00",
+        "child_pid": 147840
+      },
+      {
+        "rep": 2,
+        "device_us": 4136.0,
+        "measured_at": "2026-09-14T14:18:01.345932+00:00",
+        "child_pid": 595234
+      },
+      {
+        "rep": 3,
+        "device_us": 4129.625,
+        "measured_at": "2026-09-14T14:53:05.983698+00:00",
+        "child_pid": 910650
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RMSNormFwdOp",
+    "variant": "plain",
+    "label": "llama-70b-prefill",
+    "dtype": "float16",
+    "device_us_min": 65.75,
+    "n": 3,
+    "device_us_samples": [
+      66.625,
+      66.75,
+      65.75
+    ],
+    "measured_at": "2026-09-14T14:52:10.294956+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/rms_norm.py",
+    "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/rms_norm.py",
+      "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+      "generated_kernel_sha256": "substitute:b7184b119d9da083da7b919500cb23e6273c51f1491e30543c92f1021f858aa9",
+      "in_process": false,
+      "pid": 907807,
+      "params_changed": {
+        "shape": [
+          "their run_test default M=N=4096",
+          "M=2048 N=8192 (our workload)"
+        ],
+        "eps": [
+          "run_test default 1e-5 (a PARAMETER of _rms_norm_kernel, not a literal)",
+          1e-06
+        ],
+        "dtype": [
+          "run_test default 'float16' (also a parameter)",
+          "float16"
+        ],
+        "block_m": [
+          "NO published value: their run_test only ever calls the OTHER factory (_rms_norm_kernel_high_perf) with block_m=64, block_n=64",
+          "2 -- chosen by the stated rule: start at the sibling's published 64 and halve until it compiles and runs.  This kernel stages three (block_m, 8192) buffers (dtype + dtype + fp32 = 65536 bytes/row) in UB, so the bound is the UB budget, not a published constant.  Full ladder in block_m_attempts"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 907807,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 66.625,
+        "measured_at": "2026-09-14T13:40:42.179119+00:00",
+        "child_pid": 141209
+      },
+      {
+        "rep": 2,
+        "device_us": 66.75,
+        "measured_at": "2026-09-14T14:17:04.628029+00:00",
+        "child_pid": 580241
+      },
+      {
+        "rep": 3,
+        "device_us": 65.75,
+        "measured_at": "2026-09-14T14:52:10.294956+00:00",
+        "child_pid": 907807
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RMSNormFwdOp",
+    "variant": "plain",
+    "label": "llama-8b-decode",
+    "dtype": "bfloat16",
+    "device_us_min": 2.0,
+    "n": 3,
+    "device_us_samples": [
+      2.0,
+      2.0,
+      2.0
+    ],
+    "measured_at": "2026-09-14T13:41:23.071674+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/rms_norm.py",
+    "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/rms_norm.py",
+      "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+      "generated_kernel_sha256": "substitute:b7184b119d9da083da7b919500cb23e6273c51f1491e30543c92f1021f858aa9",
+      "in_process": false,
+      "pid": 144983,
+      "params_changed": {
+        "shape": [
+          "their run_test default M=N=4096",
+          "M=1 N=4096 (our workload)"
+        ],
+        "eps": [
+          "run_test default 1e-5 (a PARAMETER of _rms_norm_kernel, not a literal)",
+          1e-06
+        ],
+        "dtype": [
+          "run_test default 'float16' (also a parameter)",
+          "bfloat16"
+        ],
+        "block_m": [
+          "NO published value: their run_test only ever calls the OTHER factory (_rms_norm_kernel_high_perf) with block_m=64, block_n=64",
+          "1 -- chosen by the stated rule: start at the sibling's published 64 and halve until it compiles and runs.  This kernel stages three (block_m, 4096) buffers (dtype + dtype + fp32 = 32768 bytes/row) in UB, so the bound is the UB budget, not a published constant.  Full ladder in block_m_attempts"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 144983,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 2.0,
+        "measured_at": "2026-09-14T13:41:23.071674+00:00",
+        "child_pid": 144983
+      },
+      {
+        "rep": 2,
+        "device_us": 2.0,
+        "measured_at": "2026-09-14T14:17:32.338768+00:00",
+        "child_pid": 588380
+      },
+      {
+        "rep": 3,
+        "device_us": 2.0,
+        "measured_at": "2026-09-14T14:52:37.482827+00:00",
+        "child_pid": 909332
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RMSNormFwdOp",
+    "variant": "plain",
+    "label": "llama-8b-prefill",
+    "dtype": "bfloat16",
+    "device_us_min": 34.5,
+    "n": 3,
+    "device_us_samples": [
+      34.5,
+      35.5,
+      35.0
+    ],
+    "measured_at": "2026-09-14T13:39:59.012034+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/rms_norm.py",
+    "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/rms_norm.py",
+      "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+      "generated_kernel_sha256": "substitute:b7184b119d9da083da7b919500cb23e6273c51f1491e30543c92f1021f858aa9",
+      "in_process": false,
+      "pid": 137425,
+      "params_changed": {
+        "shape": [
+          "their run_test default M=N=4096",
+          "M=2048 N=4096 (our workload)"
+        ],
+        "eps": [
+          "run_test default 1e-5 (a PARAMETER of _rms_norm_kernel, not a literal)",
+          1e-06
+        ],
+        "dtype": [
+          "run_test default 'float16' (also a parameter)",
+          "bfloat16"
+        ],
+        "block_m": [
+          "NO published value: their run_test only ever calls the OTHER factory (_rms_norm_kernel_high_perf) with block_m=64, block_n=64",
+          "4 -- chosen by the stated rule: start at the sibling's published 64 and halve until it compiles and runs.  This kernel stages three (block_m, 4096) buffers (dtype + dtype + fp32 = 32768 bytes/row) in UB, so the bound is the UB budget, not a published constant.  Full ladder in block_m_attempts"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 137425,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 34.5,
+        "measured_at": "2026-09-14T13:39:59.012034+00:00",
+        "child_pid": 137425
+      },
+      {
+        "rep": 2,
+        "device_us": 35.5,
+        "measured_at": "2026-09-14T14:16:34.246076+00:00",
+        "child_pid": 572914
+      },
+      {
+        "rep": 3,
+        "device_us": 35.0,
+        "measured_at": "2026-09-14T14:51:40.439861+00:00",
+        "child_pid": 906565
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RMSNormFwdOp",
+    "variant": "plain",
+    "label": "llama-8b-prefill",
+    "dtype": "float16",
+    "device_us_min": 34.5,
+    "n": 3,
+    "device_us_samples": [
+      35.0,
+      34.75,
+      34.5
+    ],
+    "measured_at": "2026-09-14T14:51:10.673744+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/norm/rms_norm.py",
+    "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/norm/rms_norm.py",
+      "kernel_source_sha256": "2e4b1765d1824656fbea3822e46b2340b63ebaa71ca455d11a551a0e1f67f102",
+      "generated_kernel_sha256": "substitute:b7184b119d9da083da7b919500cb23e6273c51f1491e30543c92f1021f858aa9",
+      "in_process": false,
+      "pid": 904880,
+      "params_changed": {
+        "shape": [
+          "their run_test default M=N=4096",
+          "M=2048 N=4096 (our workload)"
+        ],
+        "eps": [
+          "run_test default 1e-5 (a PARAMETER of _rms_norm_kernel, not a literal)",
+          1e-06
+        ],
+        "dtype": [
+          "run_test default 'float16' (also a parameter)",
+          "float16"
+        ],
+        "block_m": [
+          "NO published value: their run_test only ever calls the OTHER factory (_rms_norm_kernel_high_perf) with block_m=64, block_n=64",
+          "4 -- chosen by the stated rule: start at the sibling's published 64 and halve until it compiles and runs.  This kernel stages three (block_m, 4096) buffers (dtype + dtype + fp32 = 32768 bytes/row) in UB, so the bound is the UB budget, not a published constant.  Full ladder in block_m_attempts"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Dev",
+          "Dev"
+        ]
+      }
+    },
+    "child_pid": 904880,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 35.0,
+        "measured_at": "2026-09-14T13:39:15.734633+00:00",
+        "child_pid": 135263
+      },
+      {
+        "rep": 2,
+        "device_us": 34.75,
+        "measured_at": "2026-09-14T14:16:04.183154+00:00",
+        "child_pid": 563320
+      },
+      {
+        "rep": 3,
+        "device_us": 34.5,
+        "measured_at": "2026-09-14T14:51:10.673744+00:00",
+        "child_pid": 904880
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "Relu6FwdOp",
+    "variant": "npuir_active_06",
+    "label": "hidden-state-prefill",
+    "dtype": "bfloat16",
+    "device_us_min": 30.125,
+    "n": 3,
+    "device_us_samples": [
+      30.25,
+      30.125,
+      31.0
+    ],
+    "measured_at": "2026-09-14T14:06:39.043235+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_hardtanh.py",
+    "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_hardtanh.py",
+      "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+      "generated_kernel_sha256": "substitute:4732d10cb58420f27032142fdfc5bb50387000b1bc4b2c9d6aaaafd9ca648529",
+      "in_process": false,
+      "pid": 399074,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "bfloat16  -- OUTSIDE their declared DTYPES list.  It is still only a parameter value, not an edit; whether it compiles and passes is measured, not assumed"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [-1.0, 1.0]",
+          "[0.0, 6.0] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 399074,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 30.25,
+        "measured_at": "2026-09-14T13:27:05.528303+00:00",
+        "child_pid": 99624
+      },
+      {
+        "rep": 2,
+        "device_us": 30.125,
+        "measured_at": "2026-09-14T14:06:39.043235+00:00",
+        "child_pid": 399074
+      },
+      {
+        "rep": 3,
+        "device_us": 31.0,
+        "measured_at": "2026-09-14T14:41:48.242437+00:00",
+        "child_pid": 870837
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "Relu6FwdOp",
+    "variant": "npuir_active_06",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "device_us_min": 28.25,
+    "n": 3,
+    "device_us_samples": [
+      28.375,
+      28.25,
+      29.875
+    ],
+    "measured_at": "2026-09-14T14:06:11.195421+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_hardtanh.py",
+    "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_hardtanh.py",
+      "kernel_source_sha256": "e6c6760ad483d498cb47a85b06e56609431f0af74c8fb06334577f8f2816190e",
+      "generated_kernel_sha256": "substitute:4732d10cb58420f27032142fdfc5bb50387000b1bc4b2c9d6aaaafd9ca648529",
+      "in_process": false,
+      "pid": 389899,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "op parameters": [
+          "their test defaults [-1.0, 1.0]",
+          "[0.0, 6.0] -- our manifest's defaults for this operator, passed through the same factory parameters"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 389899,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 28.375,
+        "measured_at": "2026-09-14T13:26:26.127601+00:00",
+        "child_pid": 97330
+      },
+      {
+        "rep": 2,
+        "device_us": 28.25,
+        "measured_at": "2026-09-14T14:06:11.195421+00:00",
+        "child_pid": 389899
+      },
+      {
+        "rep": 3,
+        "device_us": 29.875,
+        "measured_at": "2026-09-14T14:41:20.579321+00:00",
+        "child_pid": 867724
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "ReluFwdOp",
+    "variant": "npuir_active",
+    "label": "hidden-state-decode",
+    "dtype": "bfloat16",
+    "device_us_min": 3.5,
+    "n": 3,
+    "device_us_samples": [
+      3.5,
+      3.5,
+      3.5
+    ],
+    "measured_at": "2026-09-14T13:25:29.617243+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_relu.py",
+    "kernel_source_sha256": "988e19203c6530859bcba62e75750cd575df7f0087898ec76e2905c227946805",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_relu.py",
+      "kernel_source_sha256": "988e19203c6530859bcba62e75750cd575df7f0087898ec76e2905c227946805",
+      "generated_kernel_sha256": "substitute:0d8b142305b782be5b4a817e2f6e825b475553e7f633635cbb36734b857da4da",
+      "in_process": false,
+      "pid": 94428,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=1 N=4096 -- our workload [1, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "bfloat16  -- OUTSIDE their declared DTYPES list.  It is still only a parameter value, not an edit; whether it compiles and passes is measured, not assumed"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[1, 64] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 94428,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 3.5,
+        "measured_at": "2026-09-14T13:25:29.617243+00:00",
+        "child_pid": 94428
+      },
+      {
+        "rep": 2,
+        "device_us": 3.5,
+        "measured_at": "2026-09-14T14:05:24.298178+00:00",
+        "child_pid": 376544
+      },
+      {
+        "rep": 3,
+        "device_us": 3.5,
+        "measured_at": "2026-09-14T14:40:35.286310+00:00",
+        "child_pid": 865298
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "ReluFwdOp",
+    "variant": "npuir_active",
+    "label": "hidden-state-prefill",
+    "dtype": "bfloat16",
+    "device_us_min": 28.0,
+    "n": 3,
+    "device_us_samples": [
+      28.25,
+      28.0,
+      30.0
+    ],
+    "measured_at": "2026-09-14T14:04:56.683238+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_relu.py",
+    "kernel_source_sha256": "988e19203c6530859bcba62e75750cd575df7f0087898ec76e2905c227946805",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_relu.py",
+      "kernel_source_sha256": "988e19203c6530859bcba62e75750cd575df7f0087898ec76e2905c227946805",
+      "generated_kernel_sha256": "substitute:0d8b142305b782be5b4a817e2f6e825b475553e7f633635cbb36734b857da4da",
+      "in_process": false,
+      "pid": 370307,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "bfloat16  -- OUTSIDE their declared DTYPES list.  It is still only a parameter value, not an edit; whether it compiles and passes is measured, not assumed"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 370307,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 28.25,
+        "measured_at": "2026-09-14T13:24:50.599679+00:00",
+        "child_pid": 92353
+      },
+      {
+        "rep": 2,
+        "device_us": 28.0,
+        "measured_at": "2026-09-14T14:04:56.683238+00:00",
+        "child_pid": 370307
+      },
+      {
+        "rep": 3,
+        "device_us": 30.0,
+        "measured_at": "2026-09-14T14:40:07.771227+00:00",
+        "child_pid": 863840
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "ReluFwdOp",
+    "variant": "npuir_active",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "device_us_min": 27.5,
+    "n": 3,
+    "device_us_samples": [
+      31.0,
+      27.5,
+      27.625
+    ],
+    "measured_at": "2026-09-14T14:04:29.629216+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_relu.py",
+    "kernel_source_sha256": "988e19203c6530859bcba62e75750cd575df7f0087898ec76e2905c227946805",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_relu.py",
+      "kernel_source_sha256": "988e19203c6530859bcba62e75750cd575df7f0087898ec76e2905c227946805",
+      "generated_kernel_sha256": "substitute:0d8b142305b782be5b4a817e2f6e825b475553e7f633635cbb36734b857da4da",
+      "in_process": false,
+      "pid": 364586,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 364586,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 31.0,
+        "measured_at": "2026-09-14T13:24:11.095337+00:00",
+        "child_pid": 90063
+      },
+      {
+        "rep": 2,
+        "device_us": 27.5,
+        "measured_at": "2026-09-14T14:04:29.629216+00:00",
+        "child_pid": 364586
+      },
+      {
+        "rep": 3,
+        "device_us": 27.625,
+        "measured_at": "2026-09-14T14:39:40.887179+00:00",
+        "child_pid": 861607
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RopeLlama31FwdOp",
+    "variant": "rope_llama31",
+    "label": "llama31-1d-8k-d128",
+    "dtype": "bfloat16",
+    "device_us_min": 10.5,
+    "n": 3,
+    "device_us_samples": [
+      10.75,
+      11.0,
+      10.5
+    ],
+    "measured_at": "2026-09-14T14:54:52.159164+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/posembedding/rope_llama31/rope_llama31.py",
+    "kernel_source_sha256": "583b28d158349121cd7b2910a4b2ab343036ce097e6342b3dd9742dff05c66e3",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/posembedding/rope_llama31/rope_llama31.py",
+      "kernel_source_sha256": "583b28d158349121cd7b2910a4b2ab343036ce097e6342b3dd9742dff05c66e3",
+      "generated_kernel_sha256": "substitute:db6cfd84e34e0983ddb8006f3d20d05d3213df9e5f0500a1f4cc9c71840bac44",
+      "in_process": false,
+      "pid": 915701,
+      "params_changed": {
+        "shape": [
+          "their _run_case sweeps its own shapes",
+          "seq_len=8192 head_dim=128 layout=1d batch=1 num_heads=1 (our workload)"
+        ],
+        "dtype": [
+          "a constructor parameter (_DTYPE_NAMES covers fp16/bf16/fp32)",
+          "torch.bfloat16"
+        ],
+        "tiling": [
+          "their own selector.select_tile_plan(batch, seq_len, heads, head_dim, dtype, layout) picks route / block_tokens / block_heads / bn_groups",
+          "UNCHANGED -- their selector runs at our shape; nothing re-fit by hand"
+        ],
+        "llama-3.1 parameters": [
+          "their defaults base=10000, scale_factor=8, low_freq_factor=1, high_freq_factor=4, original_max_position=8192",
+          "{'base': 10000.0, 'scale_factor': 8.0, 'low_freq_factor': 1.0, 'high_freq_factor': 4.0, 'original_max_position': 8192} -- our manifest's defaults for the same five parameters (identical values except where this variant deliberately sets scale_factor)"
+        ],
+        "cos/sin tables": [
+          "built once per device in their _table_cache and read by forward()",
+          "UNCHANGED and SYMMETRIC: our adapter computes cos/sin once (adapters/position_encoding.py:218) and passes them into the timed call, so the build is outside the timed region on both sides.  Warmed here before the callable is handed over"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          null
+        ]
+      }
+    },
+    "child_pid": 915701,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 10.75,
+        "measured_at": "2026-09-14T13:44:13.524042+00:00",
+        "child_pid": 160809
+      },
+      {
+        "rep": 2,
+        "device_us": 11.0,
+        "measured_at": "2026-09-14T14:19:48.215261+00:00",
+        "child_pid": 622180
+      },
+      {
+        "rep": 3,
+        "device_us": 10.5,
+        "measured_at": "2026-09-14T14:54:52.159164+00:00",
+        "child_pid": 915701
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "RopeNeoxFwdOp",
+    "variant": "rope_llama31_sf1",
+    "label": "neox-1d-4k-d128",
+    "dtype": "bfloat16",
+    "device_us_min": 6.25,
+    "n": 3,
+    "device_us_samples": [
+      6.5,
+      6.5,
+      6.25
+    ],
+    "measured_at": "2026-09-14T14:55:36.224370+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "examples/posembedding/rope_llama31/rope_llama31.py",
+    "kernel_source_sha256": "583b28d158349121cd7b2910a4b2ab343036ce097e6342b3dd9742dff05c66e3",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "examples/posembedding/rope_llama31/rope_llama31.py",
+      "kernel_source_sha256": "583b28d158349121cd7b2910a4b2ab343036ce097e6342b3dd9742dff05c66e3",
+      "generated_kernel_sha256": "substitute:db6cfd84e34e0983ddb8006f3d20d05d3213df9e5f0500a1f4cc9c71840bac44",
+      "in_process": false,
+      "pid": 917937,
+      "params_changed": {
+        "shape": [
+          "their _run_case sweeps its own shapes",
+          "seq_len=4096 head_dim=128 layout=1d batch=1 num_heads=1 (our workload)"
+        ],
+        "dtype": [
+          "a constructor parameter (_DTYPE_NAMES covers fp16/bf16/fp32)",
+          "torch.bfloat16"
+        ],
+        "tiling": [
+          "their own selector.select_tile_plan(batch, seq_len, heads, head_dim, dtype, layout) picks route / block_tokens / block_heads / bn_groups",
+          "UNCHANGED -- their selector runs at our shape; nothing re-fit by hand"
+        ],
+        "llama-3.1 parameters": [
+          "their defaults base=10000, scale_factor=8, low_freq_factor=1, high_freq_factor=4, original_max_position=8192",
+          "{'base': 10000.0, 'scale_factor': 1.0, 'low_freq_factor': 1.0, 'high_freq_factor': 4.0, 'original_max_position': 8192} -- our manifest's defaults for the same five parameters (identical values except where this variant deliberately sets scale_factor)"
+        ],
+        "cos/sin tables": [
+          "built once per device in their _table_cache and read by forward()",
+          "UNCHANGED and SYMMETRIC: our adapter computes cos/sin once (adapters/position_encoding.py:218) and passes them into the timed call, so the build is outside the timed region on both sides.  Warmed here before the callable is handed over"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "set by their own kernel module at import",
+          null
+        ]
+      }
+    },
+    "child_pid": 917937,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 6.5,
+        "measured_at": "2026-09-14T13:45:11.780749+00:00",
+        "child_pid": 175721
+      },
+      {
+        "rep": 2,
+        "device_us": 6.5,
+        "measured_at": "2026-09-14T14:20:32.690329+00:00",
+        "child_pid": 635567
+      },
+      {
+        "rep": 3,
+        "device_us": 6.25,
+        "measured_at": "2026-09-14T14:55:36.224370+00:00",
+        "child_pid": 917937
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SeluFwdOp",
+    "variant": "npuir_active",
+    "label": "snn-fc",
+    "dtype": "float16",
+    "device_us_min": 28.0,
+    "n": 3,
+    "device_us_samples": [
+      30.5,
+      28.0,
+      31.0
+    ],
+    "measured_at": "2026-09-14T14:09:06.497366+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_selu.py",
+    "kernel_source_sha256": "18ef7487ee62c9c98f0fb08e7107bfb7a15eb7b80e3bc07258070f74f3295f98",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_selu.py",
+      "kernel_source_sha256": "18ef7487ee62c9c98f0fb08e7107bfb7a15eb7b80e3bc07258070f74f3295f98",
+      "generated_kernel_sha256": "substitute:da595c55fd9fd1080a5bc41ccf2d14f3dec375290c54985daefbe1f1000265a0",
+      "in_process": false,
+      "pid": 441922,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 441922,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 30.5,
+        "measured_at": "2026-09-14T13:30:19.449847+00:00",
+        "child_pid": 108095
+      },
+      {
+        "rep": 2,
+        "device_us": 28.0,
+        "measured_at": "2026-09-14T14:09:06.497366+00:00",
+        "child_pid": 441922
+      },
+      {
+        "rep": 3,
+        "device_us": 31.0,
+        "measured_at": "2026-09-14T14:44:16.735986+00:00",
+        "child_pid": 881960
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SeluFwdOp",
+    "variant": "npuir_active",
+    "label": "snn-fc-wide",
+    "dtype": "float16",
+    "device_us_min": 61.25,
+    "n": 3,
+    "device_us_samples": [
+      64.25,
+      62.25,
+      61.25
+    ],
+    "measured_at": "2026-09-14T14:44:43.766027+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_selu.py",
+    "kernel_source_sha256": "18ef7487ee62c9c98f0fb08e7107bfb7a15eb7b80e3bc07258070f74f3295f98",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_selu.py",
+      "kernel_source_sha256": "18ef7487ee62c9c98f0fb08e7107bfb7a15eb7b80e3bc07258070f74f3295f98",
+      "generated_kernel_sha256": "substitute:da595c55fd9fd1080a5bc41ccf2d14f3dec375290c54985daefbe1f1000265a0",
+      "in_process": false,
+      "pid": 885029,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=8192 -- our workload [2048, 8192] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 885029,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 64.25,
+        "measured_at": "2026-09-14T13:30:59.963785+00:00",
+        "child_pid": 110166
+      },
+      {
+        "rep": 2,
+        "device_us": 62.25,
+        "measured_at": "2026-09-14T14:09:34.518985+00:00",
+        "child_pid": 449719
+      },
+      {
+        "rep": 3,
+        "device_us": 61.25,
+        "measured_at": "2026-09-14T14:44:43.766027+00:00",
+        "child_pid": 885029
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SigmoidFwdOp",
+    "variant": "autotune_2d",
+    "label": "elementwise-16M",
+    "dtype": "float16",
+    "device_us_min": 205.625,
+    "n": 3,
+    "device_us_samples": [
+      209.375,
+      205.625,
+      206.25
+    ],
+    "measured_at": "2026-09-14T14:02:18.663956+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/Sigmoid/sigmoid_2d.py",
+    "kernel_source_sha256": "a13b48836c2a6c860ca1067080ae7e742913b3a8f45fc108868cc37f99e94b21",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/Sigmoid/sigmoid_2d.py",
+      "kernel_source_sha256": "a13b48836c2a6c860ca1067080ae7e742913b3a8f45fc108868cc37f99e94b21",
+      "generated_kernel_sha256": "substitute:d32996e53d40d6ed690d8f9ab7b4c6b3eaafe1dd3c733de842776ae5cca3e87f",
+      "in_process": false,
+      "pid": 336866,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=4096 N=4096 (our workload, reshaped from [4096, 4096] -- a view on contiguous memory, no copy)"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 336866,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 209.375,
+        "measured_at": "2026-09-14T13:21:20.944264+00:00",
+        "child_pid": 82088
+      },
+      {
+        "rep": 2,
+        "device_us": 205.625,
+        "measured_at": "2026-09-14T14:02:18.663956+00:00",
+        "child_pid": 336866
+      },
+      {
+        "rep": 3,
+        "device_us": 206.25,
+        "measured_at": "2026-09-14T14:37:30.822484+00:00",
+        "child_pid": 852121
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SigmoidFwdOp",
+    "variant": "autotune_2d",
+    "label": "elementwise-256M",
+    "dtype": "float16",
+    "device_us_min": 3722.375,
+    "n": 3,
+    "device_us_samples": [
+      3728.875,
+      3724.75,
+      3722.375
+    ],
+    "measured_at": "2026-09-14T14:38:05.600721+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/Sigmoid/sigmoid_2d.py",
+    "kernel_source_sha256": "a13b48836c2a6c860ca1067080ae7e742913b3a8f45fc108868cc37f99e94b21",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/Sigmoid/sigmoid_2d.py",
+      "kernel_source_sha256": "a13b48836c2a6c860ca1067080ae7e742913b3a8f45fc108868cc37f99e94b21",
+      "generated_kernel_sha256": "substitute:d32996e53d40d6ed690d8f9ab7b4c6b3eaafe1dd3c733de842776ae5cca3e87f",
+      "in_process": false,
+      "pid": 855270,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=16384 N=16384 (our workload, reshaped from [16384, 16384] -- a view on contiguous memory, no copy)"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 855270,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 3728.875,
+        "measured_at": "2026-09-14T13:22:07.602220+00:00",
+        "child_pid": 84340
+      },
+      {
+        "rep": 2,
+        "device_us": 3724.75,
+        "measured_at": "2026-09-14T14:02:55.488203+00:00",
+        "child_pid": 345676
+      },
+      {
+        "rep": 3,
+        "device_us": 3722.375,
+        "measured_at": "2026-09-14T14:38:05.600721+00:00",
+        "child_pid": 855270
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SiluFwdOp",
+    "variant": "autotune_2d",
+    "label": "llama-8b-ffn-prefill",
+    "dtype": "float16",
+    "device_us_min": 365.5,
+    "n": 3,
+    "device_us_samples": [
+      367.25,
+      365.5,
+      368.875
+    ],
+    "measured_at": "2026-09-14T14:03:43.588863+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/Silu/silu_2d.py",
+    "kernel_source_sha256": "367924f7b32909953bc0bde9e32edf474db7643a87181860f1820e1fc1f2b7dd",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/Silu/silu_2d.py",
+      "kernel_source_sha256": "367924f7b32909953bc0bde9e32edf474db7643a87181860f1820e1fc1f2b7dd",
+      "generated_kernel_sha256": "substitute:8d5e446e11daf5ec3608255d3adcc52a05c4373aef6e189c3e8a415915747005",
+      "in_process": false,
+      "pid": 354884,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=2048 N=14336 (our workload, reshaped from [2048, 14336] -- a view on contiguous memory, no copy)"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[2048, 16]]",
+          "[2048, 16]"
+        ],
+        "dtype": [
+          "float16",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 354884,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 367.25,
+        "measured_at": "2026-09-14T13:23:14.480038+00:00",
+        "child_pid": 87067
+      },
+      {
+        "rep": 2,
+        "device_us": 365.5,
+        "measured_at": "2026-09-14T14:03:43.588863+00:00",
+        "child_pid": 354884
+      },
+      {
+        "rep": 3,
+        "device_us": 368.875,
+        "measured_at": "2026-09-14T14:38:53.989176+00:00",
+        "child_pid": 858390
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SoftmaxFwdOp",
+    "variant": "autotune_2d",
+    "label": "lm-head-logits",
+    "dtype": "float32",
+    "device_us_min": 104.5,
+    "n": 3,
+    "device_us_samples": [
+      104.75,
+      104.5,
+      104.75
+    ],
+    "measured_at": "2026-09-14T14:21:19.072509+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/autotune/softmax/softmax_2d.py",
+    "kernel_source_sha256": "3fc8ae56abb2478c10b8a3d806e094b00fb58d3509cb38cf346c969a0142b606",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/autotune/softmax/softmax_2d.py",
+      "kernel_source_sha256": "3fc8ae56abb2478c10b8a3d806e094b00fb58d3509cb38cf346c969a0142b606",
+      "generated_kernel_sha256": "substitute:f91c5ec679754fb279f6899ee81400754028d236d6156f94cfac483110d993fe",
+      "in_process": false,
+      "pid": 647491,
+      "params_changed": {
+        "shape": [
+          "their SHAPES list",
+          "M=4 N=102400"
+        ],
+        "tilelang.autotune decorator": [
+          "@tilelang.autotune(configs=get_config(), ref_prog=..., supply_prog=..., atol=1e-2, rtol=1e-2)",
+          "DROPPED -- it would time their tensors against their reference (D043 G1 requires our golden).  block_M/block_N instead come from their own carver at our shape; every hint is recorded in carver_hints_all"
+        ],
+        "block_M/block_N": [
+          "[[4, 5120]]",
+          "[4, 5120]"
+        ],
+        "dtype": [
+          "float32",
+          "unchanged -- their prim_func hardcodes it; a different dtype would be an edit to their kernel, not a shape re-fit (G4)"
+        ],
+        "reduction axis": [
+          "their ref_prog is torch.nn.functional.softmax(x, dim=1) on a 2-D tensor",
+          "our SoftmaxFwdOp case reduces the same axis (adapters/reduction.py picks dim=1 for a 2-D input), so the axis is unchanged"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 647491,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 104.75,
+        "measured_at": "2026-09-14T13:46:12.709913+00:00",
+        "child_pid": 182530
+      },
+      {
+        "rep": 2,
+        "device_us": 104.5,
+        "measured_at": "2026-09-14T14:21:19.072509+00:00",
+        "child_pid": 647491
+      },
+      {
+        "rep": 3,
+        "device_us": 104.75,
+        "measured_at": "2026-09-14T14:56:22.407148+00:00",
+        "child_pid": 919814
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SoftplusFwdOp",
+    "variant": "npuir_active",
+    "label": "mlp-hidden",
+    "dtype": "float16",
+    "device_us_min": 28.25,
+    "n": 3,
+    "device_us_samples": [
+      28.25,
+      30.0,
+      29.5
+    ],
+    "measured_at": "2026-09-14T13:31:57.196126+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_softplus.py",
+    "kernel_source_sha256": "3c36e5f5194fb09b4a4c8abe8ed8931f20cb1bc7b5368ea19a15d05549f104b9",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_softplus.py",
+      "kernel_source_sha256": "3c36e5f5194fb09b4a4c8abe8ed8931f20cb1bc7b5368ea19a15d05549f104b9",
+      "generated_kernel_sha256": "substitute:d2a5f9faa05fbd981fa704bd7fdfafbb17d1c7311495b5458208a5756584564c",
+      "in_process": false,
+      "pid": 112936,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=4096 -- our workload [2048, 4096] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 112936,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 28.25,
+        "measured_at": "2026-09-14T13:31:57.196126+00:00",
+        "child_pid": 112936
+      },
+      {
+        "rep": 2,
+        "device_us": 30.0,
+        "measured_at": "2026-09-14T14:10:21.203092+00:00",
+        "child_pid": 465681
+      },
+      {
+        "rep": 3,
+        "device_us": 29.5,
+        "measured_at": "2026-09-14T14:45:29.099328+00:00",
+        "child_pid": 888373
+      }
+    ]
+  },
+  {
+    "round": "R282",
+    "op": "SoftplusFwdOp",
+    "variant": "npuir_active",
+    "label": "mlp-hidden-wide",
+    "dtype": "float16",
+    "device_us_min": 51.0,
+    "n": 3,
+    "device_us_samples": [
+      51.0,
+      56.0,
+      63.25
+    ],
+    "measured_at": "2026-09-14T13:32:36.755362+00:00",
+    "mlir_commit": "0f0809ddae52d661d2c2d5c7199930c33ec9a343",
+    "kernel_source": "testing/npuir/active_ops/test_softplus.py",
+    "kernel_source_sha256": "3c36e5f5194fb09b4a4c8abe8ed8931f20cb1bc7b5368ea19a15d05549f104b9",
+    "receipt": {
+      "tilelang_module_file": "/home/dyq/workspace/tilelang-mlir-ascend/tilelang/__init__.py",
+      "kernel_source_path": "testing/npuir/active_ops/test_softplus.py",
+      "kernel_source_sha256": "3c36e5f5194fb09b4a4c8abe8ed8931f20cb1bc7b5368ea19a15d05549f104b9",
+      "generated_kernel_sha256": "substitute:d2a5f9faa05fbd981fa704bd7fdfafbb17d1c7311495b5458208a5756584564c",
+      "in_process": false,
+      "pid": 114764,
+      "params_changed": {
+        "shape": [
+          "their tests call it at M=N=16 and M=64, N=128",
+          "M=2048 N=8192 -- our workload [2048, 8192] flattened (a view on contiguous memory: the operator is elementwise, so the 2-D presentation changes nothing and costs nothing)"
+        ],
+        "dtype": [
+          "their DTYPES list is ['float16', 'float32']; dtype is a PARAMETER of the factory",
+          "float16"
+        ],
+        "block_m/block_n": [
+          "their tests call (16, 16) and (32, 32)",
+          "[128, 256] -- first tiling in the ladder that divides the shape and both compiles and runs.  Their T.copy takes an explicit slice X[bx:bx+block_m, by:by+block_n], so a non-dividing block is an out-of-bounds access"
+        ],
+        "tilelang.cache.clear_cache": [
+          "called at module import of their kernel file (wipes TILELANG_CACHE_DIR including the precompiled npu_launcher.h.gch)",
+          "neutralized in this process -- affects compile time only, not the kernel"
+        ],
+        "TILELANG_ASCEND_MODE": [
+          "Developer",
+          "Developer"
+        ]
+      }
+    },
+    "child_pid": 114764,
+    "child_log": null,
+    "child_script_sha256": "e9a0ec10c940b03f2594304cb1edc909146491df93e5fa575e50dd03c3e9967d",
+    "evidence_verdict": "tilelang_jit",
+    "tier": "tilelang_ref",
+    "all_reps": [
+      {
+        "rep": 1,
+        "device_us": 51.0,
+        "measured_at": "2026-09-14T13:32:36.755362+00:00",
+        "child_pid": 114764
+      },
+      {
+        "rep": 2,
+        "device_us": 56.0,
+        "measured_at": "2026-09-14T14:10:49.108099+00:00",
+        "child_pid": 475909
+      },
+      {
+        "rep": 3,
+        "device_us": 63.25,
+        "measured_at": "2026-09-14T14:45:57.216020+00:00",
+        "child_pid": 890410
+      }
+    ]
+  }
+]

@@ -1,0 +1,1496 @@
+{
+  "captured_at": "2026-09-15T11:56:12.122641+00:00",
+  "coverage": [
+    {
+      "source": "tileops-ascend-harness/coverage/AbsFwdOp.json",
+      "sha256": "bb1d6dbd9f4cce522759e7d42ba44adfd2046ba4329d2941f88d6706ab52984a",
+      "bytes": 124378,
+      "op": "AbsFwdOp",
+      "generated_at": "2026-09-08T11:53:06.624509+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AdaLayerNormFwdOp.json",
+      "sha256": "fd50671813a2df2214962ec9b94d30ac992efd5c8e241844fa6ceb80679f45ad",
+      "bytes": 116418,
+      "op": "AdaLayerNormFwdOp",
+      "generated_at": "2026-09-08T09:30:42.290934+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AdaLayerNormZeroFwdOp.json",
+      "sha256": "56525ee238c598755bc5d8387afa55dde78743e23b1177279630bd26e5b19721",
+      "bytes": 68139,
+      "op": "AdaLayerNormZeroFwdOp",
+      "generated_at": "2026-09-02T16:18:03.416082+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AdaptiveAvgPool2dFwdOp.json",
+      "sha256": "d789ba53d07d6cf8f15a1b272b5cd970237e540b308b1e19404f99373aa8b5dc",
+      "bytes": 98022,
+      "op": "AdaptiveAvgPool2dFwdOp",
+      "generated_at": "2026-09-08T10:10:57.849223+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AdaptiveMaxPool2dFwdOp.json",
+      "sha256": "50798ff3ff744f3a2ee3098e076ad2f790bedc44eddb44f04a6ed003bc7348c6",
+      "bytes": 105550,
+      "op": "AdaptiveMaxPool2dFwdOp",
+      "generated_at": "2026-09-08T10:11:16.011413+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AdaptiveMaxPool2dIndicesFwdOp.json",
+      "sha256": "aba0eb77629ff93db55ca13ab1ab1f118962cc1c6c7e07a470678d15c285f47f",
+      "bytes": 67150,
+      "op": "AdaptiveMaxPool2dIndicesFwdOp",
+      "generated_at": "2026-09-02T16:13:35.385005+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AddFwdOp.json",
+      "sha256": "bd835710410f8e7aee89c8d5d83398b1d120f5daca1dae23c12338f3ed48038c",
+      "bytes": 144890,
+      "op": "AddFwdOp",
+      "generated_at": "2026-09-08T09:10:38.579783+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AlibiFwdOp.json",
+      "sha256": "453f066c0449e6d9414f35b2432c18413a1c4295776883306c695fd5bdbf094c",
+      "bytes": 80014,
+      "op": "AlibiFwdOp",
+      "generated_at": "2026-09-02T16:14:21.226763+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AllFwdOp.json",
+      "sha256": "2042f4b808b799a32f7752b5b7c1408b9c0544e24030cec97b62ab0fd36b9181",
+      "bytes": 83554,
+      "op": "AllFwdOp",
+      "generated_at": "2026-09-08T12:40:08.668328+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AmaxFwdOp.json",
+      "sha256": "69d0662f601f74d983d21580dd1d7b4e97fca90e784af512efc79a0197065887",
+      "bytes": 105768,
+      "op": "AmaxFwdOp",
+      "generated_at": "2026-09-08T11:04:32.707435+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AminFwdOp.json",
+      "sha256": "1bfaba7589c866f969da405b07462a5cbedd63b24fdddd23b64fc9073692e84b",
+      "bytes": 105782,
+      "op": "AminFwdOp",
+      "generated_at": "2026-09-08T12:42:41.786942+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AnyFwdOp.json",
+      "sha256": "0931df2209f75052cf291ffed1aa14e669d4b81ced2eb32c35bed200bc4c713c",
+      "bytes": 83648,
+      "op": "AnyFwdOp",
+      "generated_at": "2026-09-08T10:13:10.424640+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ArgmaxFwdOp.json",
+      "sha256": "36a02f5b070274ba2c2eb6d2996f87ad1c54f9eaf46e8d2ec71440b2a2a810c8",
+      "bytes": 124670,
+      "op": "ArgmaxFwdOp",
+      "generated_at": "2026-09-08T09:31:47.084023+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ArgminFwdOp.json",
+      "sha256": "d21aa1219a168abd51626912249a4cca4ba5d672ea1a37803d067305176d992c",
+      "bytes": 103725,
+      "op": "ArgminFwdOp",
+      "generated_at": "2026-09-08T11:56:01.330907+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AvgPool1dFwdOp.json",
+      "sha256": "1b3b3b147a35538ed53156746d5a29d8e52fe2d92b94a4bf726e65c7e4878ef7",
+      "bytes": 86018,
+      "op": "AvgPool1dFwdOp",
+      "generated_at": "2026-09-08T10:12:49.898691+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AvgPool2dFwdOp.json",
+      "sha256": "a799f36ec9b46206a35d242db1b18577238b11224f39c4854be71b392f8852c9",
+      "bytes": 61449,
+      "op": "AvgPool2dFwdOp",
+      "generated_at": "2026-09-02T16:58:04.628063+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/AvgPool3dFwdOp.json",
+      "sha256": "9b72ceeb973ee8cc1d4ff06f119917ab82caf4b518f7f52c2f5b1f67be43388e",
+      "bytes": 61606,
+      "op": "AvgPool3dFwdOp",
+      "generated_at": "2026-09-02T16:16:07.301369+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BatchNormBwdOp.json",
+      "sha256": "2b054998b697242e95dbd4a4bafc466f8f29a2cc6170ff4e55977937ddff3291",
+      "bytes": 33943,
+      "op": "BatchNormBwdOp",
+      "generated_at": "2026-09-08T09:29:31.270807+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BatchNormFwdOp.json",
+      "sha256": "1f02380359b81a027b5d32fb9f861712db5f09f81f8a8fccd883ea8cc41c5b6e",
+      "bytes": 126500,
+      "op": "BatchNormFwdOp",
+      "generated_at": "2026-09-08T09:32:10.915453+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BitwiseAndFwdOp.json",
+      "sha256": "92b64a15cd263dfe1608c42df21bc95b4b5b0c6914f3dd5fc0b77d44fce92989",
+      "bytes": 110891,
+      "op": "BitwiseAndFwdOp",
+      "generated_at": "2026-09-02T16:16:51.600128+00:00",
+      "cases": 7
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BitwiseNotFwdOp.json",
+      "sha256": "b9970fbcf6cbd2fe3a80903a875bec47646717d20473999d6edc5bf67c7d0a21",
+      "bytes": 51713,
+      "op": "BitwiseNotFwdOp",
+      "generated_at": "2026-09-02T16:12:24.168967+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BitwiseOrFwdOp.json",
+      "sha256": "c22a0cc391e51acb4099e71aeda7b39a3ba6cf81000f197daa4a733627cc2e05",
+      "bytes": 110710,
+      "op": "BitwiseOrFwdOp",
+      "generated_at": "2026-09-02T16:19:22.070728+00:00",
+      "cases": 7
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BitwiseXorFwdOp.json",
+      "sha256": "fab57eaa5ea5902f7640b0013a7066ad8dc5a9ed4df8e051a076c060be59460a",
+      "bytes": 110824,
+      "op": "BitwiseXorFwdOp",
+      "generated_at": "2026-09-02T16:21:51.326377+00:00",
+      "cases": 7
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BmmFp8KNFwdOp.json",
+      "sha256": "d43b8b994d6139d6a0d3ad1b901d463f01addf46a850cca351ab298c6f240572",
+      "bytes": 23968,
+      "op": "BmmFp8KNFwdOp",
+      "generated_at": "2026-09-02T16:10:55.905149+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BmmFp8NKFwdOp.json",
+      "sha256": "b22b07eaffcf990bc0f4faadf929d7017526234bb47c7a197a0548d5b7cfd783",
+      "bytes": 23968,
+      "op": "BmmFp8NKFwdOp",
+      "generated_at": "2026-09-02T16:11:11.279498+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/BmmFwdOp.json",
+      "sha256": "19c647835b5a3b0961c6ab86eb6dd5817f584a7091995ca25a136819dbdafb54",
+      "bytes": 586892,
+      "op": "BmmFwdOp",
+      "generated_at": "2026-09-08T13:51:43.432900+00:00",
+      "cases": 16
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/CeilFwdOp.json",
+      "sha256": "1c4355210a39755fbdd213a443fe1e10b0397bbf7e553e1dcf7ae4fc541e8993",
+      "bytes": 124630,
+      "op": "CeilFwdOp",
+      "generated_at": "2026-09-08T11:10:20.746010+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ClampFwdOp.json",
+      "sha256": "3e97d44d21f4453aff76d0be8f300f6fdb0f2762bfb1807770903f532f9468a9",
+      "bytes": 334546,
+      "op": "ClampFwdOp",
+      "generated_at": "2026-09-08T13:43:06.268269+00:00",
+      "cases": 15
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ClampScalarFwdOp.json",
+      "sha256": "504289a347bf1094b8631761582254489d41792c4976f4f1006b9c0e9ada796f",
+      "bytes": 85093,
+      "op": "ClampScalarFwdOp",
+      "generated_at": "2026-09-02T16:17:13.135927+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/Conv1dFwdOp.json",
+      "sha256": "77fe934e92177c4197aecaab051a639d68d4d43dbb26815908401cbafc753dfa",
+      "bytes": 33711,
+      "op": "Conv1dFwdOp",
+      "generated_at": "2026-09-08T10:49:52.571704+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/Conv2dFwdOp.json",
+      "sha256": "e89c729eca44d193556cce3d9b08e09b17e164677cfac8a930c5c94067804d9b",
+      "bytes": 53913,
+      "op": "Conv2dFwdOp",
+      "generated_at": "2026-09-08T11:00:48.688515+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/Conv3dFwdOp.json",
+      "sha256": "4ce1d17c1f075b73fbcdc6a9a665f03ce4e3ff9567f8a32030ae4cf27678114c",
+      "bytes": 30893,
+      "op": "Conv3dFwdOp",
+      "generated_at": "2026-09-08T09:01:52.771656+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/CosFwdOp.json",
+      "sha256": "765cf5ed879c7ec44bc34ba26e5b439407e96ebe7f73e14505b0f89e3728ff3b",
+      "bytes": 125502,
+      "op": "CosFwdOp",
+      "generated_at": "2026-09-08T09:34:25.727508+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/CountNonzeroFwdOp.json",
+      "sha256": "c31bd69703ec05ffeb4450386216641e7a79a55277b2dc4e955d34d014a9c2d7",
+      "bytes": 106068,
+      "op": "CountNonzeroFwdOp",
+      "generated_at": "2026-09-08T09:57:50.032372+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/CumprodFwdOp.json",
+      "sha256": "658be08d94c79f8ec1a5b16ed66e426fc14f3b054b3a7f0e06cf9c0eb082b724",
+      "bytes": 128673,
+      "op": "CumprodFwdOp",
+      "generated_at": "2026-09-08T11:16:22.123811+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/CumsumFwdOp.json",
+      "sha256": "de9a591aba1d114ecdf98ae3a3f49744769b5a9c039ddc8e3a461adbd3130709",
+      "bytes": 128058,
+      "op": "CumsumFwdOp",
+      "generated_at": "2026-09-08T10:17:24.597377+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/DeepSeekSparseAttentionDecodeWithKVCacheFwdOp.json",
+      "sha256": "a3ca617139b239f25bfb5077449f824ef361e14fea793722836eeeff282e0858",
+      "bytes": 22993,
+      "op": "DeepSeekSparseAttentionDecodeWithKVCacheFwdOp",
+      "generated_at": "2026-09-02T16:11:25.857360+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/DivFwdOp.json",
+      "sha256": "018ecfd303692670e51512f3380187f3a962d0d6e40a6d28c749d85572da4bbf",
+      "bytes": 204630,
+      "op": "DivFwdOp",
+      "generated_at": "2026-09-08T09:15:09.680728+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/DropoutFwdOp.json",
+      "sha256": "1e5a575e0ac499687bc8e08ed6a1260a216645e7d9d41d37cd5f622538171ca5",
+      "bytes": 22954,
+      "op": "DropoutFwdOp",
+      "generated_at": "2026-09-08T10:13:29.034870+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/EluFwdOp.json",
+      "sha256": "296f54419b6906511a226dfe60409e00215496cd0ec314dcf15c6bb1c33ff026",
+      "bytes": 103269,
+      "op": "EluFwdOp",
+      "generated_at": "2026-09-08T11:14:43.289942+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/EngramDecodeFwdOp.json",
+      "sha256": "ef8aab8ecb3e2aa19ff1fc7e79140e79bd16203fba3103563b27a11ecdeed676",
+      "bytes": 23427,
+      "op": "EngramDecodeFwdOp",
+      "generated_at": "2026-09-02T16:11:55.089972+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/EngramGateConvBwdOp.json",
+      "sha256": "82de32c82860a22403b209626721dd7b07e87f6102048943a1270633078631f9",
+      "bytes": 75735,
+      "op": "EngramGateConvBwdOp",
+      "generated_at": "2026-09-02T17:02:40.413449+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/EngramGateConvFwdOp.json",
+      "sha256": "a593eef14826080907bfe456bd5a0fcd00476dad334ec1aef85ba0ff34b15d77",
+      "bytes": 68847,
+      "op": "EngramGateConvFwdOp",
+      "generated_at": "2026-09-02T17:04:30.362507+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/EqFwdOp.json",
+      "sha256": "114efc1080de67cc5a9cfa608d326ab786d970acc0fd8c239d90315685715b75",
+      "bytes": 58461,
+      "op": "EqFwdOp",
+      "generated_at": "2026-09-02T16:27:05.400284+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ErfFwdOp.json",
+      "sha256": "f8df21ea7698c34bfd8f772b8689279d0242019262b6b050b02b8b188e178ccc",
+      "bytes": 125623,
+      "op": "ErfFwdOp",
+      "generated_at": "2026-09-08T12:53:23.647816+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ExpFwdOp.json",
+      "sha256": "16f5e8fcab72da6b18a8e30e3b8b806cc56a0c19045a890df057e07d5a610be0",
+      "bytes": 147443,
+      "op": "ExpFwdOp",
+      "generated_at": "2026-09-08T12:56:46.564165+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/Expm1FwdOp.json",
+      "sha256": "ae76b815b0cefa878b6f488f4bd0ed2fa78c2f91cb90095444fd982f1f2eb4e2",
+      "bytes": 124637,
+      "op": "Expm1FwdOp",
+      "generated_at": "2026-09-08T11:20:35.922698+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FP8LightningIndexerFwdOp.json",
+      "sha256": "0a185b80189c3fd983c573633f216948d336eab7effce3dfc91eb7e414e973c3",
+      "bytes": 23289,
+      "op": "FP8LightningIndexerFwdOp",
+      "generated_at": "2026-09-02T16:12:09.844737+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FP8QuantFwdOp.json",
+      "sha256": "a845f2bdbfa5b0fc577419d6156fe5328009f0878ef43157174129aae8158703",
+      "bytes": 23135,
+      "op": "FP8QuantFwdOp",
+      "generated_at": "2026-09-08T10:13:43.986846+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FloorDivideFwdOp.json",
+      "sha256": "33310943e9c5cc2e8250efe2ea4b10ed11d784bfb0aafa486b8b9f72c27f1b96",
+      "bytes": 137398,
+      "op": "FloorDivideFwdOp",
+      "generated_at": "2026-09-02T16:30:33.520930+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FloorFwdOp.json",
+      "sha256": "1946a83d04d0eb25522e53f603733e8a0c3e649158bfb60f2036ad1c30048d98",
+      "bytes": 124919,
+      "op": "FloorFwdOp",
+      "generated_at": "2026-09-08T11:21:21.196606+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FusedAddLayerNormFwdOp.json",
+      "sha256": "afc9c002a96cae24f6baf4c15b6e16a088677bb7c56f7a6ef7f7b00da2900ddf",
+      "bytes": 156236,
+      "op": "FusedAddLayerNormFwdOp",
+      "generated_at": "2026-09-08T09:14:17.748859+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FusedAddRMSNormFwdOp.json",
+      "sha256": "c35ae5697fb66b84c4cdcae890ab5f45e5e87eeaa97a7031ff2041c9d61222a4",
+      "bytes": 301790,
+      "op": "FusedAddRMSNormFwdOp",
+      "generated_at": "2026-09-08T08:51:13.580860+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FusedMoEExpertsNopadPersistent3WGFwdOp.json",
+      "sha256": "8d53cf66f8c56f1a073073f92ec401ff50ce986d84278e8283ccc3b6c53e183c",
+      "bytes": 25425,
+      "op": "FusedMoEExpertsNopadPersistent3WGFwdOp",
+      "generated_at": "2026-09-02T16:30:02.615706+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/FusedMoeFwdOp.json",
+      "sha256": "74133c86406d3e5f02b00ff183900fd7e683bd8f20d27b557359294b13e40b06",
+      "bytes": 25499,
+      "op": "FusedMoeFwdOp",
+      "generated_at": "2026-09-02T16:30:17.841412+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GatedDeltaNetBTHDFwdOp.json",
+      "sha256": "8e2d06214a07d11be102b56bd293b0b7ae0ca595d6e95701d7f8db1b71ac3a5c",
+      "bytes": 160713,
+      "op": "GatedDeltaNetBTHDFwdOp",
+      "generated_at": "2026-09-03T01:13:54.010625+00:00",
+      "cases": 12
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GeFwdOp.json",
+      "sha256": "b30499005252a0d596f33effdd97d44fd177a4db7c058f22dbafc0bf7a37fc9b",
+      "bytes": 58582,
+      "op": "GeFwdOp",
+      "generated_at": "2026-09-02T16:32:45.659251+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GeluAndMulFwdOp.json",
+      "sha256": "c300a50ca754a01e8194fb364f0c88a2d0f719de84c3fec9b4cdcdaa355a79fd",
+      "bytes": 115043,
+      "op": "GeluAndMulFwdOp",
+      "generated_at": "2026-09-08T10:16:51.572754+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GeluFwdOp.json",
+      "sha256": "e4c7ecc2b238121a06a3a4ed51104855cc4923ae9918641d6b66cc437322cbc7",
+      "bytes": 83574,
+      "op": "GeluFwdOp",
+      "generated_at": "2026-09-08T10:16:26.592751+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GeluTanhAndMulFwdOp.json",
+      "sha256": "b3ec9b45f40e3b0f407cd1154320a344ec65d828876c13a5b59b0f7f9b36fc56",
+      "bytes": 115090,
+      "op": "GeluTanhAndMulFwdOp",
+      "generated_at": "2026-09-08T10:19:17.139628+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GemmFp8FwdOp.json",
+      "sha256": "09afe09e04795d85e01f644812c076ef736cff4bd4b6300362c307a25483fe86",
+      "bytes": 29678,
+      "op": "GemmFp8FwdOp",
+      "generated_at": "2026-09-08T08:43:21.541076+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GemmFwdOp.json",
+      "sha256": "a180511662997e78b1091ef22cf561537e7beebc1fba38abcf23bdd4fc5abe41",
+      "bytes": 470823,
+      "op": "GemmFwdOp",
+      "generated_at": "2026-09-08T11:39:55.324294+00:00",
+      "cases": 14
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GemmW4A16FwdOp.json",
+      "sha256": "8285136fc12a27d8e938c520d66872d7afc36c192ea0dabd33510a778b473d09",
+      "bytes": 36557,
+      "op": "GemmW4A16FwdOp",
+      "generated_at": "2026-09-08T09:10:12.010137+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupNormFwdOp.json",
+      "sha256": "d015d14895688bc3346f3945beb559cad27af3c3e3825b8112ec7c1b0efd353a",
+      "bytes": 245843,
+      "op": "GroupNormFwdOp",
+      "generated_at": "2026-09-08T09:03:45.592144+00:00",
+      "cases": 8
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedGemmFwdOp.json",
+      "sha256": "c7cc47c05a1633dde4a286ab286d93b11781b79be2214f9f27ecdb6d672750b4",
+      "bytes": 127933,
+      "op": "GroupedGemmFwdOp",
+      "generated_at": "2026-09-08T10:01:41.365481+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionBwdOp.json",
+      "sha256": "5f903e5cf13aebaa98ea4d0b4326cbd229465768639917c543b574efc44de69a",
+      "bytes": 58154,
+      "op": "GroupedQueryAttentionBwdOp",
+      "generated_at": "2026-09-02T17:11:15.962430+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionDecodePagedWithKVCacheFwdOp.json",
+      "sha256": "177e374c819aa1a45313ddd86fe865008da98a4d98d81813623ef06c2521241b",
+      "bytes": 40014,
+      "op": "GroupedQueryAttentionDecodePagedWithKVCacheFwdOp",
+      "generated_at": "2026-09-03T00:46:54.710102+00:00",
+      "cases": 1
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionDecodeWithKVCacheFwdOp.json",
+      "sha256": "26735bda19ee0b7f764b7bc2b0dba31bc827682c940187305444599ffebd3566",
+      "bytes": 40884,
+      "op": "GroupedQueryAttentionDecodeWithKVCacheFwdOp",
+      "generated_at": "2026-09-03T00:48:04.174402+00:00",
+      "cases": 1
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionFwdOp.json",
+      "sha256": "35a1d621d5d137cf38f0781e7e84cfe27c6ba9d763af057cca8238e02a84825d",
+      "bytes": 53355,
+      "op": "GroupedQueryAttentionFwdOp",
+      "generated_at": "2026-09-02T16:33:36.093915+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionPrefillFwdOp.json",
+      "sha256": "ea801b5de44ce5885c07e3bd1bc88eb02e87fbb7ee4421cc589ad7345d2e0570",
+      "bytes": 33021,
+      "op": "GroupedQueryAttentionPrefillFwdOp",
+      "generated_at": "2026-09-02T16:34:59.548059+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionPrefillPagedWithKVCacheFwdOp.json",
+      "sha256": "f3ea0fdc23b8903f03eb19ff8bb7a4d5481f6e75551eff90f41345c4eb1815f8",
+      "bytes": 37847,
+      "op": "GroupedQueryAttentionPrefillPagedWithKVCacheFwdOp",
+      "generated_at": "2026-09-03T00:45:09.005978+00:00",
+      "cases": 1
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionSlidingWindowFwdOp.json",
+      "sha256": "a923f5e1ce410fea2c7e34b54917734a36be00ab32ba9ef50dab8d7e5a8a3d8d",
+      "bytes": 87614,
+      "op": "GroupedQueryAttentionSlidingWindowFwdOp",
+      "generated_at": "2026-09-02T16:35:45.090352+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GroupedQueryAttentionSlidingWindowVarlenFwdOp.json",
+      "sha256": "3c57520690e25553c4fc83253f6a24cdd89b03edc060f7a396a1c2644eca04a5",
+      "bytes": 87412,
+      "op": "GroupedQueryAttentionSlidingWindowVarlenFwdOp",
+      "generated_at": "2026-09-02T16:37:14.633137+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/GtFwdOp.json",
+      "sha256": "eb6182d105796323795f8d36f174ab3dcf2ddb600590826460d6eb73476e03b7",
+      "bytes": 58538,
+      "op": "GtFwdOp",
+      "generated_at": "2026-09-02T16:34:57.765107+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/HardsigmoidFwdOp.json",
+      "sha256": "fb97e2e8ee8d36e53d29fcaf836238df5d0cfc7966b101907d4553aba3a11f06",
+      "bytes": 102915,
+      "op": "HardsigmoidFwdOp",
+      "generated_at": "2026-09-08T10:00:48.201593+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/HardswishFwdOp.json",
+      "sha256": "d11ae4cd00fe9f21b3d5f3c648720fec551c6a72a8482774870b8ce00c4d1e6e",
+      "bytes": 103889,
+      "op": "HardswishFwdOp",
+      "generated_at": "2026-09-08T11:29:03.097561+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/HardtanhFwdOp.json",
+      "sha256": "dfb4007b3a6d097936103d4d1d06aa9f02ecc8c22af0cabfc4c797b501a6106e",
+      "bytes": 104637,
+      "op": "HardtanhFwdOp",
+      "generated_at": "2026-09-08T10:03:35.468469+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/InfNormFwdOp.json",
+      "sha256": "f3e451b3e10a47e5034906c4ec8e64a1d0150c96ffeb86ddc07bb30412de3cf0",
+      "bytes": 72420,
+      "op": "InfNormFwdOp",
+      "generated_at": "2026-09-02T16:18:51.155249+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/InstanceNormFwdOp.json",
+      "sha256": "029095f100a1141ad7e0e48020c3bc42f017240f353d752bab280f315efe8875",
+      "bytes": 206402,
+      "op": "InstanceNormFwdOp",
+      "generated_at": "2026-09-08T09:05:18.697968+00:00",
+      "cases": 8
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/IsfiniteFwdOp.json",
+      "sha256": "2e7f59e20a8ce517c5a98d1b7315afa1a6b0222a6afa1235826ed659c5971391",
+      "bytes": 51556,
+      "op": "IsfiniteFwdOp",
+      "generated_at": "2026-09-02T16:25:47.355080+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/IsinfFwdOp.json",
+      "sha256": "0cf8de6d76242be10da5ea3c58939adb7a8b07d74784a37e8e40fc9160890524",
+      "bytes": 51824,
+      "op": "IsinfFwdOp",
+      "generated_at": "2026-09-02T16:27:55.764585+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/IsnanFwdOp.json",
+      "sha256": "c76c4ae2692a8aba8123d6eaedd15dc1d023aab1de55a78f1f4f247eed621bd4",
+      "bytes": 51867,
+      "op": "IsnanFwdOp",
+      "generated_at": "2026-09-02T16:30:05.255117+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/L1NormFwdOp.json",
+      "sha256": "72c2d27275ae9b9e09cd325dd103ef201011d18ed0c7b387d12e80e511071d68",
+      "bytes": 99345,
+      "op": "L1NormFwdOp",
+      "generated_at": "2026-09-08T13:55:11.260134+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/L2NormFwdOp.json",
+      "sha256": "fcefdd1f5b0bdfdbfeadd21391ab54be206e0e030de0456bfaa20ad4927fbd62",
+      "bytes": 104719,
+      "op": "L2NormFwdOp",
+      "generated_at": "2026-09-08T10:05:03.001346+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LayerNormFwdOp.json",
+      "sha256": "322380a956f27aa6cc59b177e6961bcf552c88ec6260a3640824a16759bd452b",
+      "bytes": 226601,
+      "op": "LayerNormFwdOp",
+      "generated_at": "2026-09-08T08:57:03.514240+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LeFwdOp.json",
+      "sha256": "52dedc22f1f18787e9e498f189ab4f5fd5b55c7141224bac160ff1a27274a392",
+      "bytes": 58513,
+      "op": "LeFwdOp",
+      "generated_at": "2026-09-02T16:37:08.252833+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LeakyReluFwdOp.json",
+      "sha256": "16e06a479547bb3e1c0159406854e2647277555eabc72817601dffbe6a897556",
+      "bytes": 104013,
+      "op": "LeakyReluFwdOp",
+      "generated_at": "2026-09-08T13:07:29.641070+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LerpFwdOp.json",
+      "sha256": "93e94378ebc73ebd0c9138cdfff2f989a238c22681862515142e3dff7f0c6236",
+      "bytes": 205156,
+      "op": "LerpFwdOp",
+      "generated_at": "2026-09-08T09:16:53.732170+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LerpTensorFwdOp.json",
+      "sha256": "427ca419d774b81c663ec6ad981a2e2efe643a8a3d1256cee801696e7534a040",
+      "bytes": 127613,
+      "op": "LerpTensorFwdOp",
+      "generated_at": "2026-09-08T09:39:28.213364+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/Log1pFwdOp.json",
+      "sha256": "e0ebf259f35817c3fbe75dc6c8cb276fe7795cc35709c7d8f4934f8b5a695a91",
+      "bytes": 125748,
+      "op": "Log1pFwdOp",
+      "generated_at": "2026-09-08T09:40:55.546788+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LogFwdOp.json",
+      "sha256": "a96fd6c7550795a5eca8aa41602a1a28262204f3eaf4473b44033e7cb542379b",
+      "bytes": 125244,
+      "op": "LogFwdOp",
+      "generated_at": "2026-09-08T09:41:24.894229+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LogSoftmaxFwdOp.json",
+      "sha256": "297832884a428e5efd7a53bb4059fe5fbd29557367a2089eb6c48bed403b5d21",
+      "bytes": 171800,
+      "op": "LogSoftmaxFwdOp",
+      "generated_at": "2026-09-08T09:09:42.243314+00:00",
+      "cases": 7
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LogSumExpFwdOp.json",
+      "sha256": "ad5d0eb5b40320d630060477026297242d653b17287046d6cae6e74084717ff0",
+      "bytes": 153543,
+      "op": "LogSumExpFwdOp",
+      "generated_at": "2026-09-08T09:14:40.927255+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LogicalAndFwdOp.json",
+      "sha256": "90f21489b275e1ff342090fbb59eebdfa34e7677415a2f45e4d9ce156324defc",
+      "bytes": 134541,
+      "op": "LogicalAndFwdOp",
+      "generated_at": "2026-09-08T09:07:57.660027+00:00",
+      "cases": 8
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LogicalNotFwdOp.json",
+      "sha256": "040c93b96d1d015798f432e39e22afd63c3b58d03ff8364f85594458889d526e",
+      "bytes": 77957,
+      "op": "LogicalNotFwdOp",
+      "generated_at": "2026-09-08T10:06:27.888623+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LogicalOrFwdOp.json",
+      "sha256": "42b6cd94df01a59c79627c2c087e9a83ab9bef6c762c2cc943c43f97bd092f46",
+      "bytes": 71465,
+      "op": "LogicalOrFwdOp",
+      "generated_at": "2026-09-02T16:46:00.959484+00:00",
+      "cases": 8
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/LtFwdOp.json",
+      "sha256": "e6cb9d0eb6e260c3528f755169c727ee63219022c8b900f6713ab632cabf7702",
+      "bytes": 58448,
+      "op": "LtFwdOp",
+      "generated_at": "2026-09-02T16:48:12.858469+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MHCPostFwdOp.json",
+      "sha256": "5919367ee8b74870c594d3c5091158d624baae87676b5c5c777ae54d6e21da3b",
+      "bytes": 59254,
+      "op": "MHCPostFwdOp",
+      "generated_at": "2026-09-02T17:05:42.312935+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MHCPreFwdOp.json",
+      "sha256": "6f5549d76912d3feb5f75f2407838c7ab3837fe75636e48bef8c6d0b7fb836fc",
+      "bytes": 68295,
+      "op": "MHCPreFwdOp",
+      "generated_at": "2026-09-02T17:06:59.644906+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaskedFillFwdOp.json",
+      "sha256": "522ff3fe49767516e2372e19fe6f867d2cbc65083f7cfd30483c93b82d759165",
+      "bytes": 128391,
+      "op": "MaskedFillFwdOp",
+      "generated_at": "2026-09-08T09:42:06.204398+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaskedFillScalarFwdOp.json",
+      "sha256": "1a480576471662845b0c3afa594115213ee4db75e885d33ae631f39c19a45335",
+      "bytes": 87655,
+      "op": "MaskedFillScalarFwdOp",
+      "generated_at": "2026-09-02T16:50:33.667736+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaxPool1dFwdOp.json",
+      "sha256": "7204c6b6e1979a3bd898f04f9329a72c4b0d53723d9dc753824a34f7b5c834da",
+      "bytes": 40949,
+      "op": "MaxPool1dFwdOp",
+      "generated_at": "2026-09-08T10:18:24.731285+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaxPool1dIndicesFwdOp.json",
+      "sha256": "89c966c9f4bcf6f49930caff81f8522224c30c2179182674b657b99d2ff07bc2",
+      "bytes": 29611,
+      "op": "MaxPool1dIndicesFwdOp",
+      "generated_at": "2026-09-02T16:18:42.947541+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaxPool2dFwdOp.json",
+      "sha256": "eb03c6b526947c09278f494a39ba4f161dbec9109f32671bdbf32f1970521901",
+      "bytes": 212183,
+      "op": "MaxPool2dFwdOp",
+      "generated_at": "2026-09-08T13:13:05.280678+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaxPool2dIndicesFwdOp.json",
+      "sha256": "a848a2ccedb7e26c05fb54186e6f58faf9e5388527fe2eaa2243e6cca6d8f70f",
+      "bytes": 46988,
+      "op": "MaxPool2dIndicesFwdOp",
+      "generated_at": "2026-09-02T16:25:52.848487+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaxPool3dFwdOp.json",
+      "sha256": "f49ec1d04a3c2b3424a8ed68c3065a5dc1d6b0b4948beb273b1427ac7b301c58",
+      "bytes": 107024,
+      "op": "MaxPool3dFwdOp",
+      "generated_at": "2026-09-08T13:10:56.370472+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaxPool3dIndicesFwdOp.json",
+      "sha256": "f7ffeb714a54442936d03918f8d023b0c9802b77ace92165cd78c3df15059c90",
+      "bytes": 54374,
+      "op": "MaxPool3dIndicesFwdOp",
+      "generated_at": "2026-09-02T16:29:44.222268+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MaximumFwdOp.json",
+      "sha256": "7f1127690bee98ff464d7b56dabe2b5a19dc488d2e25d7f918975995c2d2acd8",
+      "bytes": 205042,
+      "op": "MaximumFwdOp",
+      "generated_at": "2026-09-08T09:20:51.515838+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MeanFwdOp.json",
+      "sha256": "dc76e4b92fdaaf7304107aa8e0e0c009929c12c6649a21853b617700a79ef413",
+      "bytes": 105525,
+      "op": "MeanFwdOp",
+      "generated_at": "2026-09-08T13:12:42.085980+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MinimumFwdOp.json",
+      "sha256": "233b9e956e8d8a855f5240e57b622d6326b3cb0b9eb7c42c3926ccb4b18eb7a7",
+      "bytes": 204774,
+      "op": "MinimumFwdOp",
+      "generated_at": "2026-09-08T09:21:14.567196+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MishFwdOp.json",
+      "sha256": "0ec75080b94b833a881fcf5f20e4a113d591b8c6d7cd1b4eda205d61301c02dd",
+      "bytes": 105279,
+      "op": "MishFwdOp",
+      "generated_at": "2026-09-08T10:07:54.383547+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MoeGateUpFwdOp.json",
+      "sha256": "c19137d643b2fd9cca5efa00f7334000d0032c81c21737297d1111d586cb1332",
+      "bytes": 23703,
+      "op": "MoeGateUpFwdOp",
+      "generated_at": "2026-09-02T16:33:12.600646+00:00",
+      "cases": 2
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MoeGroupedGemmFwdOp.json",
+      "sha256": "e604af692312e27df8ffbf05e5871dcfafffa2ccbdf24566c66dddec9d03a8cc",
+      "bytes": 6907,
+      "op": "MoeGroupedGemmFwdOp",
+      "generated_at": "2026-09-08T10:21:00.465695+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MoeGroupedGemmNopadFwdOp.json",
+      "sha256": "34643c04d0aaf8c5d8491e7ae38aba029520af2b4a1ef1ff007233d25c7cc52f",
+      "bytes": 39183,
+      "op": "MoeGroupedGemmNopadFwdOp",
+      "generated_at": "2026-09-02T16:36:46.383816+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MoePermuteAlignFwdOp.json",
+      "sha256": "2de0262bacbb6f34a13950a9d692ac0f6e4bc6c08c774afe4fa8cfab7d8b6c68",
+      "bytes": 26182,
+      "op": "MoePermuteAlignFwdOp",
+      "generated_at": "2026-09-02T16:37:35.563701+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MoePermuteNopadFwdOp.json",
+      "sha256": "c7be0821e147193fa0cd39c6866e7a1895bdf1f51a0c5b214f53873413a6370a",
+      "bytes": 35342,
+      "op": "MoePermuteNopadFwdOp",
+      "generated_at": "2026-09-02T16:38:58.879077+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MoeUnpermuteFwdOp.json",
+      "sha256": "844e4b3ef7bc342997eb95815e83c16633cddfa40bd2dcde33d7b9a71575d41c",
+      "bytes": 128849,
+      "op": "MoeUnpermuteFwdOp",
+      "generated_at": "2026-09-02T16:40:33.970296+00:00",
+      "cases": 8
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MulFwdOp.json",
+      "sha256": "27671fd82918f050e11f7f117eab77c6817b6c6054cd204e46daa28299d2a4ec",
+      "bytes": 234406,
+      "op": "MulFwdOp",
+      "generated_at": "2026-09-08T09:23:31.950213+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MultiHeadAttentionBwdOp.json",
+      "sha256": "2454e5807d23e401a24d0da27e8a66dfb739cf1fee454052952f9f5e73a849f5",
+      "bytes": 87680,
+      "op": "MultiHeadAttentionBwdOp",
+      "generated_at": "2026-09-02T17:17:15.448448+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MultiHeadAttentionDecodePagedWithKVCacheFwdOp.json",
+      "sha256": "5eb823ed18d5355e38cab5bc3bd60daf3b13ccf559b5b0b6333fe3376bfd64c2",
+      "bytes": 58433,
+      "op": "MultiHeadAttentionDecodePagedWithKVCacheFwdOp",
+      "generated_at": "2026-09-02T16:43:28.854373+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MultiHeadAttentionDecodeWithKVCacheFwdOp.json",
+      "sha256": "032f91d0e81e84c5caf2e4abee18c9a9e31a1211877a5276702481bd53f4b871",
+      "bytes": 121228,
+      "op": "MultiHeadAttentionDecodeWithKVCacheFwdOp",
+      "generated_at": "2026-09-02T16:56:19.452595+00:00",
+      "cases": 8
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MultiHeadAttentionFwdOp.json",
+      "sha256": "9bc8f26f159115a2fe768769b87ba4718eb951f388b67daa8a799ee0545b2ef7",
+      "bytes": 71703,
+      "op": "MultiHeadAttentionFwdOp",
+      "generated_at": "2026-09-02T16:40:21.975145+00:00",
+      "cases": 8
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/MultiHeadLatentAttentionDecodeWithKVCacheFwdOp.json",
+      "sha256": "70a1034dedbdb81b4f7ed018fbe669e4a69959ae71732015dff5a8b4972f2d99",
+      "bytes": 57821,
+      "op": "MultiHeadLatentAttentionDecodeWithKVCacheFwdOp",
+      "generated_at": "2026-09-02T16:59:34.787827+00:00",
+      "cases": 2
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/NanToNumFwdOp.json",
+      "sha256": "1e25f99f538772d1b846f39423b2957a3c672ad011950421bd125e99e6f27400",
+      "bytes": 84832,
+      "op": "NanToNumFwdOp",
+      "generated_at": "2026-09-02T16:32:14.531951+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/NeFwdOp.json",
+      "sha256": "ead39ecb650f00223a2d779aa408910cf3662964f2bf377e79d9b9c55944ddbf",
+      "bytes": 58645,
+      "op": "NeFwdOp",
+      "generated_at": "2026-09-02T17:01:57.072836+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/NegFwdOp.json",
+      "sha256": "f956644ec4ad5eeb8e321c2467f7bee4a4b3486674e795f646a3d778f93390c0",
+      "bytes": 124534,
+      "op": "NegFwdOp",
+      "generated_at": "2026-09-08T11:38:11.660076+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/PowFwdOp.json",
+      "sha256": "32d30cbdc0951b9d3cf80b0051e63dcbb73e653a44c80d23b71e6115a7417578",
+      "bytes": 206644,
+      "op": "PowFwdOp",
+      "generated_at": "2026-09-08T09:24:03.317948+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/PreluFwdOp.json",
+      "sha256": "72f3910f004c7e490cfd520d19cfdb4cdeb07f3aea97b96e57af4393f13c301b",
+      "bytes": 86291,
+      "op": "PreluFwdOp",
+      "generated_at": "2026-09-02T17:26:42.329508+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ProdFwdOp.json",
+      "sha256": "6857f54c7c2b20c648696b5d032f78a123138d34570720858dc1e12398d25879",
+      "bytes": 80471,
+      "op": "ProdFwdOp",
+      "generated_at": "2026-09-08T10:20:35.051089+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RMSNormFwdOp.json",
+      "sha256": "a188cedc009177c074ff0abe88d9a88ca69c88be2e8d00353ba0cc7f01b12f04",
+      "bytes": 283526,
+      "op": "RMSNormFwdOp",
+      "generated_at": "2026-09-08T13:23:12.266297+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ReciprocalFwdOp.json",
+      "sha256": "6f713d45d594e00b44e3e00f73ecbc5903986645076c6d7671faa4f61aefc57a",
+      "bytes": 98622,
+      "op": "ReciprocalFwdOp",
+      "generated_at": "2026-09-08T14:18:16.483660+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/ReluFwdOp.json",
+      "sha256": "4d3d3a57df699dbfe62064226cef6334d134e17c0532a395ea68207bc1814006",
+      "bytes": 82976,
+      "op": "ReluFwdOp",
+      "generated_at": "2026-09-08T14:04:59.724980+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RemainderFwdOp.json",
+      "sha256": "14f86af90ab9643dcd31e29ea2e6f93773f7f1a41142da4dcf6fca3a307375b8",
+      "bytes": 210419,
+      "op": "RemainderFwdOp",
+      "generated_at": "2026-09-08T09:27:53.836746+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RopeLlama31FwdOp.json",
+      "sha256": "d10ed50bd232a022ec3b46da430093feaa02a5d861d1a6e325bcbae37e152a0a",
+      "bytes": 49890,
+      "op": "RopeLlama31FwdOp",
+      "generated_at": "2026-09-02T16:38:34.601266+00:00",
+      "cases": 2
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RopeLongRopeFwdOp.json",
+      "sha256": "39d98baac1be7c10ebfeab581340e8711f51f1aefa1de38491fba9959a604d9e",
+      "bytes": 49910,
+      "op": "RopeLongRopeFwdOp",
+      "generated_at": "2026-09-02T16:39:31.607874+00:00",
+      "cases": 2
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RopeNeoxFwdOp.json",
+      "sha256": "ff811bb353597bd55984fd9ec9f79f8f980f6c61b653c5cf1afe5d5426dd0ceb",
+      "bytes": 63424,
+      "op": "RopeNeoxFwdOp",
+      "generated_at": "2026-09-02T16:40:48.126498+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RopeNeoxPositionIdsFwdOp.json",
+      "sha256": "5d89ab858fee77302cca67c93919be824038c4839d6a0447f34624da2b6330f7",
+      "bytes": 50932,
+      "op": "RopeNeoxPositionIdsFwdOp",
+      "generated_at": "2026-09-02T16:41:49.309553+00:00",
+      "cases": 2
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RopeNonNeoxFwdOp.json",
+      "sha256": "386024be758b5dd5f5be19fdff55b4fd3d8d8d6c531cdc6e113c172e57942599",
+      "bytes": 50650,
+      "op": "RopeNonNeoxFwdOp",
+      "generated_at": "2026-09-02T16:42:46.687800+00:00",
+      "cases": 2
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RopeYarnFwdOp.json",
+      "sha256": "3280771be9cd9b22f98f560bdab34297f3de88809cffc07e34d69fc12eebd5b5",
+      "bytes": 49861,
+      "op": "RopeYarnFwdOp",
+      "generated_at": "2026-09-02T16:43:47.263960+00:00",
+      "cases": 2
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RoundFwdOp.json",
+      "sha256": "c5cddd1fdeffee21eee53be92c8bc1057cd2d9020b8e858fc242725dc2ecc2a9",
+      "bytes": 124852,
+      "op": "RoundFwdOp",
+      "generated_at": "2026-09-08T13:18:42.482626+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/RsqrtFwdOp.json",
+      "sha256": "8e3b6608b7379d8463ea55f691b4d23c27f39e5e6644b4b47471dd4dc60e32f2",
+      "bytes": 124999,
+      "op": "RsqrtFwdOp",
+      "generated_at": "2026-09-08T11:41:51.527477+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SeluFwdOp.json",
+      "sha256": "15d347717f87131a8e1f2bb8fd9d93d8b745b6730fe7ff0b7b6361c78e284b59",
+      "bytes": 60166,
+      "op": "SeluFwdOp",
+      "generated_at": "2026-09-02T16:59:12.407384+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SigmoidFwdOp.json",
+      "sha256": "f38467d7b84fa28c807d766c0eb22381c597a2b8a03f39145724dcd3efc97f11",
+      "bytes": 124842,
+      "op": "SigmoidFwdOp",
+      "generated_at": "2026-09-08T13:20:34.374521+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SignFwdOp.json",
+      "sha256": "437d1186aa0fb5271975b65135e00ba3ecb1b6c9ed8dbe18992c5932498d11c2",
+      "bytes": 124695,
+      "op": "SignFwdOp",
+      "generated_at": "2026-09-08T11:44:33.696466+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SiluAndMulFwdOp.json",
+      "sha256": "f838608558fa03dd1270505317a0438bd9453ae33dd2b5b3ecc3e89da52848e9",
+      "bytes": 136491,
+      "op": "SiluAndMulFwdOp",
+      "generated_at": "2026-09-08T10:23:07.583760+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SiluFwdOp.json",
+      "sha256": "e3ae324248147ae291e8d027ee34509e9960290311d5145eb2dfd1941b0ba3ab",
+      "bytes": 83757,
+      "op": "SiluFwdOp",
+      "generated_at": "2026-09-08T10:22:22.970442+00:00",
+      "cases": 3
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SinFwdOp.json",
+      "sha256": "b35024a5d9cef56915c3f9430634cb29fbaea17b9c3fa61816e8829f07b8a132",
+      "bytes": 125497,
+      "op": "SinFwdOp",
+      "generated_at": "2026-09-08T09:48:55.407488+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SinusoidalFwdOp.json",
+      "sha256": "40e37d4b143a0d995fe3568cb4e354a2781bfd68af38eb78f662a2bad684dc9f",
+      "bytes": 81830,
+      "op": "SinusoidalFwdOp",
+      "generated_at": "2026-09-02T17:28:08.835697+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SoftmaxFwdOp.json",
+      "sha256": "297111c0b132965c42eba547295f835b997d22749d69e176d78a3be262916d82",
+      "bytes": 171600,
+      "op": "SoftmaxFwdOp",
+      "generated_at": "2026-09-08T09:09:30.826443+00:00",
+      "cases": 7
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SoftplusFwdOp.json",
+      "sha256": "49df8ff640893183e516082b7a336f2d5be5623de93be32b00c3e9d4b0ba6bad",
+      "bytes": 104691,
+      "op": "SoftplusFwdOp",
+      "generated_at": "2026-09-08T10:08:06.010880+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SqrtFwdOp.json",
+      "sha256": "810ec01e03e9d996e28f5645f95b54082c7e85e81eb2ada344d318ec79d55b8d",
+      "bytes": 150574,
+      "op": "SqrtFwdOp",
+      "generated_at": "2026-09-08T14:15:42.012090+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/StdFwdOp.json",
+      "sha256": "89fc0815f4f55c7e0ba4847aea05905ba32476f5799620c7ac86a82d93467d99",
+      "bytes": 107442,
+      "op": "StdFwdOp",
+      "generated_at": "2026-09-08T10:09:46.970881+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SubFwdOp.json",
+      "sha256": "8608567463487c6567857fa1f900808d55c73fb345f5990f561107567dc11ec6",
+      "bytes": 204573,
+      "op": "SubFwdOp",
+      "generated_at": "2026-09-08T09:28:11.291460+00:00",
+      "cases": 9
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/SumFwdOp.json",
+      "sha256": "80aa48317d9f2715a46778f8df240a027ea807faaedfa21fc480a0f28ee8c139",
+      "bytes": 146835,
+      "op": "SumFwdOp",
+      "generated_at": "2026-09-08T09:28:35.146595+00:00",
+      "cases": 6
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/TanhFwdOp.json",
+      "sha256": "40ee6a7ef32046f5594ace54c255155f26f5e87e79554a6873af67b22f0d16e2",
+      "bytes": 125310,
+      "op": "TanhFwdOp",
+      "generated_at": "2026-09-08T09:50:54.629416+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/TopkSelectorFwdOp.json",
+      "sha256": "ec2e451fd175fcc3046c7290e5c71b28583e2b126912547f5dba29bcec809117",
+      "bytes": 23483,
+      "op": "TopkSelectorFwdOp",
+      "generated_at": "2026-09-08T10:21:00.376051+00:00",
+      "cases": 0
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/TruncFwdOp.json",
+      "sha256": "113d100bb30b655a431e7fd43a9447b99dd4d105fc7fb2d62e70db79caa417ad",
+      "bytes": 124386,
+      "op": "TruncFwdOp",
+      "generated_at": "2026-09-08T13:25:18.754057+00:00",
+      "cases": 5
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/VarFwdOp.json",
+      "sha256": "64977e4ba2b966c0865b5894527e471496423864c57b91339f013c70bc83253c",
+      "bytes": 107901,
+      "op": "VarFwdOp",
+      "generated_at": "2026-09-08T12:36:57.372088+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/VarMeanFwdOp.json",
+      "sha256": "0c0841810e59a3987d459638a1c38b817d33796bca8dbddc543b99b0bc221d18",
+      "bytes": 74279,
+      "op": "VarMeanFwdOp",
+      "generated_at": "2026-09-02T16:35:57.945202+00:00",
+      "cases": 4
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/WhereFwdOp.json",
+      "sha256": "a79b52e27ed5906a6c5e02fc1b5f83f20b1de477f7bff1699c8504a4aef28c5c",
+      "bytes": 375181,
+      "op": "WhereFwdOp",
+      "generated_at": "2026-09-08T10:01:17.470592+00:00",
+      "cases": 17
+    },
+    {
+      "source": "tileops-ascend-harness/coverage/_selftest_matmul.json",
+      "sha256": "bff73bf18b46fc84e2fa902b7c82941c6a3ca7972b2c05c6257ea971560c53a1",
+      "bytes": 30544,
+      "op": "_selftest_matmul",
+      "generated_at": "2026-09-03T00:46:19.467610+00:00",
+      "cases": 4
+    }
+  ],
+  "sources": [
+    {
+      "source": "tileops-ascend-harness/publish/coverage_to_junit.py",
+      "snapshot": "harness/publish/coverage_to_junit.py",
+      "sha256": "b5c3ebdf657d97d92cf39265b7dc5db2d9dc3a88de12987b5b9d25a8785fcc44"
+    },
+    {
+      "source": "tileops-ascend-harness/devicetimer.py",
+      "snapshot": "harness/devicetimer.py",
+      "sha256": "cf0a69b099c77c5d72ef9d0ffd1f8a5c29071dd3a5e1a0469bd25249c9ba12e5"
+    },
+    {
+      "source": "TileOPs.github.io/scripts/workload_shape.py",
+      "snapshot": "renderer/workload_shape.py",
+      "sha256": "25f71606b0d819a4fa63ef0ea6b848446e7e255c044a0f2da9fcd8437703cd83"
+    },
+    {
+      "source": "TileOPs.github.io/hooks.py",
+      "snapshot": "hooks.py",
+      "sha256": "b8a4907bda0cb6230a1c6bc8984847592d42f7e0d38c6b713026effe2cb44cb8"
+    },
+    {
+      "source": "docs/tasks/OPS-178.md",
+      "snapshot": "OPS-178.md",
+      "sha256": "bc17e3dcfd77dea0a9a078bc0938f4fc036033a20083670838332e205c8c57af"
+    },
+    {
+      "source": "docs/reports/R302-data/01-enumeration.json",
+      "snapshot": "T302/01-enumeration.json",
+      "sha256": "3f05364dda2f1bd4894c86a1caf37dfab228eb9a60db1730121910e4effdbaac"
+    },
+    {
+      "source": "docs/reports/R302-data/03-table-manifest.json",
+      "snapshot": "T302/03-table-manifest.json",
+      "sha256": "025344c79e4f0a923c95391caf63124c694b59b770f85fa04cff1f0db69bd574"
+    },
+    {
+      "source": "docs/reports/R302-data/mlir_latency_table.json",
+      "snapshot": "T302/mlir_latency_table.json",
+      "sha256": "46bdefb32460e1ca1566c39dfef54574262c751e3986c449ee600774e7f27a05"
+    },
+    {
+      "source": "docs/reports/R302-data/mlir_latency_receipts.json",
+      "snapshot": "T302/mlir_latency_receipts.json",
+      "sha256": "611a97985e2942319b0cc4494e478b97123a25e169e174dff8a9a20e41a385d1"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/attention.yaml",
+      "snapshot": "manifest/attention.yaml",
+      "sha256": "ff9f792031d3f4cd29777959f74e496398c3ba635903feca1516826b232523be"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/attention_indexing.yaml",
+      "snapshot": "manifest/attention_indexing.yaml",
+      "sha256": "a83f375f7cbf9523ea07a5cd4d9ed4a6bcbed206df0c2706386160fbea8b0d20"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/bmm.yaml",
+      "snapshot": "manifest/bmm.yaml",
+      "sha256": "125c37e234b5e943401d502af3dfeb536404a5a7752047a8b250d7dde0ace12b"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/convolution.yaml",
+      "snapshot": "manifest/convolution.yaml",
+      "sha256": "7681d86023146abb54d2b8a3c5d9cc58a485a9b911684cf6b0f76d98fc44fa09"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/elementwise_binary.yaml",
+      "snapshot": "manifest/elementwise_binary.yaml",
+      "sha256": "fa533b3099e897097487b3c1ad313cd68e9c59576a50ebccf5e198a6e7ba59b2"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/elementwise_fused_gated.yaml",
+      "snapshot": "manifest/elementwise_fused_gated.yaml",
+      "sha256": "e9077ac75e0c8db9d7549d909c2f6935d5565107712bab22e37be44d88f02c88"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/elementwise_generative.yaml",
+      "snapshot": "manifest/elementwise_generative.yaml",
+      "sha256": "886f1ddf76ab28e74a1676fa15ea15dea80480dead38641e9bb789e706ba759a"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/elementwise_multi_input.yaml",
+      "snapshot": "manifest/elementwise_multi_input.yaml",
+      "sha256": "f1a2c97c00efabf3e8e1dd45eba00260859af0178de14e4b9a788ad0413ad8d8"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/elementwise_unary_activation.yaml",
+      "snapshot": "manifest/elementwise_unary_activation.yaml",
+      "sha256": "981eca7f075de2f05e8ba3124b2676087d2661c72bfad9ded7806a68a6abe87e"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/elementwise_unary_math.yaml",
+      "snapshot": "manifest/elementwise_unary_math.yaml",
+      "sha256": "da780b27ec9c52497dda9ab52170790e078d541afecd102db0e116785c300587"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/gemm.yaml",
+      "snapshot": "manifest/gemm.yaml",
+      "sha256": "14f1fe1fc9b8e93f7a32b6bd0bd0cb945a593e523a6eec298d3ad6c17466b3de"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/gemm_variants.yaml",
+      "snapshot": "manifest/gemm_variants.yaml",
+      "sha256": "e8d1a507fc3ccac9fc4a72bc6d3aa3ccdbef71f500453fdef5e2127d5deac6f7"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/linear_attention.yaml",
+      "snapshot": "manifest/linear_attention.yaml",
+      "sha256": "0912713fc6703ceb7e55901bb97d45fa649f40c8164ec242706ff94d33aa2ca2"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/mamba.yaml",
+      "snapshot": "manifest/mamba.yaml",
+      "sha256": "f74e2ff8ef4b90f3a9873f859a896c3bad65b1c7f465d92d97dbbe759b0a0bd0"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/moe.yaml",
+      "snapshot": "manifest/moe.yaml",
+      "sha256": "8b1c8596be85e120a8317591bad77ef94dd9322acfc96ef1b0e201c919d50e8b"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/normalization.yaml",
+      "snapshot": "manifest/normalization.yaml",
+      "sha256": "f560eaca8d0a747e166bfd1aa08500538d568678d35e5125c0dd73bf6aa08da3"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/normalization_t301.yaml",
+      "snapshot": "manifest/normalization_t301.yaml",
+      "sha256": "aa04fb3e47b4e7d8d15dd86a507df6e37a97c86dd7e03320209092a0ea913381"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/pool.yaml",
+      "snapshot": "manifest/pool.yaml",
+      "sha256": "669803aca7eb5c25ea2a3e6f4290f53dc6470f8b4050a900cf1fdabb183ec625"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/position_encoding.yaml",
+      "snapshot": "manifest/position_encoding.yaml",
+      "sha256": "3fe609bce9f206fd824d654b30f670a5fcbd20d8a416382ce5b23e34b5adc8ff"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/quantization.yaml",
+      "snapshot": "manifest/quantization.yaml",
+      "sha256": "15e96551d5231cc3f6e276d58bc519b7d43f555e9e44b878b6637844d878f9d6"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/reduction.yaml",
+      "snapshot": "manifest/reduction.yaml",
+      "sha256": "940119a2d60b4935caf2b6f99edb9b86ade079f12fb391c355140715c89652f2"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/regularization.yaml",
+      "snapshot": "manifest/regularization.yaml",
+      "sha256": "7d8f5f609885b109fb4e6aa76e66c4385e53eabc91b78b6e01e2007bc11ef417"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/scan.yaml",
+      "snapshot": "manifest/scan.yaml",
+      "sha256": "bdc90c678acbeb1ccee2eff46dd75de5e1fd96b0f204dd2f5d61ffe639bd568f"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/sequence_modeling.yaml",
+      "snapshot": "manifest/sequence_modeling.yaml",
+      "sha256": "5797bb4f9f46a011d6d642e32a7f0e0fbbbd6f788ae274b6f293b2a5c594b24c"
+    },
+    {
+      "source": "TileOPs/src/tileops/manifest/t301a.yaml",
+      "snapshot": "manifest/t301a.yaml",
+      "sha256": "dd00d5a28aa0594a0dd4998de51647807a7b1a53a2a3959ff42abd4cf1caf692"
+    },
+    {
+      "source": "TileOPs.github.io/scripts/gen_bench_pages.py",
+      "snapshot": "renderer/gen_bench_pages.py",
+      "sha256": "8fc5334a69d1dd5b5fa51b6b51128b57e0b3b0818ae731cf01c6e2b372c5127e"
+    },
+    {
+      "source": "TileOPs/scripts/nightly_report.py",
+      "snapshot": "TileOPs/scripts/nightly_report.py",
+      "sha256": "35fe73426091b0e16df4d39066106147d6e8d32b9cae956751e07ee0cbe67dca"
+    },
+    {
+      "source": "TileOPs/src/tileops/__init__.py",
+      "snapshot": "TileOPs/src/tileops/__init__.py",
+      "sha256": "5daff027a74d50ceb23b1db18b070ccc593c18876c177a3ed3663af0b2428052"
+    },
+    {
+      "source": "TileOPs/src/tileops/perf/__init__.py",
+      "snapshot": "TileOPs/src/tileops/perf/__init__.py",
+      "sha256": "450ed00b794b02e2cac347d525b383ea9ab9b156ead6f60910b4a663cd4126f3"
+    },
+    {
+      "source": "TileOPs/src/tileops/perf/profile.py",
+      "snapshot": "TileOPs/src/tileops/perf/profile.py",
+      "sha256": "aeed4198b0508d98e654ed74fda5da0382d80fa46fcf73e43864793bbe8f7736"
+    },
+    {
+      "source": "TileOPs/src/tileops/perf/profiles/ascend910b1.yaml",
+      "snapshot": "TileOPs/src/tileops/perf/profiles/ascend910b1.yaml",
+      "sha256": "20c94e91ad6f457df38093b0abff8a40634c7c34e0d470ca5743c268383475be"
+    }
+  ],
+  "renderer_refreshed_at": "2026-09-15T12:00:25.606280+00:00"
+}

@@ -1,0 +1,9 @@
+{
+  "table_ops": 23,
+  "table_cases": 53,
+  "pool_ops": 17,
+  "pool_cases": 42,
+  "paired_ratio_cases": 42,
+  "ratio_worse_cases": 25,
+  "ratio_worse_ops": 9
+}
