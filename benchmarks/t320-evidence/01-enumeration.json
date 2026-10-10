@@ -1,0 +1,898 @@
+{
+  "task": "T302",
+  "definition": "semantic-aligned variant/case pairs from R278 and R282 gates",
+  "r278_count": 26,
+  "r282_count": 34,
+  "measured_case_count": 60,
+  "unique_workload_count": 53,
+  "entries": [
+    {
+      "round": "R278",
+      "op": "AdaLayerNormFwdOp",
+      "variant": "high_perf",
+      "label": "llama-8b-decode",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "AdaLayerNormZeroFwdOp",
+      "variant": "high_perf",
+      "label": "llama-8b-decode",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "AddFwdOp",
+      "variant": "example",
+      "label": "hidden-state-prefill",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "AddFwdOp",
+      "variant": "example",
+      "label": "hidden-state-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "FusedAddRMSNormFwdOp",
+      "variant": "selector",
+      "label": "llama-405b-prefill",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "FusedAddRMSNormFwdOp",
+      "variant": "selector",
+      "label": "llama-8b-decode",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "FusedAddRMSNormFwdOp",
+      "variant": "selector",
+      "label": "llama-8b-prefill",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "FusedAddRMSNormFwdOp",
+      "variant": "selector",
+      "label": "llama-8b-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "GemmFwdOp",
+      "variant": "example_gemm",
+      "label": "square-1k-nn",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "GemmFwdOp",
+      "variant": "example_gemm",
+      "label": "square-1k-nn",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "LayerNormFwdOp",
+      "variant": "high_perf",
+      "label": "llama-8b-decode",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "LayerNormFwdOp",
+      "variant": "high_perf",
+      "label": "llama-8b-prefill",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "LogSumExpFwdOp",
+      "variant": "shipped",
+      "label": "3d-multidim-reduce",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "LogSumExpFwdOp",
+      "variant": "shipped",
+      "label": "attn-weights-32k",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "LogSumExpFwdOp",
+      "variant": "shipped",
+      "label": "attn-weights-4k",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "LogSumExpFwdOp",
+      "variant": "shipped",
+      "label": "attn-weights-4k",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "LogSumExpFwdOp",
+      "variant": "shipped",
+      "label": "lm-head-logits",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "LogSumExpFwdOp",
+      "variant": "shipped",
+      "label": "lm-head-logits",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage3",
+      "label": "yolo-p3",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage4_opt",
+      "label": "yolo-p3",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage3",
+      "label": "yolo-p3",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage4_opt",
+      "label": "yolo-p3",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage3",
+      "label": "yolo-p4",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage4_opt",
+      "label": "yolo-p4",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage3",
+      "label": "yolo-p4",
+      "dtype": "float16"
+    },
+    {
+      "round": "R278",
+      "op": "MishFwdOp",
+      "variant": "stage4_opt",
+      "label": "yolo-p4",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "AbsFwdOp",
+      "variant": "autotune_2d",
+      "label": "elementwise-16M",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "AbsFwdOp",
+      "variant": "autotune_2d",
+      "label": "elementwise-256M",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "AddFwdOp",
+      "variant": "autotune_2d",
+      "label": "hidden-state-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "EluFwdOp",
+      "variant": "npuir_active",
+      "label": "mlp-hidden-wide",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "EluFwdOp",
+      "variant": "npuir_active",
+      "label": "mlp-hidden",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "EluFwdOp",
+      "variant": "npuir_active",
+      "label": "mlp-hidden",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "HardsigmoidFwdOp",
+      "variant": "npuir_active",
+      "label": "mbv3-se-gate-deep",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "HardsigmoidFwdOp",
+      "variant": "npuir_active",
+      "label": "mbv3-se-gate",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "HardtanhFwdOp",
+      "variant": "npuir_active",
+      "label": "bounded-conv-feat",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "HardtanhFwdOp",
+      "variant": "npuir_active",
+      "label": "bounded-hidden",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "LeakyReluFwdOp",
+      "variant": "npuir_active",
+      "label": "gan-feat-deep",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "LeakyReluFwdOp",
+      "variant": "npuir_active",
+      "label": "gan-feat",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "RMSNormFwdOp",
+      "variant": "autotune_2d",
+      "label": "llama-405b-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "RMSNormFwdOp",
+      "variant": "autotune_2d",
+      "label": "llama-70b-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "RMSNormFwdOp",
+      "variant": "autotune_2d",
+      "label": "llama-8b-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "RMSNormFwdOp",
+      "variant": "plain",
+      "label": "llama-70b-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "RMSNormFwdOp",
+      "variant": "plain",
+      "label": "llama-8b-decode",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "RMSNormFwdOp",
+      "variant": "plain",
+      "label": "llama-8b-prefill",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "RMSNormFwdOp",
+      "variant": "plain",
+      "label": "llama-8b-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "Relu6FwdOp",
+      "variant": "npuir_active_06",
+      "label": "hidden-state-prefill",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "Relu6FwdOp",
+      "variant": "npuir_active_06",
+      "label": "hidden-state-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "ReluFwdOp",
+      "variant": "npuir_active",
+      "label": "hidden-state-decode",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "ReluFwdOp",
+      "variant": "npuir_active",
+      "label": "hidden-state-prefill",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "ReluFwdOp",
+      "variant": "npuir_active",
+      "label": "hidden-state-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "RopeLlama31FwdOp",
+      "variant": "rope_llama31",
+      "label": "llama31-1d-8k-d128",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "RopeNeoxFwdOp",
+      "variant": "rope_llama31_sf1",
+      "label": "neox-1d-4k-d128",
+      "dtype": "bfloat16"
+    },
+    {
+      "round": "R282",
+      "op": "SeluFwdOp",
+      "variant": "npuir_active",
+      "label": "snn-fc-wide",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "SeluFwdOp",
+      "variant": "npuir_active",
+      "label": "snn-fc",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "SigmoidFwdOp",
+      "variant": "autotune_2d",
+      "label": "elementwise-16M",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "SigmoidFwdOp",
+      "variant": "autotune_2d",
+      "label": "elementwise-256M",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "SiluFwdOp",
+      "variant": "autotune_2d",
+      "label": "llama-8b-ffn-prefill",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "SoftmaxFwdOp",
+      "variant": "autotune_2d",
+      "label": "lm-head-logits",
+      "dtype": "float32"
+    },
+    {
+      "round": "R282",
+      "op": "SoftplusFwdOp",
+      "variant": "npuir_active",
+      "label": "mlp-hidden-wide",
+      "dtype": "float16"
+    },
+    {
+      "round": "R282",
+      "op": "SoftplusFwdOp",
+      "variant": "npuir_active",
+      "label": "mlp-hidden",
+      "dtype": "float16"
+    }
+  ],
+  "by_op": {
+    "AbsFwdOp": [
+      {
+        "round": "R282",
+        "op": "AbsFwdOp",
+        "variant": "autotune_2d",
+        "label": "elementwise-16M",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "AbsFwdOp",
+        "variant": "autotune_2d",
+        "label": "elementwise-256M",
+        "dtype": "float16"
+      }
+    ],
+    "AdaLayerNormFwdOp": [
+      {
+        "round": "R278",
+        "op": "AdaLayerNormFwdOp",
+        "variant": "high_perf",
+        "label": "llama-8b-decode",
+        "dtype": "bfloat16"
+      }
+    ],
+    "AdaLayerNormZeroFwdOp": [
+      {
+        "round": "R278",
+        "op": "AdaLayerNormZeroFwdOp",
+        "variant": "high_perf",
+        "label": "llama-8b-decode",
+        "dtype": "bfloat16"
+      }
+    ],
+    "AddFwdOp": [
+      {
+        "round": "R278",
+        "op": "AddFwdOp",
+        "variant": "example",
+        "label": "hidden-state-prefill",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "AddFwdOp",
+        "variant": "example",
+        "label": "hidden-state-prefill",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "AddFwdOp",
+        "variant": "autotune_2d",
+        "label": "hidden-state-prefill",
+        "dtype": "float16"
+      }
+    ],
+    "EluFwdOp": [
+      {
+        "round": "R282",
+        "op": "EluFwdOp",
+        "variant": "npuir_active",
+        "label": "mlp-hidden-wide",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "EluFwdOp",
+        "variant": "npuir_active",
+        "label": "mlp-hidden",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R282",
+        "op": "EluFwdOp",
+        "variant": "npuir_active",
+        "label": "mlp-hidden",
+        "dtype": "float16"
+      }
+    ],
+    "FusedAddRMSNormFwdOp": [
+      {
+        "round": "R278",
+        "op": "FusedAddRMSNormFwdOp",
+        "variant": "selector",
+        "label": "llama-405b-prefill",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "FusedAddRMSNormFwdOp",
+        "variant": "selector",
+        "label": "llama-8b-decode",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "FusedAddRMSNormFwdOp",
+        "variant": "selector",
+        "label": "llama-8b-prefill",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "FusedAddRMSNormFwdOp",
+        "variant": "selector",
+        "label": "llama-8b-prefill",
+        "dtype": "float16"
+      }
+    ],
+    "GemmFwdOp": [
+      {
+        "round": "R278",
+        "op": "GemmFwdOp",
+        "variant": "example_gemm",
+        "label": "square-1k-nn",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "GemmFwdOp",
+        "variant": "example_gemm",
+        "label": "square-1k-nn",
+        "dtype": "float16"
+      }
+    ],
+    "HardsigmoidFwdOp": [
+      {
+        "round": "R282",
+        "op": "HardsigmoidFwdOp",
+        "variant": "npuir_active",
+        "label": "mbv3-se-gate-deep",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "HardsigmoidFwdOp",
+        "variant": "npuir_active",
+        "label": "mbv3-se-gate",
+        "dtype": "float16"
+      }
+    ],
+    "HardtanhFwdOp": [
+      {
+        "round": "R282",
+        "op": "HardtanhFwdOp",
+        "variant": "npuir_active",
+        "label": "bounded-conv-feat",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "HardtanhFwdOp",
+        "variant": "npuir_active",
+        "label": "bounded-hidden",
+        "dtype": "float16"
+      }
+    ],
+    "LayerNormFwdOp": [
+      {
+        "round": "R278",
+        "op": "LayerNormFwdOp",
+        "variant": "high_perf",
+        "label": "llama-8b-decode",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "LayerNormFwdOp",
+        "variant": "high_perf",
+        "label": "llama-8b-prefill",
+        "dtype": "bfloat16"
+      }
+    ],
+    "LeakyReluFwdOp": [
+      {
+        "round": "R282",
+        "op": "LeakyReluFwdOp",
+        "variant": "npuir_active",
+        "label": "gan-feat-deep",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "LeakyReluFwdOp",
+        "variant": "npuir_active",
+        "label": "gan-feat",
+        "dtype": "float16"
+      }
+    ],
+    "LogSumExpFwdOp": [
+      {
+        "round": "R278",
+        "op": "LogSumExpFwdOp",
+        "variant": "shipped",
+        "label": "3d-multidim-reduce",
+        "dtype": "float16"
+      },
+      {
+        "round": "R278",
+        "op": "LogSumExpFwdOp",
+        "variant": "shipped",
+        "label": "attn-weights-32k",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "LogSumExpFwdOp",
+        "variant": "shipped",
+        "label": "attn-weights-4k",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "LogSumExpFwdOp",
+        "variant": "shipped",
+        "label": "attn-weights-4k",
+        "dtype": "float16"
+      },
+      {
+        "round": "R278",
+        "op": "LogSumExpFwdOp",
+        "variant": "shipped",
+        "label": "lm-head-logits",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "LogSumExpFwdOp",
+        "variant": "shipped",
+        "label": "lm-head-logits",
+        "dtype": "float16"
+      }
+    ],
+    "MishFwdOp": [
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage3",
+        "label": "yolo-p3",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage4_opt",
+        "label": "yolo-p3",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage3",
+        "label": "yolo-p3",
+        "dtype": "float16"
+      },
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage4_opt",
+        "label": "yolo-p3",
+        "dtype": "float16"
+      },
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage3",
+        "label": "yolo-p4",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage4_opt",
+        "label": "yolo-p4",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage3",
+        "label": "yolo-p4",
+        "dtype": "float16"
+      },
+      {
+        "round": "R278",
+        "op": "MishFwdOp",
+        "variant": "stage4_opt",
+        "label": "yolo-p4",
+        "dtype": "float16"
+      }
+    ],
+    "RMSNormFwdOp": [
+      {
+        "round": "R282",
+        "op": "RMSNormFwdOp",
+        "variant": "autotune_2d",
+        "label": "llama-405b-prefill",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "RMSNormFwdOp",
+        "variant": "autotune_2d",
+        "label": "llama-70b-prefill",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "RMSNormFwdOp",
+        "variant": "autotune_2d",
+        "label": "llama-8b-prefill",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "RMSNormFwdOp",
+        "variant": "plain",
+        "label": "llama-70b-prefill",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "RMSNormFwdOp",
+        "variant": "plain",
+        "label": "llama-8b-decode",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R282",
+        "op": "RMSNormFwdOp",
+        "variant": "plain",
+        "label": "llama-8b-prefill",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R282",
+        "op": "RMSNormFwdOp",
+        "variant": "plain",
+        "label": "llama-8b-prefill",
+        "dtype": "float16"
+      }
+    ],
+    "Relu6FwdOp": [
+      {
+        "round": "R282",
+        "op": "Relu6FwdOp",
+        "variant": "npuir_active_06",
+        "label": "hidden-state-prefill",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R282",
+        "op": "Relu6FwdOp",
+        "variant": "npuir_active_06",
+        "label": "hidden-state-prefill",
+        "dtype": "float16"
+      }
+    ],
+    "ReluFwdOp": [
+      {
+        "round": "R282",
+        "op": "ReluFwdOp",
+        "variant": "npuir_active",
+        "label": "hidden-state-decode",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R282",
+        "op": "ReluFwdOp",
+        "variant": "npuir_active",
+        "label": "hidden-state-prefill",
+        "dtype": "bfloat16"
+      },
+      {
+        "round": "R282",
+        "op": "ReluFwdOp",
+        "variant": "npuir_active",
+        "label": "hidden-state-prefill",
+        "dtype": "float16"
+      }
+    ],
+    "RopeLlama31FwdOp": [
+      {
+        "round": "R282",
+        "op": "RopeLlama31FwdOp",
+        "variant": "rope_llama31",
+        "label": "llama31-1d-8k-d128",
+        "dtype": "bfloat16"
+      }
+    ],
+    "RopeNeoxFwdOp": [
+      {
+        "round": "R282",
+        "op": "RopeNeoxFwdOp",
+        "variant": "rope_llama31_sf1",
+        "label": "neox-1d-4k-d128",
+        "dtype": "bfloat16"
+      }
+    ],
+    "SeluFwdOp": [
+      {
+        "round": "R282",
+        "op": "SeluFwdOp",
+        "variant": "npuir_active",
+        "label": "snn-fc-wide",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "SeluFwdOp",
+        "variant": "npuir_active",
+        "label": "snn-fc",
+        "dtype": "float16"
+      }
+    ],
+    "SigmoidFwdOp": [
+      {
+        "round": "R282",
+        "op": "SigmoidFwdOp",
+        "variant": "autotune_2d",
+        "label": "elementwise-16M",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "SigmoidFwdOp",
+        "variant": "autotune_2d",
+        "label": "elementwise-256M",
+        "dtype": "float16"
+      }
+    ],
+    "SiluFwdOp": [
+      {
+        "round": "R282",
+        "op": "SiluFwdOp",
+        "variant": "autotune_2d",
+        "label": "llama-8b-ffn-prefill",
+        "dtype": "float16"
+      }
+    ],
+    "SoftmaxFwdOp": [
+      {
+        "round": "R282",
+        "op": "SoftmaxFwdOp",
+        "variant": "autotune_2d",
+        "label": "lm-head-logits",
+        "dtype": "float32"
+      }
+    ],
+    "SoftplusFwdOp": [
+      {
+        "round": "R282",
+        "op": "SoftplusFwdOp",
+        "variant": "npuir_active",
+        "label": "mlp-hidden-wide",
+        "dtype": "float16"
+      },
+      {
+        "round": "R282",
+        "op": "SoftplusFwdOp",
+        "variant": "npuir_active",
+        "label": "mlp-hidden",
+        "dtype": "float16"
+      }
+    ]
+  }
+}
