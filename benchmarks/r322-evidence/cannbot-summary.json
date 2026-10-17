@@ -1,0 +1,100 @@
+{
+  "ops_with_n5": 13,
+  "ops_denominator": 13,
+  "cases_denominator": 95,
+  "n5_eager_cases": 71,
+  "n5_graph_cases": 71,
+  "operators": [
+    {
+      "op": "Conv2dFwdOp",
+      "cases_denominator": 39,
+      "n5_eager_cases": 17,
+      "n5_graph_cases": 17,
+      "n5_any": true
+    },
+    {
+      "op": "CountNonzeroFwdOp",
+      "cases_denominator": 4,
+      "n5_eager_cases": 4,
+      "n5_graph_cases": 4,
+      "n5_any": true
+    },
+    {
+      "op": "EluFwdOp",
+      "cases_denominator": 4,
+      "n5_eager_cases": 4,
+      "n5_graph_cases": 4,
+      "n5_any": true
+    },
+    {
+      "op": "GeluFwdOp",
+      "cases_denominator": 3,
+      "n5_eager_cases": 3,
+      "n5_graph_cases": 3,
+      "n5_any": true
+    },
+    {
+      "op": "GemmFwdOp",
+      "cases_denominator": 14,
+      "n5_eager_cases": 14,
+      "n5_graph_cases": 14,
+      "n5_any": true
+    },
+    {
+      "op": "HardsigmoidFwdOp",
+      "cases_denominator": 4,
+      "n5_eager_cases": 4,
+      "n5_graph_cases": 4,
+      "n5_any": true
+    },
+    {
+      "op": "HardswishFwdOp",
+      "cases_denominator": 4,
+      "n5_eager_cases": 4,
+      "n5_graph_cases": 4,
+      "n5_any": true
+    },
+    {
+      "op": "LeakyReluFwdOp",
+      "cases_denominator": 4,
+      "n5_eager_cases": 4,
+      "n5_graph_cases": 4,
+      "n5_any": true
+    },
+    {
+      "op": "MaskedFillFwdOp",
+      "cases_denominator": 5,
+      "n5_eager_cases": 5,
+      "n5_graph_cases": 5,
+      "n5_any": true
+    },
+    {
+      "op": "MishFwdOp",
+      "cases_denominator": 4,
+      "n5_eager_cases": 4,
+      "n5_graph_cases": 4,
+      "n5_any": true
+    },
+    {
+      "op": "ReluFwdOp",
+      "cases_denominator": 3,
+      "n5_eager_cases": 1,
+      "n5_graph_cases": 1,
+      "n5_any": true
+    },
+    {
+      "op": "SiluFwdOp",
+      "cases_denominator": 3,
+      "n5_eager_cases": 3,
+      "n5_graph_cases": 3,
+      "n5_any": true
+    },
+    {
+      "op": "SoftplusFwdOp",
+      "cases_denominator": 4,
+      "n5_eager_cases": 4,
+      "n5_graph_cases": 4,
+      "n5_any": true
+    }
+  ]
+}

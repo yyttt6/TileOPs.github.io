@@ -1,0 +1,314 @@
+[
+  {
+    "op": "Conv2dFwdOp",
+    "label": "bottleneck-expand-1x1-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-27/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "bottleneck-reduce-1x1-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-28/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "classifier-1x1-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-30/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "deeplabv3-aspp-3x3-rate12",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: ['cannbot: docs/reports/R298-data/cannbot-kernels/conv2d.py::build_conv2d_kernel((1, 2048, 32, 32), (256, 2048, 3, 3), torch.float16) refused: NotImplementedError: conv2d dilation=12 is not supported; this kernel implements dilation=1 only']",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-14/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "depthwise-direct-fp16",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: ['cannbot: docs/reports/R298-data/cannbot-kernels/conv2d.py::build_conv2d_kernel((1, 4, 8, 9), (4, 1, 3, 3), torch.float16) refused: NotImplementedError: conv2d groups=4 is not supported; this kernel implements groups=1 only']",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-35/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "dilation-cube-fp16",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: ['cannbot: docs/reports/R298-data/cannbot-kernels/conv2d.py::build_conv2d_kernel((1, 16, 9, 10), (16, 16, 3, 3), torch.float16) refused: NotImplementedError: conv2d dilation=2 is not supported; this kernel implements dilation=1 only']",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-33/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "fp32-direct",
+    "dtype": "float32",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: cannbot's conv2d.py::build_conv2d_kernel declares support for ('float16', 'bfloat16'); float32 is not one of them\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-37/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "grouped-direct-fp16",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: ['cannbot: docs/reports/R298-data/cannbot-kernels/conv2d.py::build_conv2d_kernel((1, 8, 9, 10), (8, 2, 3, 3), torch.float16) refused: NotImplementedError: conv2d groups=4 is not supported; this kernel implements groups=1 only']",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-34/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "highres-3x3-s1-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-21/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "large-grid-depthwise-fp16",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: ['cannbot: docs/reports/R298-data/cannbot-kernels/conv2d.py::build_conv2d_kernel((16, 256, 56, 56), (256, 1, 1, 1), torch.float16) refused: NotImplementedError: conv2d groups=256 is not supported; this kernel implements groups=1 only']",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-38/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "late-stage-1x1-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-29/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "midres-5x5-s1-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-22/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "mobilenetv2-depthwise",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: ['cannbot: docs/reports/R298-data/cannbot-kernels/conv2d.py::build_conv2d_kernel((1, 32, 56, 56), (32, 1, 3, 3), torch.float16) refused: NotImplementedError: conv2d groups=32 is not supported; this kernel implements groups=1 only']",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-15/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "resnet-1x1-bias",
+    "dtype": "bfloat16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-26/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "resnet-1x1-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-25/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "resnet-3x3-bias",
+    "dtype": "bfloat16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-18/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "resnet-3x3-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-17/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "resnext-grouped-3x3",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: ['cannbot: docs/reports/R298-data/cannbot-kernels/conv2d.py::build_conv2d_kernel((1, 128, 28, 28), (256, 4, 3, 3), torch.float16) refused: NotImplementedError: conv2d groups=32 is not supported; this kernel implements groups=1 only']",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-16/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "stage-transition-3x3-s2-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-20/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "stage-transition-5x5-s2-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-23/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "stem-3x3-s2-bias",
+    "dtype": "float16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-19/result.json"
+      }
+    ]
+  },
+  {
+    "op": "Conv2dFwdOp",
+    "label": "stride2-bias",
+    "dtype": "bfloat16",
+    "n": 0,
+    "errors": [
+      {
+        "rep": 1,
+        "reason": "RuntimeError: no admissible cannbot candidate: [\"cannbot: Conv2dFwdOp: 3 operands -- cannbot's build_conv2d_kernel has no bias parameter, so a case that declares bias_shape is a different operator expression and is refused rather than compared without the bias\"]",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/conv/case-24/result.json"
+      }
+    ]
+  },
+  {
+    "op": "ReluFwdOp",
+    "label": "hidden-state-decode",
+    "dtype": "bfloat16",
+    "n": 4,
+    "errors": [
+      {
+        "rep": 5,
+        "reason": "device timing failed: RuntimeError: expected 1 kernel_details.csv under /home/dyq/workspace/docs/reports/R322-data/runs/pass-5/ReluFwdOp/profiler/ReluFwdOp_0006_case, got []",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/runs/pass-5/ReluFwdOp/coverage/ReluFwdOp.json"
+      }
+    ]
+  },
+  {
+    "op": "ReluFwdOp",
+    "label": "hidden-state-prefill",
+    "dtype": "float16",
+    "n": 4,
+    "errors": [
+      {
+        "rep": 4,
+        "reason": "D036 selection could not be measured (RuntimeError: expected 1 kernel_details.csv under /home/dyq/workspace/docs/reports/R322-data/runs/pass-4/ReluFwdOp/profiler/ReluFwdOp_0001_d036_ReluFwdOp_hidden-state-prefill_float16, got []); fell back to the pre-D036 first-match order, which this record says so that the number is not read as best-of-pool",
+        "source": "/home/dyq/workspace/docs/reports/R322-data/runs/pass-4/ReluFwdOp/coverage/ReluFwdOp.json"
+      }
+    ]
+  }
+]

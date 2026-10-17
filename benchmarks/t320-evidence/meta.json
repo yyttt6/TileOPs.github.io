@@ -1,0 +1,34 @@
+{
+  "run_id": "20260915T120256Z",
+  "commit": "06fc97a46e7664b3f30bbee6d66e2abd1061972b",
+  "date": "2026-09-15T12:02:56+00:00",
+  "measured_at_oldest": "2026-09-02T16:10:55+00:00",
+  "measured_at_newest": "2026-09-08T14:18:16+00:00",
+  "measured_span_days": 5.92,
+  "measured_records": 161,
+  "measured_at_missing": 0,
+  "gpu": "Ascend910B1",
+  "environment": {
+    "platform": "Linux-5.10.0-136.12.0.86.r1526_92.hce2.aarch64-aarch64-with-glibc2.34",
+    "python": "3.11.13",
+    "provider": "tilelang",
+    "headline_regime": "graph",
+    "harness_commit": "cbd7900d8b333aaf495f7477e333cb16d0e3d132",
+    "backend_commit": "06fc97a46e7664b3f30bbee6d66e2abd1061972b"
+  },
+  "packages": {},
+  "providers": {
+    "hand": false,
+    "tilelang": true,
+    "mlir": false
+  },
+  "pool_out_replay": {
+    "name": "tilelang-mlir-ascend",
+    "cross_process_frozen": true,
+    "measurement_dates_utc": [
+      "2026-09-14"
+    ],
+    "table_sha256": "46bdefb32460e1ca1566c39dfef54574262c751e3986c449ee600774e7f27a05",
+    "coverage_captured_at": "2026-09-15T11:56:12.122641+00:00"
+  }
+}
