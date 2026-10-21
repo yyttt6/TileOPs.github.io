@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 # Shared with the daily refresh: two `gh-deploy --force` runs at once would race
 # to publish gh-pages.
@@ -31,6 +32,8 @@ jobs:
           # surfaced on an unrelated push. This fork's checkout moves when we
           # move it. See PROJECT_STATE 13.84.
           repository: yyttt6/TileOPs
+          # Legacy API/design reference; measured 950 data is fetched separately.
+          ref: 250b2be6447e8c2699940a176103929956b99daa
           path: TileOPs
           fetch-depth: 1
           sparse-checkout: |
@@ -43,8 +46,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements-docs.txt
-      # Regenerate the Benchmarks page from the latest nightly snapshot so a
-      # push deploy never serves a stale page. Falls back to the placeholder if
-      # the snapshot is unavailable.
-      - run: bash scripts/render_bench.sh
+      # Failed data validation aborts deployment and preserves the live page.
+      - name: Fetch current Ascend 950 CI and render data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASCEND950_SYNC_CI: "1"
+        run: bash scripts/render_bench.sh
       - run: mkdocs gh-deploy --force

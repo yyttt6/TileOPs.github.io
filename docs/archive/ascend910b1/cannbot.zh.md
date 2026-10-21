@@ -1,5 +1,7 @@
 # cannbot 独立实测对比
 
+> Archived Ascend 910B1 data. These are not Ascend 950 measurements.
+
 本轮重测，使用磁盘上的 cannbot 源码、我们的 TileLang 编译器；没有启动 cannbot agent。未写入默认 coverage 或既有 150 行 / 49 达标口径。
 
 D032：设备 kernel 区间并集，每次计时前驱逐 384 MiB L2，ABBA 顺序。每个 case 五轮，每轮 30 次调用；表中 ratio 为五轮 cannbot/ours 的中位数，范围为五轮最小值至最大值。单独一侧的耗时也是五轮中位数，两列耗时之商不必等于 ratio 的中位数。

@@ -1,0 +1,124 @@
+{
+ "run_id": "20260923T093242Z",
+ "commit": "250b2be6447e8c2699940a176103929956b99daa",
+ "date": "2026-09-23T09:32:42+00:00",
+ "measured_at_oldest": "2026-09-02T16:11:25+00:00",
+ "measured_at_newest": "2026-09-23T09:12:52+00:00",
+ "measured_span_days": 20.71,
+ "measured_records": 215,
+ "measured_at_missing": 0,
+ "gpu": "Ascend 910B1",
+ "environment": {
+  "platform": "Linux-5.10.0-136.12.0.86.r1526_92.hce2.aarch64-aarch64-with-glibc2.34",
+  "python": "3.9.9",
+  "provider": "tilelang",
+  "headline_regime": "graph",
+  "harness_commit": "c04ff24867ce4b8e59ef426e67e0518d807b9bff",
+  "backend_commit": "250b2be6447e8c2699940a176103929956b99daa"
+ },
+ "packages": {},
+ "regime_census": {
+  "headline_regime": "graph",
+  "cases": {
+   "graph": 1159
+  },
+  "ops": {
+   "graph": 146
+  },
+  "attainment": {
+   "graph": {
+    "threshold": 0.7,
+    "thresholds_seen": [
+     0.7
+    ],
+    "ops_with_published_ratio": 146,
+    "ops_at_or_above_threshold": 91,
+    "ops_below_threshold": 55
+   }
+  },
+  "off_headline_cases": 0,
+  "off_headline_ops": 0,
+  "off_headline_regimes": []
+ },
+ "phase_one_source": "docs/reports/R267-data/oplist150.json",
+ "phase_two_census": {
+  "headline_regime": "graph",
+  "cases": {
+   "graph": 236
+  },
+  "ops": {
+   "graph": 50
+  },
+  "attainment": {
+   "graph": {
+    "threshold": 0.7,
+    "thresholds_seen": [
+     0.7
+    ],
+    "ops_with_published_ratio": 50,
+    "ops_at_or_above_threshold": 32,
+    "ops_below_threshold": 18
+   }
+  },
+  "off_headline_cases": 0,
+  "off_headline_ops": 0,
+  "off_headline_regimes": [],
+  "ops_published": [
+   "AdaLayerNormZeroFwdOp",
+   "AdaptiveMaxPool2dIndicesFwdOp",
+   "AlibiFwdOp",
+   "BitwiseAndFwdOp",
+   "BitwiseNotFwdOp",
+   "BitwiseOrFwdOp",
+   "BitwiseXorFwdOp",
+   "BmmFp8KNFwdOp",
+   "BmmFp8NKFwdOp",
+   "ClampScalarFwdOp",
+   "EngramGateConvBwdOp",
+   "EngramGateConvFwdOp",
+   "EqFwdOp",
+   "FP8LightningIndexerFwdOp",
+   "FloorDivideFwdOp",
+   "GeFwdOp",
+   "GroupedQueryAttentionBwdOp",
+   "GroupedQueryAttentionDecodePagedWithKVCacheFwdOp",
+   "GroupedQueryAttentionFwdOp",
+   "GroupedQueryAttentionSlidingWindowFwdOp",
+   "GroupedQueryAttentionSlidingWindowVarlenFwdOp",
+   "GtFwdOp",
+   "InfNormFwdOp",
+   "IsfiniteFwdOp",
+   "IsinfFwdOp",
+   "IsnanFwdOp",
+   "LeFwdOp",
+   "LogicalOrFwdOp",
+   "LtFwdOp",
+   "MHCPostFwdOp",
+   "MHCPreFwdOp",
+   "MaskedFillScalarFwdOp",
+   "MaxPool3dIndicesFwdOp",
+   "MoeUnpermuteFwdOp",
+   "MultiHeadAttentionBwdOp",
+   "MultiHeadAttentionDecodeWithKVCacheFwdOp",
+   "MultiHeadAttentionFwdOp",
+   "MultiHeadLatentAttentionDecodeWithKVCacheFwdOp",
+   "NanToNumFwdOp",
+   "NeFwdOp",
+   "PreluFwdOp",
+   "RopeLlama31FwdOp",
+   "RopeLongRopeFwdOp",
+   "RopeNeoxFwdOp",
+   "RopeNeoxPositionIdsFwdOp",
+   "RopeNonNeoxFwdOp",
+   "RopeYarnFwdOp",
+   "SeluFwdOp",
+   "SinusoidalFwdOp",
+   "VarMeanFwdOp"
+  ]
+ },
+ "providers": {
+  "hand": false,
+  "tilelang": true,
+  "mlir": false
+ }
+}

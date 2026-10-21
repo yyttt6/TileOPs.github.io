@@ -49,6 +49,8 @@ jobs:
           # surfaced on an unrelated push. This fork's checkout moves when we
           # move it. See PROJECT_STATE 13.84.
           repository: yyttt6/TileOPs
+          # Legacy API/design reference; measured 950 data is fetched separately.
+          ref: 250b2be6447e8c2699940a176103929956b99daa
           path: TileOPs
           fetch-depth: 1
           sparse-checkout: |
@@ -69,6 +71,7 @@ jobs:
       - name: Build the site, and fail on any warning of our own
         run: |
           set -o pipefail
+          bash scripts/render_bench.sh
           mkdocs build 2>&1 | tee build.log
           if grep -E '^WARNING' build.log | grep -v 'griffe:'; then
             echo "::error::mkdocs reported the warnings above"

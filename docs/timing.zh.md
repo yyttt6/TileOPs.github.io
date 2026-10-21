@@ -1,14 +1,19 @@
-# benchmark 的计时方法
+# benchmark 如何计时
 
-## 本 fork 的 Ascend nightly
+## Ascend 950
 
-当前 nightly 使用 **Ascend 910B1（Atlas A2，8 卡）**，软件栈为
-**CANN 9.2.0-beta.1 / torch_npu 2.7.1.post8**。`device_busy_ms` 通过
-`torch_npu.profiler` 采集，取一次调用各 kernel 在设备上的执行区间并集，
-不含 host 发起调用的开销或 kernel 之间的空隙。
+网站分别展示 **TileLang 0.1.15 正确性 CI** 和**最近已有的历史开发性能记录**。
+[测量口径](benchmarks/reading.md)说明两个协议；[结果页](benchmarks/index.md)保留日期及证据。
 
-采样设置为 **WARMUP=10 / REPEATS=30**，每次迭代间驱逐 **192 MiB L2**，
-**headline regime 为 `graph`**。当前结果见[性能数据](benchmarks/index.md)。
+历史 v2 使用 **3 次 warmup / 15 个独立 profiler 窗口**、**1 GiB 缓存驱逐**，
+以设备 kernel 耗时之和的平均值计分。当时未建立锁频证据，不代表 release 性能验收。
+
+共享 release 协议同样使用 3/15 和 1 GiB 缓存驱逐，但要求已验证锁频，
+并测量设备执行区间并集的平均值。正式测量仍等待锁频控制及同口径 baseline。
+两种正式计时均使用 `torch_npu.profiler.profile`，无 Event 计时回退。
+
+请使用[共享 benchmark 入口](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md)。
+此前的 [910B1 数据和协议已归档](benchmarks/archive.md)。
 
 ## 上游 NVIDIA 计时参考
 
@@ -16,7 +21,7 @@
 
     以下各节保留上游的计时流程、代码及 H200 实测，供理解计时量与误差来源。
     CUPTI、CUDA events、25/100 ms 时间预算和表中读数均属于上游实验，
-    不描述本 fork 的 Ascend nightly；不得将这些数字解释为 Ascend 实测。
+    不描述本 fork 的 Ascend 950 协议；不得将这些数字解释为 Ascend 实测。
 
 上游 nightly benchmark 给每个算子的每个 workload 各测一行，报出的 `device_busy_ms` 是这次调用产生的全部 kernel 在设备上执行区间的并集。CUPTI 记下每个 kernel 的执行起止，按 external correlation id 归到某次迭代；每次迭代之前清空 L2，25 ms 预热、100 ms 测量，取中位数。
 

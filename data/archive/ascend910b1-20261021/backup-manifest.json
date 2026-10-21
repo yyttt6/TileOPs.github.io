@@ -1,0 +1,13 @@
+{
+  "hardware": "Ascend910B1",
+  "source_repository": "yyttt6/TileOPs",
+  "source_branch": "nightly-bench",
+  "source_commit": "c71531310ee6ce0a26b0a86b7a6ddc79f0201ab2",
+  "site_backup_branch": "archive/ascend910b1-20261021",
+  "sha256": {
+    "README.md": "2b7de7c1ab38de7feb42c703a26758c02111f5795bc7c043094ab534d75ca59b",
+    "bench_results.xml": "6ff54458f1f0891b2af758f210044b4e5c73d8d653afd549a7a32c8928811d74",
+    "meta.json": "8c99117ddc46bbaa36d4f5df74ae8db21cbfc86be7cc9a6b7a73fef65ab2488f",
+    "test_results.xml": "10f474464ce117f2b263ebd795c703e9678903fb3d6d53c50b0598cbf882e276"
+  }
+}

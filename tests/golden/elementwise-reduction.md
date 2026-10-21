@@ -2,7 +2,7 @@
 
 **3 ops, 4 workloads.**
 
-One table per op, one row per workload. `Ratio` is the fastest other implementation's device time divided by ours, so <span class="perf-ahead">green</span> is faster than it, <span class="perf-par">plain</span> is level with it, <span class="perf-behind">red</span> is slower. Times are in ms. [How these numbers are taken](reading.md).
+One table per op, one row per workload. `Ratio` is the baseline device time divided by ours in the same measurement regime, so <span class="perf-ahead">green</span> is faster than it, <span class="perf-par">plain</span> is level with it, <span class="perf-behind">red</span> is slower. Times are in ms. [How these numbers are taken](reading.md).
 
 ## Elementwise
 

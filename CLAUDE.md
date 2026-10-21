@@ -47,12 +47,18 @@ Never edit these by hand — change what produces them.
 |-------|-------------|
 | `docs/api/` | mkdocstrings, from TileOPs docstrings |
 | `docs/design/` | `include-markdown`, mirroring TileOPs `docs/design/` |
-| `docs/benchmarks/` | `scripts/gen_bench_pages.py`, from the newest commit on the `nightly-bench` branch of [yyttt6/TileOPs](https://github.com/yyttt6/TileOPs/tree/nightly-bench) (`scripts/render_bench.sh` fetches it; upstream publishes to its own `tile-ai/TileOPs-nightly`, this fork does not) |
+| `docs/benchmarks/` | `scripts/gen_ascend950_pages.py`, from validated `data/ascend950/`; `scripts/sync_ascend950_ci.py` refreshes correctness CI. Old 910B1 renderer/data are retained for the archive. |
 
 `hooks.py` rewrites the repo-relative paths mirrored content arrives with, and
 expands the single `Benchmarks` nav entry to whichever pages the renderer produced.
 
-## Benchmarks pages
+## Ascend 950 publication
+
+The current renderer keeps release correctness and historical v2 performance in separate pages.
+Do not label unlocked development results as TileLang 0.1.15 release performance.
+See README.md for data import, CI refresh and the complete 910B1 backup.
+
+## Historical 910B1 benchmark renderer
 
 They answer one question per workload: how TileOPs compares to the fastest other
 implementation of the same op on that workload.

@@ -1,15 +1,22 @@
 # How a benchmark is timed
 
-## This fork's Ascend nightly
+## Ascend 950
 
-The current nightly runs on **Ascend 910B1 (Atlas A2, 8 cards)** with
-**CANN 9.2.0-beta.1 / torch_npu 2.7.1.post8**. `device_busy_ms` is collected
-through `torch_npu.profiler`: the union of the device execution intervals
-of the kernels in one call, excluding host launch overhead and gaps between kernels.
+The website separates **TileLang 0.1.15 correctness CI** from the latest available
+**historical development timings**. [Measurement scope](benchmarks/reading.md)
+records the two protocols; [results](benchmarks/index.md) gives their dates and evidence.
 
-Sampling uses **WARMUP=10 / REPEATS=30**, with **192 MiB L2** evicted
-between iterations. The **headline regime is `graph`**. See
-[Benchmarks](benchmarks/index.md) for current results.
+The development v2 protocol uses **3 warmups / 15 independent profiler windows**,
+**1 GiB cache eviction**, and the mean of summed device kernel durations.
+Clock locking was not established. These results do not certify release performance.
+
+The shared release protocol also uses 3/15 and 1 GiB eviction, but requires a
+verified clock policy and measures device execution interval unions. Formal
+measurement is pending that clock control and matching baselines. Both formal
+timers use `torch_npu.profiler.profile`, with no Event timing fallback.
+
+Use the [shared benchmark entry](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md).
+The earlier [910B1 data and protocol are archived](benchmarks/archive.md).
 
 ## Upstream NVIDIA timing reference
 
@@ -18,7 +25,7 @@ between iterations. The **headline regime is `graph`**. See
     The following sections retain the upstream timing procedure, code and
     H200 measurements to explain timing quantities and sources of error.
     CUPTI, CUDA events, the 25/100 ms budgets and the readings in the tables
-    belong to that upstream experiment, not this fork's Ascend nightly.
+    belong to that upstream experiment and do not describe the Ascend 950 protocol.
     They must not be interpreted as Ascend measurements.
 
 The upstream nightly benchmark measures one row per workload per op, reporting `device_busy_ms`:

@@ -1,0 +1,6504 @@
+{
+  "schema": "ascend950-ci/v1",
+  "run": {
+    "id": 39443665413,
+    "commit": "1f20d26885b42429dd487d9b3e10c8b243d80b96",
+    "branch": "ascend950",
+    "url": "https://github.com/yyttt6/TileOPs/actions/runs/39443665413",
+    "conclusion": "success",
+    "completed_at": "2026-10-20T15:20:38.948997+00:00"
+  },
+  "environment": {
+    "device": "Ascend950DT_9592",
+    "tilelang": "0.1.15",
+    "torch": "2.13.0+cpu",
+    "torch_npu": "2.13.0.rc1",
+    "cann_components": {
+      "CANN": "9.2.0.beta2",
+      "RUNTIME": "9.2.0.beta2",
+      "COMPILER": "9.2.0.beta2",
+      "DRIVER": "7.0.t9.0.B827",
+      "TOOLKIT": "9.2.0.beta2",
+      "OPP": "9.2.0.beta2"
+    },
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "ops": [
+      "AbsFwdOp",
+      "BitwiseNotFwdOp",
+      "BmmFwdOp",
+      "CeilFwdOp",
+      "CosFwdOp",
+      "CumsumFwdOp",
+      "DropoutFwdOp",
+      "EluFwdOp",
+      "ErfFwdOp",
+      "ExpFwdOp",
+      "Expm1FwdOp",
+      "FloorFwdOp",
+      "GeluAndMulFwdOp",
+      "GeluFwdOp",
+      "GeluTanhAndMulFwdOp",
+      "HardsigmoidFwdOp",
+      "HardswishFwdOp",
+      "HardtanhFwdOp",
+      "IsfiniteFwdOp",
+      "IsinfFwdOp",
+      "IsnanFwdOp",
+      "LeakyReluFwdOp",
+      "Log1pFwdOp",
+      "LogFwdOp",
+      "LogicalNotFwdOp",
+      "MishFwdOp",
+      "NegFwdOp",
+      "ReciprocalFwdOp",
+      "ReluFwdOp",
+      "RoundFwdOp",
+      "RsqrtFwdOp",
+      "SeluFwdOp",
+      "SigmoidFwdOp",
+      "SignFwdOp",
+      "SiluAndMulFwdOp",
+      "SiluFwdOp",
+      "SinFwdOp",
+      "SoftplusFwdOp",
+      "SqrtFwdOp",
+      "TanhFwdOp",
+      "TruncFwdOp"
+    ]
+  },
+  "guard_exit_code": 0,
+  "source_changed": false,
+  "verify_only": true,
+  "passed": 191,
+  "failed": 0,
+  "source_sha256": {
+    "receipt.json": "78b1912ce10a0894d70b37095ce97c0841efb74b7a6787c01447e020fd307b26",
+    "environment.json": "c9e1b2b0e98062a53d640c741d29dc1025981c208e4c6e6cb5e1cf378a6f3c13",
+    "results.jsonl": "11e13a58165a8ed5273c07c5e9e08f4cda47ea1163dd10752d1c9b21ad28dc54"
+  },
+  "cases": [
+    {
+      "op": "AbsFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 908333159,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "AbsFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3314332291,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "AbsFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 570311913,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "AbsFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3955032602,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "AbsFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3995371960,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BitwiseNotFwdOp",
+      "case_id": "16M-int32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "int32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "int32"
+        ]
+      },
+      "seed": 1337878006,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BitwiseNotFwdOp",
+      "case_id": "16M-int64",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "int64"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "int64"
+        ]
+      },
+      "seed": 33984276,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BitwiseNotFwdOp",
+      "case_id": "256M-int32",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "int32"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "int32"
+        ]
+      },
+      "seed": 2290113898,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-128-float16",
+      "params": {
+        "a": [
+          [
+            8,
+            128,
+            128
+          ],
+          "float16"
+        ],
+        "b": [
+          [
+            8,
+            128,
+            128
+          ],
+          "float16"
+        ],
+        "d": [
+          [
+            8,
+            128,
+            128
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2944942210,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-128-bfloat16",
+      "params": {
+        "a": [
+          [
+            8,
+            128,
+            128
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            8,
+            128,
+            128
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            8,
+            128,
+            128
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2666473148,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-1k-float16",
+      "params": {
+        "a": [
+          [
+            8,
+            1024,
+            1024
+          ],
+          "float16"
+        ],
+        "b": [
+          [
+            8,
+            1024,
+            1024
+          ],
+          "float16"
+        ],
+        "d": [
+          [
+            8,
+            1024,
+            1024
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2831982531,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-1k-bfloat16",
+      "params": {
+        "a": [
+          [
+            8,
+            1024,
+            1024
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            8,
+            1024,
+            1024
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            8,
+            1024,
+            1024
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 723666626,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-512-float16",
+      "params": {
+        "a": [
+          [
+            16,
+            512,
+            512
+          ],
+          "float16"
+        ],
+        "b": [
+          [
+            16,
+            512,
+            512
+          ],
+          "float16"
+        ],
+        "d": [
+          [
+            16,
+            512,
+            512
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3677867873,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-512-bfloat16",
+      "params": {
+        "a": [
+          [
+            16,
+            512,
+            512
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            16,
+            512,
+            512
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            16,
+            512,
+            512
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2369516711,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-256-float16",
+      "params": {
+        "a": [
+          [
+            32,
+            256,
+            256
+          ],
+          "float16"
+        ],
+        "b": [
+          [
+            32,
+            256,
+            256
+          ],
+          "float16"
+        ],
+        "d": [
+          [
+            32,
+            256,
+            256
+          ],
+          "float16"
+        ]
+      },
+      "seed": 1410958275,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-256-bfloat16",
+      "params": {
+        "a": [
+          [
+            32,
+            256,
+            256
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            32,
+            256,
+            256
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            32,
+            256,
+            256
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 583754137,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-4k-bfloat16",
+      "params": {
+        "a": [
+          [
+            4,
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            4,
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            4,
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3604962415,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-2k-float16",
+      "params": {
+        "a": [
+          [
+            8,
+            2048,
+            2048
+          ],
+          "float16"
+        ],
+        "b": [
+          [
+            8,
+            2048,
+            2048
+          ],
+          "float16"
+        ],
+        "d": [
+          [
+            8,
+            2048,
+            2048
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3534686036,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "square-2k-bfloat16",
+      "params": {
+        "a": [
+          [
+            8,
+            2048,
+            2048
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            8,
+            2048,
+            2048
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            8,
+            2048,
+            2048
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3263977244,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "mha-decode-qk-float16",
+      "params": {
+        "a": [
+          [
+            64,
+            128,
+            128
+          ],
+          "float16"
+        ],
+        "b": [
+          [
+            64,
+            128,
+            2048
+          ],
+          "float16"
+        ],
+        "d": [
+          [
+            64,
+            128,
+            2048
+          ],
+          "float16"
+        ]
+      },
+      "seed": 128720695,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "mha-decode-qk-bfloat16",
+      "params": {
+        "a": [
+          [
+            64,
+            128,
+            128
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            64,
+            128,
+            2048
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            64,
+            128,
+            2048
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3904233097,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "mha-decode-pv-float16",
+      "params": {
+        "a": [
+          [
+            64,
+            128,
+            2048
+          ],
+          "float16"
+        ],
+        "b": [
+          [
+            64,
+            2048,
+            128
+          ],
+          "float16"
+        ],
+        "d": [
+          [
+            64,
+            128,
+            128
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3145577243,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "mha-decode-pv-bfloat16",
+      "params": {
+        "a": [
+          [
+            64,
+            128,
+            2048
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            64,
+            2048,
+            128
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            64,
+            128,
+            128
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3026666705,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "BmmFwdOp",
+      "case_id": "moe-prefill-bfloat16",
+      "params": {
+        "a": [
+          [
+            128,
+            512,
+            2048
+          ],
+          "bfloat16"
+        ],
+        "b": [
+          [
+            128,
+            2048,
+            512
+          ],
+          "bfloat16"
+        ],
+        "d": [
+          [
+            128,
+            512,
+            512
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 4234172227,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CeilFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 856606375,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CeilFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2287565368,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CeilFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 2585514673,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CeilFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3291198077,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CeilFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 364333177,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CosFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 1534570148,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CosFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2812645195,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CosFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 988287906,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CosFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2025037900,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CosFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3495826076,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CumsumFwdOp",
+      "case_id": "hidden-state-float16",
+      "params": {
+        "x": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "y": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "dim": -1
+      },
+      "seed": 2363109608,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CumsumFwdOp",
+      "case_id": "hidden-state-bfloat16",
+      "params": {
+        "x": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "y": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "dim": -1
+      },
+      "seed": 2423604699,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 1.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CumsumFwdOp",
+      "case_id": "long-seq-bfloat16",
+      "params": {
+        "x": [
+          [
+            64,
+            32768
+          ],
+          "bfloat16"
+        ],
+        "y": [
+          [
+            64,
+            32768
+          ],
+          "bfloat16"
+        ],
+        "dim": -1
+      },
+      "seed": 1431194057,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 2.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "CumsumFwdOp",
+      "case_id": "llama-13b-hidden-float32",
+      "params": {
+        "x": [
+          [
+            4096,
+            5120
+          ],
+          "float32"
+        ],
+        "y": [
+          [
+            4096,
+            5120
+          ],
+          "float32"
+        ],
+        "dim": -1
+      },
+      "seed": 1311936755,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.000152587890625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "DropoutFwdOp",
+      "case_id": "hidden-4k-float16",
+      "params": {
+        "input": [
+          [
+            1024,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            1024,
+            4096
+          ],
+          "float16"
+        ],
+        "p": 0.5,
+        "seed": 0,
+        "training": true
+      },
+      "seed": 1917231647,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 10.2421875,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "DropoutFwdOp",
+      "case_id": "hidden-4k-float32",
+      "params": {
+        "input": [
+          [
+            1024,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            1024,
+            4096
+          ],
+          "float32"
+        ],
+        "p": 0.5,
+        "seed": 0,
+        "training": true
+      },
+      "seed": 4719799,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 11.08393383026123,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "DropoutFwdOp",
+      "case_id": "hidden-10k-bfloat16",
+      "params": {
+        "input": [
+          [
+            1024,
+            10240
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            1024,
+            10240
+          ],
+          "bfloat16"
+        ],
+        "p": 0.5,
+        "seed": 0,
+        "training": true
+      },
+      "seed": 1954717506,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 10.75,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "EluFwdOp",
+      "case_id": "mlp-hidden-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "alpha": 1.0,
+        "inplace": false
+      },
+      "seed": 761297546,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 7.62939453125e-06,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "EluFwdOp",
+      "case_id": "mlp-hidden-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "alpha": 1.0,
+        "inplace": false
+      },
+      "seed": 2515558355,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 2.9802322387695312e-08,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "EluFwdOp",
+      "case_id": "mlp-hidden-wide-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            8192
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            8192
+          ],
+          "float16"
+        ],
+        "alpha": 1.0,
+        "inplace": false
+      },
+      "seed": 3619771530,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 7.62939453125e-06,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "EluFwdOp",
+      "case_id": "mlp-hidden-wide-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            8192
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            8192
+          ],
+          "bfloat16"
+        ],
+        "alpha": 1.0,
+        "inplace": false
+      },
+      "seed": 2879615621,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 3.725290298461914e-08,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ErfFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2893909078,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00048828125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ErfFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2090279609,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00390625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ErfFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 2674886784,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 5.848705768585205e-07,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ErfFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3948280219,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00048828125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ErfFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1288236359,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00390625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ExpFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3735008337,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ExpFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1616332523,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ExpFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 3949299892,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ExpFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2228112993,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ExpFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3612178302,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Expm1FwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2666572463,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 6.103515625e-05,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Expm1FwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1718573919,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 1.52587890625e-05,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Expm1FwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 2607271180,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 4.76837158203125e-07,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Expm1FwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 641400567,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 6.103515625e-05,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Expm1FwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1724226066,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 1.52587890625e-05,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "FloorFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 355541269,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "FloorFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 85236116,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "FloorFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 2608215600,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "FloorFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 625048457,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "FloorFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 4285151192,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluAndMulFwdOp",
+      "case_id": "llama-8b-ffn-prefill-float16",
+      "params": {
+        "x": [
+          [
+            2048,
+            28672
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3053668606,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0078125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluAndMulFwdOp",
+      "case_id": "llama-8b-ffn-prefill-bfloat16",
+      "params": {
+        "x": [
+          [
+            2048,
+            28672
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1584209440,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluAndMulFwdOp",
+      "case_id": "llama-8b-ffn-decode-bfloat16",
+      "params": {
+        "x": [
+          [
+            1,
+            28672
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            1,
+            14336
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2700654709,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.03125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluFwdOp",
+      "case_id": "llama-8b-ffn-prefill-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            14336
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "float16"
+        ],
+        "approximate": "none"
+      },
+      "seed": 1637435876,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.001953125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluFwdOp",
+      "case_id": "llama-8b-ffn-prefill-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "approximate": "none"
+      },
+      "seed": 3120059978,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00048828125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluFwdOp",
+      "case_id": "llama-8b-ffn-decode-bfloat16",
+      "params": {
+        "input": [
+          [
+            1,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            1,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "approximate": "none"
+      },
+      "seed": 157036034,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00048828125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluTanhAndMulFwdOp",
+      "case_id": "llama-8b-ffn-prefill-float16",
+      "params": {
+        "x": [
+          [
+            2048,
+            28672
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "float16"
+        ]
+      },
+      "seed": 4284567981,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0078125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluTanhAndMulFwdOp",
+      "case_id": "llama-8b-ffn-prefill-bfloat16",
+      "params": {
+        "x": [
+          [
+            2048,
+            28672
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2857642822,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "GeluTanhAndMulFwdOp",
+      "case_id": "llama-8b-ffn-decode-bfloat16",
+      "params": {
+        "x": [
+          [
+            1,
+            28672
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            1,
+            14336
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1047344630,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.03125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardsigmoidFwdOp",
+      "case_id": "mbv3-se-gate-float16",
+      "params": {
+        "input": [
+          [
+            32,
+            240,
+            1,
+            1
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            32,
+            240,
+            1,
+            1
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 351948761,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardsigmoidFwdOp",
+      "case_id": "mbv3-se-gate-bfloat16",
+      "params": {
+        "input": [
+          [
+            32,
+            240,
+            1,
+            1
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            32,
+            240,
+            1,
+            1
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 1390792492,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00390625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardsigmoidFwdOp",
+      "case_id": "mbv3-se-gate-deep-float16",
+      "params": {
+        "input": [
+          [
+            32,
+            960,
+            1,
+            1
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            32,
+            960,
+            1,
+            1
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 2939718814,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardsigmoidFwdOp",
+      "case_id": "mbv3-se-gate-deep-bfloat16",
+      "params": {
+        "input": [
+          [
+            32,
+            960,
+            1,
+            1
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            32,
+            960,
+            1,
+            1
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 3383105418,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00390625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardswishFwdOp",
+      "case_id": "mbv3-stage2-float16",
+      "params": {
+        "input": [
+          [
+            32,
+            96,
+            56,
+            56
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            32,
+            96,
+            56,
+            56
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 768410440,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.000244140625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardswishFwdOp",
+      "case_id": "mbv3-stage2-bfloat16",
+      "params": {
+        "input": [
+          [
+            32,
+            96,
+            56,
+            56
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            32,
+            96,
+            56,
+            56
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 1258935749,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0009765625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardswishFwdOp",
+      "case_id": "mbv3-stage3-float16",
+      "params": {
+        "input": [
+          [
+            32,
+            240,
+            28,
+            28
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            32,
+            240,
+            28,
+            28
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 2062906994,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.000244140625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardswishFwdOp",
+      "case_id": "mbv3-stage3-bfloat16",
+      "params": {
+        "input": [
+          [
+            32,
+            240,
+            28,
+            28
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            32,
+            240,
+            28,
+            28
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 4267194518,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0009765625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardtanhFwdOp",
+      "case_id": "bounded-hidden-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "min_val": -1.0,
+        "max_val": 1.0,
+        "inplace": false
+      },
+      "seed": 1149629034,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardtanhFwdOp",
+      "case_id": "bounded-hidden-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "min_val": -1.0,
+        "max_val": 1.0,
+        "inplace": false
+      },
+      "seed": 2039939610,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardtanhFwdOp",
+      "case_id": "bounded-conv-feat-float16",
+      "params": {
+        "input": [
+          [
+            16,
+            256,
+            56,
+            56
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16,
+            256,
+            56,
+            56
+          ],
+          "float16"
+        ],
+        "min_val": -1.0,
+        "max_val": 1.0,
+        "inplace": false
+      },
+      "seed": 363352519,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "HardtanhFwdOp",
+      "case_id": "bounded-conv-feat-bfloat16",
+      "params": {
+        "input": [
+          [
+            16,
+            256,
+            56,
+            56
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16,
+            256,
+            56,
+            56
+          ],
+          "bfloat16"
+        ],
+        "min_val": -1.0,
+        "max_val": 1.0,
+        "inplace": false
+      },
+      "seed": 2738748731,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsfiniteFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 3328922557,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsfiniteFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 2863672198,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsfiniteFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 1689080575,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsfiniteFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ]
+      },
+      "seed": 395926489,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsfiniteFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ]
+      },
+      "seed": 1847361634,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsinfFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 2634578557,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsinfFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 4205711721,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsinfFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 2760816892,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsinfFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ]
+      },
+      "seed": 476284690,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsinfFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ]
+      },
+      "seed": 238105426,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsnanFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 569538389,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsnanFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 3089679459,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsnanFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 3666703420,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsnanFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ]
+      },
+      "seed": 2112478746,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "IsnanFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ]
+      },
+      "seed": 2974814176,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LeakyReluFwdOp",
+      "case_id": "gan-feat-float16",
+      "params": {
+        "input": [
+          [
+            16,
+            256,
+            64,
+            64
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16,
+            256,
+            64,
+            64
+          ],
+          "float16"
+        ],
+        "negative_slope": 0.01,
+        "inplace": false
+      },
+      "seed": 1515474951,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LeakyReluFwdOp",
+      "case_id": "gan-feat-bfloat16",
+      "params": {
+        "input": [
+          [
+            16,
+            256,
+            64,
+            64
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16,
+            256,
+            64,
+            64
+          ],
+          "bfloat16"
+        ],
+        "negative_slope": 0.01,
+        "inplace": false
+      },
+      "seed": 1723248052,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LeakyReluFwdOp",
+      "case_id": "gan-feat-deep-float16",
+      "params": {
+        "input": [
+          [
+            16,
+            512,
+            32,
+            32
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16,
+            512,
+            32,
+            32
+          ],
+          "float16"
+        ],
+        "negative_slope": 0.01,
+        "inplace": false
+      },
+      "seed": 1426363483,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LeakyReluFwdOp",
+      "case_id": "gan-feat-deep-bfloat16",
+      "params": {
+        "input": [
+          [
+            16,
+            512,
+            32,
+            32
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16,
+            512,
+            32,
+            32
+          ],
+          "bfloat16"
+        ],
+        "negative_slope": 0.01,
+        "inplace": false
+      },
+      "seed": 1204674520,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Log1pFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3139507389,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Log1pFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 373225087,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Log1pFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 2809103758,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 1.1920928955078125e-07,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Log1pFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 80629073,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "Log1pFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1086548733,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 397968921,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1108347711,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 3946534497,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2067309209,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 945316563,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogicalNotFwdOp",
+      "case_id": "16M-bool",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 2406324048,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogicalNotFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 4116371105,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogicalNotFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bool"
+        ]
+      },
+      "seed": 446838510,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "LogicalNotFwdOp",
+      "case_id": "256M-bool",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bool"
+        ]
+      },
+      "seed": 2388030580,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "MishFwdOp",
+      "case_id": "yolo-p3-float16",
+      "params": {
+        "input": [
+          [
+            16,
+            256,
+            80,
+            80
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16,
+            256,
+            80,
+            80
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 3155862770,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00048828125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "MishFwdOp",
+      "case_id": "yolo-p3-bfloat16",
+      "params": {
+        "input": [
+          [
+            16,
+            256,
+            80,
+            80
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16,
+            256,
+            80,
+            80
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 1890819150,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "MishFwdOp",
+      "case_id": "yolo-p4-float16",
+      "params": {
+        "input": [
+          [
+            16,
+            512,
+            40,
+            40
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16,
+            512,
+            40,
+            40
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 2703855713,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00048828125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "MishFwdOp",
+      "case_id": "yolo-p4-bfloat16",
+      "params": {
+        "input": [
+          [
+            16,
+            512,
+            40,
+            40
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16,
+            512,
+            40,
+            40
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 3027454581,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "NegFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 955787451,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "NegFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 367408101,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "NegFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 2449009191,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "NegFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2261922330,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "NegFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2853217328,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReciprocalFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 4074530380,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReciprocalFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1294096908,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReciprocalFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 2610013969,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 1.1920928955078125e-07,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReciprocalFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 4062531499,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReciprocalFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2826926667,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReluFwdOp",
+      "case_id": "hidden-state-prefill-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 3242577670,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReluFwdOp",
+      "case_id": "hidden-state-prefill-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 2335186014,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "ReluFwdOp",
+      "case_id": "hidden-state-decode-bfloat16",
+      "params": {
+        "input": [
+          [
+            1,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            1,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 1881233372,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RoundFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "decimals": 0
+      },
+      "seed": 3045615203,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RoundFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "decimals": 0
+      },
+      "seed": 1331768393,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RoundFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "decimals": 0
+      },
+      "seed": 837048719,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RoundFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "decimals": 0
+      },
+      "seed": 1524122379,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RoundFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "decimals": 0
+      },
+      "seed": 3121362094,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RsqrtFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 1800725675,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RsqrtFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1003932734,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RsqrtFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 287216534,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 1.1920928955078125e-07,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RsqrtFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2778084557,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "RsqrtFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2250210404,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SeluFwdOp",
+      "case_id": "snn-fc-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 1567395730,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 3.0517578125e-05,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SeluFwdOp",
+      "case_id": "snn-fc-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 2198638615,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 3.814697265625e-06,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SeluFwdOp",
+      "case_id": "snn-fc-wide-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            8192
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            8192
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 1183969165,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 3.0517578125e-05,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SeluFwdOp",
+      "case_id": "snn-fc-wide-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            8192
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            8192
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 4168365783,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 3.814697265625e-06,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SigmoidFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 4001769780,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SigmoidFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 685943668,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SigmoidFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 3783728115,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SigmoidFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 517243263,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SigmoidFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3496558848,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SignFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3789706242,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SignFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3742353241,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SignFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 299921664,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SignFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2273425722,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SignFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 163698057,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SiluAndMulFwdOp",
+      "case_id": "llama-8b-ffn-prefill-float16",
+      "params": {
+        "x": [
+          [
+            2048,
+            28672
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "float16"
+        ]
+      },
+      "seed": 394256448,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0078125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SiluAndMulFwdOp",
+      "case_id": "llama-8b-ffn-prefill-bfloat16",
+      "params": {
+        "x": [
+          [
+            2048,
+            28672
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 4019807367,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SiluAndMulFwdOp",
+      "case_id": "llama-8b-ffn-decode-bfloat16",
+      "params": {
+        "x": [
+          [
+            1,
+            28672
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            1,
+            14336
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2036036179,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.03125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SiluAndMulFwdOp",
+      "case_id": "qwen3-8b-swiglu-b32-bfloat16",
+      "params": {
+        "x": [
+          [
+            32,
+            24576
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            32,
+            12288
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1028229113,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.03125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SiluFwdOp",
+      "case_id": "llama-8b-ffn-prefill-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            14336
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "float16"
+        ],
+        "inplace": false
+      },
+      "seed": 2958077817,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SiluFwdOp",
+      "case_id": "llama-8b-ffn-prefill-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 3925286002,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SiluFwdOp",
+      "case_id": "llama-8b-ffn-decode-bfloat16",
+      "params": {
+        "input": [
+          [
+            1,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            1,
+            14336
+          ],
+          "bfloat16"
+        ],
+        "inplace": false
+      },
+      "seed": 2644969712,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SinFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 4233455683,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SinFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 856417195,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SinFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 458386719,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SinFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3754974556,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SinFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 797099412,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SoftplusFwdOp",
+      "case_id": "mlp-hidden-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "float16"
+        ],
+        "beta": 1.0,
+        "threshold": 20.0
+      },
+      "seed": 266281774,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SoftplusFwdOp",
+      "case_id": "mlp-hidden-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "beta": 1.0,
+        "threshold": 20.0
+      },
+      "seed": 114222728,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00390625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SoftplusFwdOp",
+      "case_id": "mlp-hidden-wide-float16",
+      "params": {
+        "input": [
+          [
+            2048,
+            8192
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            2048,
+            8192
+          ],
+          "float16"
+        ],
+        "beta": 1.0,
+        "threshold": 20.0
+      },
+      "seed": 673049040,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00048828125,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SoftplusFwdOp",
+      "case_id": "mlp-hidden-wide-bfloat16",
+      "params": {
+        "input": [
+          [
+            2048,
+            8192
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            2048,
+            8192
+          ],
+          "bfloat16"
+        ],
+        "beta": 1.0,
+        "threshold": 20.0
+      },
+      "seed": 2951111594,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.00390625,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SqrtFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 2648999280,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SqrtFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 3067537595,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SqrtFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 4079797023,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 1.1920928955078125e-07,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SqrtFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 4293674543,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "SqrtFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 646369079,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TanhFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 3121764548,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TanhFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 4173571246,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TanhFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 412278817,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 5.960464477539063e-08,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TanhFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 752537771,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TanhFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 765982093,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TruncFwdOp",
+      "case_id": "16M-float16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float16"
+        ]
+      },
+      "seed": 950417601,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TruncFwdOp",
+      "case_id": "16M-bfloat16",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 2641002425,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TruncFwdOp",
+      "case_id": "16M-float32",
+      "params": {
+        "input": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ],
+        "output": [
+          [
+            4096,
+            4096
+          ],
+          "float32"
+        ]
+      },
+      "seed": 1968026806,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TruncFwdOp",
+      "case_id": "256M-float16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "float16"
+        ]
+      },
+      "seed": 202405081,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    },
+    {
+      "op": "TruncFwdOp",
+      "case_id": "256M-bfloat16",
+      "params": {
+        "input": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ],
+        "output": [
+          [
+            16384,
+            16384
+          ],
+          "bfloat16"
+        ]
+      },
+      "seed": 1472959561,
+      "implementations": {
+        "tileops": {
+          "correctness": {
+            "checked_outputs": 1,
+            "total_outputs": 1,
+            "max_abs_err": 0.0,
+            "unchecked_reason": null
+          }
+        }
+      },
+      "status": "verified"
+    }
+  ]
+}

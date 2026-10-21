@@ -1,5 +1,7 @@
 # Controlled cannbot comparison
 
+> Archived Ascend 910B1 data. These are not Ascend 950 measurements.
+
 Fresh measurements of the existing cannbot source compiled by our TileLang. No cannbot agent was started. These results do not enter default coverage or the existing 150-row / 49-attained accounting.
 
 D032 device-kernel interval union, 384 MiB eviction before each timed call, ABBA order. Five trials per case, 30 calls per trial. Ratio is the median of the five cannbot/ours ratios; the range shows their minimum and maximum. Individual latency medians need not divide to the median ratio.

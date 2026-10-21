@@ -7,3 +7,6 @@ tests/.golden-tmp/
 TileOPs
 docs/benchmarks/*.md
 !docs/benchmarks/index.md
+
+# Download copies are regenerated from the validated data/ snapshot.
+docs/benchmarks/data/

@@ -6,9 +6,11 @@ earns its place here only where the behaviour is a rule the pages do not show �
 a template rejected, a package deciding where an op is published, an expression
 the evaluator must refuse.
 """
+import ast
 import os
 import subprocess
 import sys
+from collections import Counter
 
 import gen_bench_pages as g
 import pytest
@@ -136,9 +138,11 @@ def test_the_locale_table_carries_no_dead_copy():
     """
     src = open(os.path.join(REPO, "scripts", "gen_bench_pages.py"),
                encoding="utf-8").read()
-    # Twice for the two locale tables, at least once more for the use.
+    # Count parsed literals, so single and double quoting are equivalent.
+    uses = Counter(n.value for n in ast.walk(ast.parse(src))
+                   if isinstance(n, ast.Constant) and isinstance(n.value, str))
     unused = sorted(k for k in g.STRINGS[g.DEFAULT_LANG]
-                    if src.count(f'"{k}"') < len(g.STRINGS) + 1)
+                    if uses[k] < len(g.STRINGS) + 1)
     assert not unused, f"declared but never rendered: {unused}"
 
 
@@ -257,11 +261,13 @@ def test_a_tier_badge_links_to_what_a_tier_means(d036):
     assert "{#" + g.PROV_ANCHOR + "}" in reading
 
 
-def test_a_hand_written_candidate_that_lost_still_reports_its_own_ratio(d036):
-    # D006: the tier-1-only reading stays available where the pool's winner is
-    # a vendor kernel. 56.5 us against our 59 us -> 0.96x, under the graded one.
+def test_a_losing_candidate_retains_its_time_without_an_extra_headline_ratio(d036):
+    # The renderer now publishes one ratio in the headline measurement regime.
+    # Pool times stay visible without substituting an eager ratio for it.
     row = _row(d036[0], "ops-nn-ew:aclnnForeachMulList")
-    assert "open-src 0.96×" in row
+    assert "1.01×" in row
+    assert "0.0565" in row and "0.0517" in row
+    assert "open-src 0.96×" not in row
     # And is absent where the open-source candidate won the pool: there it
     # would be the same number twice.
     assert "hw " not in _row(d036[0], "ops-nn:aclnnRmsNorm")
@@ -303,7 +309,7 @@ def test_the_index_reports_both_coverage_readings_over_one_denominator(d036):
     # Three ops, all three with an open-source candidate somewhere in a pool.
     assert "**3 of 3 ops** are rated against a real alternative" in index
     assert "**3 of 3 ops** have a tier-1 open-source baseline" in index
-    assert "this snapshot benchmarked" in index  # what the denominator is
+    assert "**3 ops**" in index and "5 workloads" in index  # explicit denominator
 
 
 # --- The rules of the pool parser ------------------------------------------

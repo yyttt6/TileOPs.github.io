@@ -20,14 +20,21 @@ the specialized kernel is auto-tuned and cached on first use and works under CUD
 graphs afterwards, and each op declares whether it supports
 `torch.compile(fullgraph=True)`.
 
+## Ascend 950
+
+The current results cover **41 operators and 191 cases**.
+[View the data](benchmarks/index.md) or use the
+[shared benchmark guide](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md).
+The previous [910B1 results are archived](benchmarks/archive.md).
+
 ## Installation
 
 !!! note "Upstream NVIDIA example"
 
     The installation and quick start below are retained from
     [tile-ai/TileOPs](https://github.com/tile-ai/TileOPs). They use CUDA and are
-    not an Ascend installation or execution recipe. This fork's nightly
-    measurements use Ascend 910B1; see [Benchmarks](benchmarks/index.md) and
+    not an Ascend installation or execution recipe. This fork now publishes Ascend 950
+    correctness CI and separately labelled development measurements; see [Benchmarks](benchmarks/index.md) and
     [Timing](timing.md) for the current platform and measurement method.
 
 ```bash
@@ -57,8 +64,7 @@ flops, nbytes = op.eval_roofline()   # what the call had to do and move
   `torch.compile`, how a benchmark is timed, and adding a hardware backend
 - [API Reference](api/index.md) — constructor parameters and call signatures, one
   page per op family
-- [Benchmarks](benchmarks/index.md) — measured nightly on Ascend 910B1 (Atlas A2) against the
-  alternatives
+- [Benchmarks](benchmarks/index.md) — Ascend 950 correctness CI and per-case development measurements
 
 ## Links
 
