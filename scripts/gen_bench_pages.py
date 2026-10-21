@@ -562,7 +562,8 @@ def op_link(op: str, module: str | None, ref: str) -> str:
         rel = "src/" + module.replace(".", "/") + ".py"
         if os.path.exists(os.path.join(TILEOPS, rel)):
             return f"{_GH}/blob/{ref}/{rel}"
-    return f"{_GH}/search?q=repo%3Atile-ai%2FTileOPs+{op}&type=code"
+    repository = _GH.removeprefix("https://github.com/").replace("/", "%2F")
+    return f"{_GH}/search?q=repo%3A{repository}+{op}&type=code"
 
 
 def _op_cell(op: str, module: str | None, ref: str) -> str:
@@ -985,7 +986,10 @@ def env_block(meta: dict, timing: str | None) -> list[str]:
         lines += ["| | |", "| --- | --- |"]
         lines += [f"| {_md(k)} | `{_md_code(env[k])}` |" for k in keys]
         # A version the inventory carries is published, wherever it sits.
-        missing = [k for k in ("image", "driver", "cuda", "torch", "tilelang")
+        required = (("driver", "cann", "torch", "torch_npu", "tilelang")
+                    if meta.get("measurement_protocol") == "ascend950-profiler-locked-v1"
+                    else ("image", "driver", "cuda", "torch", "tilelang"))
+        missing = [k for k in required
                    if k not in env and k not in packages]
         if missing:
             lines += ["", "Not published by this run: "
@@ -996,12 +1000,22 @@ def env_block(meta: dict, timing: str | None) -> list[str]:
     return lines + [""]
 
 
-def method_block() -> list[str]:
+def method_block(meta: dict | None = None) -> list[str]:
     """How the numbers were taken. Fixed policy of the benchmark layer.
 
     Kept to what changes how a number should be read. The reasoning behind the
     compared quantity lives on the reading page, not here.
     """
+    if (meta or {}).get("measurement_protocol") == "ascend950-profiler-locked-v1":
+        return [
+            "## Method", "",
+            "- **Common inputs and complete correctness checks** for TileOPs and every compared implementation.",
+            "- **3 warmup calls and 15 measured calls** per implementation. The reported value is the arithmetic mean of device execution interval unions.",
+            "- **1 GiB L2 eviction before every call**, outside the profiler window. Compilation, workspace setup, reset and synchronization before the call are excluded.",
+            "- **NPU activity collected by `torch_npu.profiler.profile`.** Event timers and host wall time are not used for performance scores.",
+            "- **Exclusive host reservation and verified clock policy.** Frequencies are checked before and after samples; the site's restore command runs on exit. A failed reservation, clock check or restore rejects the run.",
+            "",
+        ]
     return [
         "## Method", "",
         "- **One process, common inputs.** Every implementation of an op is "
@@ -1026,18 +1040,19 @@ def index_page(args, meta: dict, rows: list[tuple],
     head = [
         "# Benchmarks", "",
         '!!! info "Nightly snapshot"', "",
-        f"    **GPU** {args.gpu} · **commit** "
+        f"    **{'NPU' if meta.get('measurement_protocol') == 'ascend950-profiler-locked-v1' else 'GPU'}** {args.gpu} · **commit** "
         f"[`{args.commit[:12]}`]({_GH}/commit/{args.commit}) · "
         f"**run date** {args.date} · **{len(rows)} ops**, {n_workloads} workloads",
     ]
     if run_id:
-        head.append(f"    · [nightly run]({_GH}/actions/runs/{run_id})")
+        run_repo = meta.get("publisher_repository", _GH)
+        head.append(f"    · [nightly run]({run_repo}/actions/runs/{run_id})")
     if args.rendered:
         head += ["", f"    Page rendered {args.rendered} from the "
                  f"[latest snapshot]({_NB})."]
     head.append("")
 
-    lines = head + env_block(meta, timing) + method_block()
+    lines = head + env_block(meta, timing) + method_block(meta)
 
     # What the run covers and how far to trust it — the qualifications a reader
     # needs before reading any single number off a data page.
@@ -1066,7 +1081,7 @@ def index_page(args, meta: dict, rows: list[tuple],
     return "\n".join(lines) + "\n"
 
 
-def reading_page(sol_engine=(None, None)) -> str:
+def reading_page(sol_engine=(None, None), meta: dict | None = None) -> str:
     lo, hi = PAR_BAND
     mod = sol_engine[0]
     # The at-ceiling lines belong to the roofline tool; quote them from it so
@@ -1211,6 +1226,12 @@ def reading_page(sol_engine=(None, None)) -> str:
         "no alternative ran on it.",
         "",
     ]
+    if (meta or {}).get("measurement_protocol") == "ascend950-profiler-locked-v1":
+        text = "\n".join(lines)
+        text = text.replace("a non-CUPTI timing, or no GPU profile for the device",
+                            "no validated Ascend roofline calibration for this device and protocol")
+        text = text.replace("on this GPU", "on this device")
+        return text + "\n\n" + "\n".join(method_block(meta)) + "\n"
     return "\n".join(lines) + "\n"
 
 
@@ -1299,6 +1320,7 @@ def collect_ratio_drift(workloads: list[dict], metrics: list[dict]) -> list[tupl
 
 
 def main():
+    global _GH, _NB
     ap = argparse.ArgumentParser()
     ap.add_argument("--bench-xml", required=True)
     ap.add_argument("--test-xml")
@@ -1321,6 +1343,9 @@ def main():
     if args.meta and os.path.exists(args.meta):
         with open(args.meta, encoding="utf-8") as f:
             meta = json.load(f)
+    if meta.get("measurement_protocol") == "ascend950-profiler-locked-v1":
+        _GH = "https://github.com/yyttt6/TileOPs"
+        _NB = "https://github.com/yyttt6/TileOPs.github.io/actions/workflows/ascend950-nightly.yml"
 
     workloads, failures, skips = parse_bench_xml(args.bench_xml)
     tests = (parse_test_xml(args.test_xml)
@@ -1380,7 +1405,7 @@ def main():
         "index.md": index_page(args, meta, all_rows, by_page,
                                timing, len(workloads), len(failures),
                                len(skips)),
-        "reading.md": reading_page(sol_engine),
+        "reading.md": reading_page(sol_engine, meta),
     }
     api_order = api_op_order()  # read once, not once per page
     for slug, title, fams in DATA_PAGES:

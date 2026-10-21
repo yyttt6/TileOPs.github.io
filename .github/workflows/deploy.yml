@@ -8,6 +8,11 @@ on:
   # A manual trigger means the fork can always re-deploy without an empty commit.
   workflow_dispatch:
   workflow_call:
+    inputs:
+      snapshot_run_id:
+        type: string
+        default: ''
+        required: false
 
 permissions:
   contents: write
@@ -47,6 +52,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements-docs.txt
+      - name: Fetch the dedicated remote nightly snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SNAPSHOT_RUN_ID: ${{ inputs.snapshot_run_id }}
+        run: |
+          python scripts/fetch_official_snapshot.py \
+            --output "$RUNNER_TEMP/official-snapshot" --run-id "$SNAPSHOT_RUN_ID"
       # Failed data validation aborts deployment and preserves the live page.
       - name: Render eligible official performance data
         run: bash scripts/render_bench.sh

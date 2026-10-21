@@ -73,9 +73,28 @@ historical unlocked timings are never consumed by the site renderer.
 Run `bash scripts/render_bench.sh` to build the empty section. A validated official
 snapshot may be supplied through `ASCEND950_OFFICIAL_SNAPSHOT`. It must identify
 the remote publisher, locked protocol, successful guard and matched comparisons.
-The remote nightly is being provisioned for **00:00 UTC** against the latest
-`ascend950` commit. Device execution and publication remain blocked until host
-clock control, restore and shared device reservation are available.
+The `Official Ascend 950 nightly` workflow is scheduled for **00:00 UTC**. GitHub
+may delay scheduled jobs when its queues are busy. It resolves the latest
+`ascend950` commit once, runs CPU contracts, then runs the exact same commit on
+the dedicated `ascend950-production` ARM64 runner. Publication requires that job
+to succeed. Site-only deployments reuse the latest successful remote artifact;
+they never fetch results from the local correctness runner.
+
+The remote environment lives at `/workspace/user_data/tileops-ci`. Deploy
+`ci/ascend950-env.sh` as `env.sh` and the site configuration as `site.json` there.
+The example intentionally leaves `host_reservation_confirmed` false: an
+administrator must provide host-shared reservation/PID visibility and a verified
+clock lock/restore tool before device execution. Merely having `npu-smi` inside
+a container does not establish either capability. Do not turn this flag on to
+bypass an unavailable host interface.
+
+The runner listener starts with `ci/start-ascend950-runner.sh`. In a container
+without systemd, the platform's startup hook must invoke it again after container
+restart. It performs no device work; each benchmark command acquires the separate
+host NPU reservation. Raw evidence is retained in Actions artifacts, outside the
+public performance pages. An empty baseline factory list produces no performance
+rows; baseline source identity and matched measurements are required to populate
+the tables.
 
 910B1 data remains in `data/archive/ascend910b1-20261021/` and the original source
 branch `archive/ascend910b1-20261021`. The withdrawn custom 950 pages and evidence

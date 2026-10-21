@@ -1,0 +1,7 @@
+{
+  "host_reservation_confirmed": false,
+  "guard": "/usr/local/bin/npu-guard",
+  "clock_config": "/workspace/user_data/tileops-ci/clocks.json",
+  "implementation_factories": [],
+  "baseline_provenance": {}
+}

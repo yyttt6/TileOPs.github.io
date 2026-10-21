@@ -1,0 +1,94 @@
+name: Official Ascend 950 nightly
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ascend950-official-nightly
+  cancel-in-progress: false
+
+jobs:
+  contracts:
+    if: github.repository == 'yyttt6/TileOPs.github.io' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      source_commit: ${{ steps.source.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: yyttt6/TileOPs
+          ref: ascend950
+          persist-credentials: false
+      - id: source
+        run: echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[dev]' -c constraints.txt
+      - run: python scripts/ci/ascend950.py --phase cpu --output "$RUNNER_TEMP/official-950-contracts"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ascend950-contracts
+          overwrite: true
+          path: ${{ runner.temp }}/official-950-contracts
+          if-no-files-found: error
+
+  benchmark:
+    needs: contracts
+    if: github.repository == 'yyttt6/TileOPs.github.io' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, linux, ARM64, ascend950-production]
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: yyttt6/TileOPs
+          ref: ${{ needs.contracts.outputs.source_commit }}
+          path: measured-tileops
+          persist-credentials: false
+      - name: Run exact checkout through the shared host reservation
+        shell: bash
+        run: |
+          set -eo pipefail
+          source /workspace/user_data/tileops-ci/env.sh
+          /workspace/user_data/tileops-ci/bin/uv pip install --python "$VIRTUAL_ENV/bin/python" \
+            --constraint /workspace/user_data/tileops-ci/runtime-freeze.txt --editable measured-tileops
+          /workspace/user_data/tileops-ci/bin/uv pip check --python "$VIRTUAL_ENV/bin/python"
+          python scripts/remote_nightly.py \
+            --tileops measured-tileops \
+            --config /workspace/user_data/tileops-ci/site.json \
+            --output "$RUNNER_TEMP/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+      - name: Preserve raw evidence, including failed runs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ascend950-raw-evidence
+          overwrite: true
+          path: ${{ runner.temp }}/official-950-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 90
+          if-no-files-found: error
+      - name: Publish validated snapshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ascend950-official-snapshot
+          overwrite: true
+          path: ${{ runner.temp }}/official-950-${{ github.run_id }}-${{ github.run_attempt }}/snapshot
+          retention-days: 90
+          if-no-files-found: error
+
+  publish:
+    needs: benchmark
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/deploy.yml
+    with:
+      snapshot_run_id: ${{ github.run_id }}

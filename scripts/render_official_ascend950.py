@@ -1,22 +1,20 @@
 """Render only remote official 950 snapshots with the upstream benchmark layout."""
 
 import argparse
-import json
+import shutil
 import subprocess
 import sys
-import xml.etree.ElementTree as ET
+import tempfile
 from pathlib import Path
 
+from ascend950_snapshot import validate, write_xml
+
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL = "ascend950-profiler-locked-v1"
 
 
-def render(snapshot, out):
-    out.mkdir(parents=True, exist_ok=True)
-    # Remove generated pages from the superseded layout, never evidence sources.
-    for path in out.glob("*.md"):
-        path.unlink()
-    if snapshot is None:
+def build(snapshot, out):
+    meta, rows = validate(snapshot) if snapshot is not None else ({}, [])
+    if not rows:
         (out / "index.md").write_text(
             "# Benchmarks\n\n"
             "No eligible Ascend 950 performance snapshot has been published yet.\n\n"
@@ -28,24 +26,30 @@ def render(snapshot, out):
             "## Data\n\n| Page | Ops | Workloads |\n| --- | --- | --- |\n"
         )
         return
-    meta = json.loads((snapshot / "meta.json").read_text())
-    if (meta.get("measurement_protocol") != PROTOCOL
-            or meta.get("publisher") != "openlibing-DevEnv-661495"
-            or meta.get("status") != "passed"
-            or not meta.get("clock_verified")
-            or not meta.get("guard_verified")):
-        raise ValueError("Not an eligible remote official snapshot")
-    xml = ET.parse(snapshot / "bench_results.xml")
-    if not xml.findall(".//testcase"):
-        raise ValueError("An official measured snapshot must contain actual comparisons")
+    xml = out / "bench_results.xml"
+    write_xml(rows, xml)
     command = [sys.executable, str(ROOT / "scripts/gen_bench_pages.py"),
-               "--bench-xml", str(snapshot / "bench_results.xml"),
+               "--bench-xml", str(xml),
+               "--test-xml", str(xml),
                "--meta", str(snapshot / "meta.json"),
                "--commit", meta["commit"], "--date", meta["date"], "--gpu", meta["gpu"],
+               "--tileops", str(snapshot / "source"),
+               "--manifest-dir", str(snapshot / "source/src/tileops/manifest"),
                "--out-dir", str(out)]
-    if (snapshot / "test_results.xml").exists():
-        command += ["--test-xml", str(snapshot / "test_results.xml")]
     subprocess.run(command, cwd=ROOT, check=True)
+    xml.unlink()
+
+
+def render(snapshot, out):
+    # Validate and render first: a rejected snapshot must preserve existing pages.
+    with tempfile.TemporaryDirectory(prefix="ascend950-pages-") as directory:
+        staging = Path(directory)
+        build(snapshot, staging)
+        out.mkdir(parents=True, exist_ok=True)
+        for path in out.glob("*.md"):
+            path.unlink()
+        for path in staging.glob("*.md"):
+            shutil.copy2(path, out / path.name)
 
 
 def main():
