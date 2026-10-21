@@ -1,7 +1,20 @@
-# Ascend 950 results
+# Benchmarks
 
-The deployment renders this page from validated Ascend 950 evidence.
-Run `bash scripts/render_bench.sh` to generate the result pages locally.
+No eligible Ascend 950 performance snapshot has been published yet.
 
-Release correctness and historical v2 performance have separate version scopes.
-The original 910B1 data is preserved under `data/archive/ascend910b1-20261021/`.
+## Environment
+
+Ascend 950DT · TileLang 0.1.15.
+
+## Method
+
+Only the dedicated remote nightly CI may publish results. Matched baselines, correctness, verified clock control and the shared profiler protocol must all pass before a workload is shown.
+
+## Coverage
+
+0 operators, 0 measured workloads.
+
+## Data
+
+| Page | Ops | Workloads |
+| --- | --- | --- |

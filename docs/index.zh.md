@@ -10,16 +10,16 @@ TileOPs 是一个面向大模型推理的算子库，构建在 [TileLang](https:
 
 ## Ascend 950
 
-当前数据覆盖 **41 个算子、191 个 case**。
-查看[完整数据](benchmarks/index.md)或[共享 benchmark 指南](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md)。
-此前的 [910B1 结果已归档](benchmarks/archive.md)。
+[性能数据](benchmarks/index.md)使用上游统一格式，仅展示远端正式 CI 的合格结果。
+当前 baseline 尚未就绪，性能表格暂为空。
+[共享 benchmark 指南](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md)。
 
 ## 安装
 
 !!! note "上游 NVIDIA 示例"
 
     以下安装步骤和快速开始保留自 [tile-ai/TileOPs](https://github.com/tile-ai/TileOPs)，
-    使用 CUDA，不是 Ascend 安装或运行教程。本 fork 当前展示 Ascend 950 正确性 CI 及单独标注的开发性能记录；
+    使用 CUDA，不是 Ascend 安装或运行教程。本 fork 的性能数据来自 Ascend 950 正式 CI；
     当前平台与测量方法见[性能数据](benchmarks/index.md)和[计时方法](timing.md)。
 
 ```bash
@@ -46,7 +46,7 @@ flops, nbytes = op.eval_roofline()   # 本次调用所需的计算量与访存�
 
 - [使用指南](user-guide/index.md) —— 读写 manifest、接入 `torch.compile`、benchmark 怎么计时、接入新硬件后端
 - [API 参考](api/index.md) —— 各算子族的构造参数与调用方式
-- [性能数据](benchmarks/index.md) —— Ascend 950 正确性 CI 与逐 case 开发性能记录
+- [性能数据](benchmarks/index.md) —— Ascend 950 正式 CI 的逐 workload 对比
 
 ## 相关链接
 

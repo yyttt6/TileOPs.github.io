@@ -1,61 +1,8 @@
-name: Refresh Ascend 950 results
-
-# Refresh the latest successful Ascend 950 CI artifact. Historical development
-# timings are imported separately after review. Never read 910 nightly data.
-
+name: Refresh official performance pages
 on:
-  schedule:
-    - cron: "17 * * * *"
   workflow_dispatch:
-
 permissions:
   contents: write
-  actions: read
-
-# Both this job and the push deploy publish gh-pages with `--force`, so the two
-# share one queue: a scheduled refresh and a merge landing together would
-# otherwise race, and the loser's pages would be the ones served.
-concurrency:
-  group: gh-pages
-  cancel-in-progress: false
-
 jobs:
   refresh:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/checkout@v4
-        with:
-          # Ascend fork: upstream deletes/renames Ops on its own schedule, and
-          # docs/api/*.md still lists them, so tracking upstream HEAD turns any
-          # upstream refactor into a build abort here -- caeb6c78 (2026-09-02,
-          # "Remove legacy contiguous GQA and MHA Ops") did exactly that, and it
-          # surfaced on an unrelated push. This fork's checkout moves when we
-          # move it. See PROJECT_STATE 13.84.
-          repository: yyttt6/TileOPs
-          # Legacy API/design reference; measured 950 data is fetched separately.
-          ref: 250b2be6447e8c2699940a176103929956b99daa
-          path: TileOPs
-          fetch-depth: 1
-          sparse-checkout: |
-            docs/design
-            docs/perf
-            src/tileops
-            scripts/nightly_report.py
-          sparse-checkout-cone-mode: false
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - run: pip install -r requirements-docs.txt
-
-      - name: Fetch current Ascend 950 CI and render data
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ASCEND950_SYNC_CI: "1"
-        run: bash scripts/render_bench.sh
-
-      - name: Deploy site
-        run: mkdocs gh-deploy --force
+    uses: ./.github/workflows/deploy.yml

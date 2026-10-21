@@ -7,6 +7,7 @@ on:
   # have deployed can land before Actions is switched on and then never fire.
   # A manual trigger means the fork can always re-deploy without an empty commit.
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: write
@@ -47,9 +48,6 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements-docs.txt
       # Failed data validation aborts deployment and preserves the live page.
-      - name: Fetch current Ascend 950 CI and render data
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ASCEND950_SYNC_CI: "1"
+      - name: Render eligible official performance data
         run: bash scripts/render_bench.sh
       - run: mkdocs gh-deploy --force

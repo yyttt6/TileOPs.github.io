@@ -1,19 +1,15 @@
 # benchmark 如何计时
 
-## Ascend 950
+## Ascend 950 正式 CI
 
-网站分别展示 **TileLang 0.1.15 正确性 CI** 和**最近已有的历史开发性能记录**。
-[测量口径](benchmarks/reading.md)说明两个协议；[结果页](benchmarks/index.md)保留日期及证据。
+只有远端专用 Ascend 950 CI 发布性能数据，本机 CI 仅作内部检查。
+正式协议要求同口径 baseline、正确性、**3 次 warmup / 15 个独立 profiler 窗口**、
+**1 GiB 缓存驱逐**、已验证的锁频与频率读回及恢复、共享主机设备锁。
+分数为 `torch_npu.profiler.profile` 采集的设备执行区间并集平均值，
+不回退到 Event 或墙钟计时。
 
-历史 v2 使用 **3 次 warmup / 15 个独立 profiler 窗口**、**1 GiB 缓存驱逐**，
-以设备 kernel 耗时之和的平均值计分。当时未建立锁频证据，不代表 release 性能验收。
-
-共享 release 协议同样使用 3/15 和 1 GiB 缓存驱逐，但要求已验证锁频，
-并测量设备执行区间并集的平均值。正式测量仍等待锁频控制及同口径 baseline。
-两种正式计时均使用 `torch_npu.profiler.profile`，无 Event 计时回退。
-
-请使用[共享 benchmark 入口](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md)。
-此前的 [910B1 数据和协议已归档](benchmarks/archive.md)。
+当前尚无合格性能快照。详见[性能数据](benchmarks/index.md)和
+[共享协议](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md)。
 
 ## 上游 NVIDIA 计时参考
 

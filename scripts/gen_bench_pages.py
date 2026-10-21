@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Render the Benchmarks section from a nightly benchmark XML snapshot.
 
-Output is one overview page, one page explaining the numbers, and five data
-pages grouped by op domain. `hooks.py` puts them into the site nav in that
-order.
+Output is one overview page, one page explaining the numbers, and the data
+pages of `DATA_PAGES`, in the order that list gives. `hooks.py` puts them into
+the site nav in that order.
 
 These pages answer one question per workload: **how does TileOPs compare to the
 fastest other implementation of the same op on that workload?**
@@ -36,7 +36,7 @@ Rules this renderer follows:
 
 Usage:
     python scripts/gen_bench_pages.py --bench-xml <xml> [--test-xml <xml>] \
-        [--meta <meta.json>] --commit <sha> --date <YYYY-MM-DD> --gpu "<device recorded in snapshot>"
+        [--meta <meta.json>] --commit <sha> --date <YYYY-MM-DD> --gpu "NVIDIA H200"
 """
 from __future__ import annotations
 
@@ -57,53 +57,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 TILEOPS = os.path.join(REPO, "TileOPs")
 MANIFEST_DIR = os.path.join(TILEOPS, "src", "tileops", "manifest")
-_GH = "https://github.com/yyttt6/TileOPs"           # Ascend fork; data source only
+_GH = "https://github.com/tile-ai/TileOPs"
 # Where the nightly publishes: one commit per run, the newest rendered here.
-_NB = "https://github.com/yyttt6/TileOPs/tree/nightly-bench"  # Ascend fork; data source only
+_NB = "https://github.com/tile-ai/TileOPs-nightly/tree/snapshots"
 
 # How an op stands against the fastest real alternative on its workloads. The
 # colour of the ratio is the verdict, so no separate status glyph is needed.
 AHEAD, PAR, BEHIND, UNRATED = "ahead", "par", "behind", "unrated"
 PAR_BAND = (0.95, 1.05)  # inside this the two implementations are level
-
-# R338 built a page bullet quoting the harness' 0.70 attainment tally (65 graph / 66
-# incl. eager, over a denominator of 127 rated ops).  PM turned it OFF 2026-09-18 and
-# did not delete it: the attainment number the team reports upward is on the *150-row*
-# denominator, and printing a second, differently-based "N attained" on the public page
-# would collide with that at exactly the moment someone reports it.  The census still
-# ships in meta.json (`regime_census`) for anyone who wants it; only the rendering is
-# withheld.  Flip to True to publish it -- that is a reporting decision, not a code one.
-RENDER_ATTAINMENT_LINE = False
 NA = "—"
 EMPTY = "·"  # a metric whose input was not recorded
-
-# --- The measurement regime a row's ratio was taken in ----------------------
-# A ratio is comparable with another ratio only if the two were taken the same
-# way. The snapshot names the regime per row (`<tag>_regime`) and names the one
-# it calls the headline in `meta.json`, and until now the page read neither: the
-# 2026-09-16 snapshot published 88 rows across 15 operators measured in `eager`
-# — schema 1.0.0 coverage files, which predate the regime split and were never
-# measured any other way — in the same Ratio column as 643 `graph` rows, with
-# nothing to tell a reader which was which.
-#
-# The fix is not to drop them. A row is one measured ratio; dropping 88 of them
-# would make the page shorter by an eighth with no explanation, and the numbers
-# are real. The fix is to say so: every off-headline row is badged, every op
-# whose rows are off-headline is badged in its heading, and the coverage counts
-# on the overview are given per regime and never added across regimes.
-DEFAULT_HEADLINE_REGIME = "graph"
-# Set from `meta.json`'s `environment.headline_regime` by `main`, so a snapshot
-# published with a different headline badges against its own, not against a
-# constant compiled into the renderer. Read through `headline_regime()`, never
-# directly, for the same reason `DEFAULT_LANG` is read late.
-_HEADLINE_REGIME: str | None = None
-# The reading page's explanation, as an explicit anchor: the badges link there.
-REGIME_ANCHOR = "measurement-regime"
-REGIME_HREF = f"../reading/#{REGIME_ANCHOR}"
-
-
-def headline_regime() -> str:
-    return _HEADLINE_REGIME or DEFAULT_HEADLINE_REGIME
 
 # --- Baseline tiers ---------------------------------------------------------
 # A tier decides how a comparison reads, not whether it is shown. An unknown tag
@@ -111,24 +74,11 @@ def headline_regime() -> str:
 TIER_LIB, TIER_TORCH, TIER_REF = "lib", "torch", "ref"
 _TORCH_NATIVE = {"torch", "torch-autograd", "torch-dequantized-matmul"}
 _KNOWN_TAGS = _TORCH_NATIVE | {
-    # Upstream NVIDIA snapshot identifiers; keep these for schema compatibility.
     "fa3", "flashinfer", "flashinfer-bmm-fp8", "flashinfer-fp8-blockscale-sm90",
     "fla", "mamba", "vllm", "vllm-triton", "triton", "triton-tma", "deepgemm",
     "marlin-fp16", "marlin-fp32", "torch-cublas", "torch-cudnn", "torch-cufft",
     "torch-scaled-mm", "torch-sdpa",
     "torch-ref", "torch-fp32-ref",
-    # Ascend fork: the three TileOPs-on-Ascend providers. Not baselines in the
-    # upstream sense -- they are the implementation under test -- but they arrive
-    # through the same property-prefix mechanism, so classify them deliberately
-    # instead of letting them fall into "lib" with a warning every run.
-    "hand", "tilelang", "mlir",
-    # The comparison group itself, when the snapshot publishes only one: see
-    # `_LEGACY_TAG`. It reaches the page as a library-tier rival, because a
-    # member of a D036 pool is a real implementation of the op on the identical
-    # workload -- a CANN kernel or torch_npu's own dispatch -- and not the eager
-    # composition of primitives that `-ref` means upstream. Which of the two it
-    # was is the provenance tier, badged per line, never folded into this one.
-    "baseline",
 }
 
 
@@ -140,175 +90,95 @@ def tier_of(tag: str) -> str:
     return TIER_LIB
 
 
-# --- Baseline provenance (a second, independent axis) ----------------------
-# The tier above says how a comparison *reads*. This one says where the kernel
-# on the other side *came from*, which the Ascend snapshot records per workload
-# as `baseline_tier`. The two must not be conflated: `handwritten` is a
-# statement about provenance, backed by kernel-source evidence, and carries no
-# claim about speed. A open-source kernel losing to a vendor one is the
-# ordinary case here, not an error -- see the reading page.
-PROV_HANDWRITTEN, PROV_VENDOR = "handwritten", "vendor"
-PROV_TILELANG_REF = "tilelang_ref"
-PROV_AGENT_WRITTEN = "agent_written"
-# The css class each one is badged with. An unrecognised value keeps the neutral
-# badge and its own text, so a tier added on the harness side is shown as
-# written rather than silently painted as one of these two.
-PROV_CLASS = {PROV_HANDWRITTEN: "tier-hw", PROV_VENDOR: "tier-vendor",
-              PROV_TILELANG_REF: "tier-other", PROV_AGENT_WRITTEN: "tier-other"}
-# The reading page's explanation of the two, as an explicit anchor: the badges
-# link there, and a heading slug generated from Chinese text would not be the
-# same string in both locales.
-PROV_ANCHOR = "baseline-tiers"
-# Written into a raw-HTML cell, so it is the built URL and not the source path
-# markdown would have rewritten. A data page is served at `benchmarks/<slug>/`
-# and the reading page at `benchmarks/reading/`, in every locale, so one
-# relative target is correct for both.
-PROV_HREF = f"../reading/#{PROV_ANCHOR}"
-# Kept as literal keys rather than built from the tier name, so the locale
-# tables can be checked for a key nothing renders.
-PROV_LABEL_KEY = {PROV_HANDWRITTEN: "tier.handwritten",
-                  PROV_VENDOR: "tier.vendor",
-                  PROV_TILELANG_REF: "tier.tilelang_ref",
-                  PROV_AGENT_WRITTEN: "tier.agent_written"}
-
-# The tag the implementation under test publishes its metrics under. Upstream
-# writes `tileops_*`; the Ascend fork writes the provider that ran, since one
-# run has exactly one provider. First match wins, so a snapshot carrying both
-# spellings is read the upstream way.
-_OURS_TAGS = ("tileops", "tilelang", "hand", "mlir")
-
-
-def ours_of(impls: dict) -> dict:
-    """The metrics of the implementation under test, or {} if none ran."""
-    for tag in _OURS_TAGS:
-        if tag in impls:
-            return impls[tag]
-    return {}
-
-
-
-# --- The historical source-coverage inventory ------------------------------
-# A fixed cohort of 91 elementwise / reduction / scan / dropout operators, first
-# enumerated in R250 and re-counted in R319 and R321. The reading page quotes how
-# many of them have a third-party source candidate that actually got a time, and
-# that sentence has carried a HAND-WRITTEN number three times now -- 58/91 as of
-# 2026-09-04, then 66/91 from R321, and the 2026-09-16 snapshot says 62/91. A
-# number a human retypes is a number that goes stale the next time coverage
-# moves, which is the failure this page is being audited for. So the cohort is
-# embedded and the counts are computed from the snapshot being rendered.
-#
-# The cohort itself is history and does not move: it is the list those three
-# recounts were over, and changing it would make the sentence answer a different
-# question under the same words. `docs/reports/R321-data/inventory91.json` in the
-# harness workspace is where it came from.
-_INVENTORY_91 = frozenset((
-    "AbsFwdOp AddFwdOp AlibiFwdOp AllFwdOp AmaxFwdOp AminFwdOp AnyFwdOp "
-    "ArgmaxFwdOp ArgminFwdOp BitwiseAndFwdOp BitwiseNotFwdOp BitwiseOrFwdOp "
-    "BitwiseXorFwdOp CeilFwdOp ClampFwdOp ClampScalarFwdOp CosFwdOp "
-    "CountNonzeroFwdOp CumprodFwdOp CumsumFwdOp DivFwdOp DropoutFwdOp "
-    "EluFwdOp EqFwdOp ErfFwdOp ExpFwdOp Expm1FwdOp FloorDivideFwdOp "
-    "FloorFwdOp GeFwdOp GeluAndMulFwdOp GeluFwdOp GeluTanhAndMulFwdOp GtFwdOp "
-    "HardsigmoidFwdOp HardswishFwdOp HardtanhFwdOp InfNormFwdOp IsfiniteFwdOp "
-    "IsinfFwdOp IsnanFwdOp L1NormFwdOp L2NormFwdOp LeFwdOp LeakyReluFwdOp "
-    "LerpFwdOp LerpTensorFwdOp Log1pFwdOp LogFwdOp LogSoftmaxFwdOp "
-    "LogSumExpFwdOp LogicalAndFwdOp LogicalNotFwdOp LogicalOrFwdOp LtFwdOp "
-    "MaskedFillFwdOp MaskedFillScalarFwdOp MaximumFwdOp MeanFwdOp "
-    "MinimumFwdOp MishFwdOp MulFwdOp NanToNumFwdOp NeFwdOp NegFwdOp PowFwdOp "
-    "PreluFwdOp ProdFwdOp ReciprocalFwdOp ReluFwdOp RemainderFwdOp RoundFwdOp "
-    "RsqrtFwdOp SeluFwdOp SigmoidFwdOp SignFwdOp SiluAndMulFwdOp SiluFwdOp "
-    "SinFwdOp SinusoidalFwdOp SoftmaxFwdOp SoftplusFwdOp SqrtFwdOp StdFwdOp "
-    "SubFwdOp SumFwdOp TanhFwdOp TruncFwdOp VarFwdOp VarMeanFwdOp WhereFwdOp"
-).split())
-
-# The provenance tiers that count as "a third-party source candidate": a kernel
-# built from someone else's source, not a vendor dispatch. It has to have been
-# TIMED -- a candidate admitted and then never measured proves nothing about
-# coverage, and rendering it as coverage is how 24/91 and 28/91 could both be
-# true of the same run.
-_SOURCE_TIERS = (PROV_HANDWRITTEN, PROV_TILELANG_REF)
-
-
-def inventory_counts(metrics_by_op: dict) -> dict:
-    """How the 91-op cohort stands on the snapshot being rendered.
-
-    `unknown` is an operator the cohort names that this run published no
-    workload for: it is not "has none", because nothing was measured either way,
-    and folding it into the other two is what would make the sentence overclaim.
-    """
-    got = none = unknown = 0
-    for op in sorted(_INVENTORY_91):
-        ms = metrics_by_op.get(op)
-        if not ms:
-            unknown += 1
-        elif any(c.get("prov") in _SOURCE_TIERS and c.get("ms") is not None
-                 for m in ms for c in m.get("pool", ())):
-            got += 1
-        else:
-            none += 1
-    return {"total": len(_INVENTORY_91), "got": got, "none": none,
-            "unknown": unknown}
-
 # --- Op families and the pages they group into -----------------------------
-# The section heading each family gets, by locale. Not in `STRINGS`, because
-# these are keyed by a family slug that comes out of the data rather than by a
-# key a page builder names: `family_title` is what reads them, and it falls back
-# to the default locale and then to the slug itself, so a family added on the
-# TileOPs side reaches the page under its own name either way.
-#
-# The names that are the term of art in both languages -- `Attention`, `GEMM`,
-# `MoE`, `FFT` -- stay as they are; translating them would leave a reader
-# hunting for the English word the rest of the page uses.
 FAMILY_TITLE = {
-    "en": {
-        "attention": "Attention", "linear_attention": "Linear Attention / SSM",
-        "scan": "Scan", "normalization": "Normalization",
-        "moe": "Mixture of Experts",
-        "linear_algebra": "Linear Algebra (GEMM)", "reduction": "Reduction",
-        "elementwise": "Elementwise", "convolution": "Convolution",
-        "pool": "Pooling", "quantization": "Quantization",
-        "positional": "Positional Encoding",
-        "fft": "FFT", "mhc": "MHC", "topk": "Top-k", "other": "Other",
-    },
-    "zh": {
-        "attention": "Attention", "linear_attention": "Linear Attention 与 SSM",
-        "scan": "扫描（Scan）", "normalization": "归一化",
-        "moe": "混合专家（MoE）",
-        "linear_algebra": "线性代数（GEMM）", "reduction": "归约",
-        "elementwise": "逐元素运算", "convolution": "卷积",
-        "pool": "池化", "quantization": "量化",
-        "positional": "位置编码",
-        "fft": "FFT", "mhc": "MHC", "topk": "Top-k", "other": "其它",
-    },
+    "attention": "Attention", "linear_attention": "Linear Attention",
+    "ssm": "SSM", "scan": "Scan", "normalization": "Normalization",
+    "moe": "MoE", "linear_algebra": "GEMM", "reduction": "Reduction",
+    "elementwise": "Elementwise", "convolution": "Convolution", "pool": "Pooling",
+    "quantization": "Quantization & Dequantization", "sampling": "Sampling", "positional": "RoPE",
+    "fft": "FFT", "mhc": "mHC", "engram": "Engram", "topk": "Top-k",
+    "other": "Other",
 }
+API_DIR = os.path.join(REPO, "docs", "api")
+MKDOCS_YML = os.path.join(REPO, "mkdocs.yml")
+# A nav item naming an API page, `- Elementwise: api/elementwise.md` or the bare
+# `- api/index.md`, and not a path mentioned in a comment or in prose.
+_API_PAGE = re.compile(r"^\s*-\s+(?:[^:\n]+:\s+)?api/([\w-]+\.md)\s*$",
+                       re.MULTILINE)
+_API_OP = re.compile(r"^\s*::: +tileops\.\w+\.(\w+)\s*$", re.MULTILINE)
 
 
-# `DEFAULT_LANG` is declared with the locale table further down, so the default
-# is resolved when the function runs rather than when it is defined.
-def family_title(fam: str, lang: str | None = None) -> str:
-    table = FAMILY_TITLE.get(lang or DEFAULT_LANG) or FAMILY_TITLE["en"]
-    return table.get(fam) or FAMILY_TITLE["en"].get(fam) or fam
-# (slug, locale key of the page title, families in display order)
+def api_op_order(api_dir: str = API_DIR,
+                 mkdocs_yml: str = MKDOCS_YML) -> dict[str, int]:
+    """Op name without its `Op` suffix -> where the API reference names it.
+
+    The API pages are written by hand and ordered for a reader — the plain
+    kernel, then its quantized variants, then the batched forms — so the
+    Benchmarks pages take their op order from there rather than inventing a
+    second one. Pages are read in `nav` order, ops in the order each names them.
+    An op no page names is not in the result; `data_page` puts those last.
+
+    Reading nothing is reported, not accepted: the pages would still render, in
+    an order that looks deliberate and is not.
+    """
+    order: dict[str, int] = {}
+    with open(mkdocs_yml, encoding="utf-8") as f:
+        pages = list(OrderedDict.fromkeys(_API_PAGE.findall(f.read())))
+    missing = []
+    for page in pages:
+        path = os.path.join(api_dir, page)
+        if not os.path.isfile(path):
+            missing.append(page)
+            continue
+        with open(path, encoding="utf-8") as f:
+            for op in _API_OP.findall(f.read()):
+                order.setdefault(op.removesuffix("Op"), len(order))
+    if missing:
+        print(f"warning: {len(missing)} API page(s) the nav lists are not in "
+              f"{api_dir}, so their ops fall to the end of a Benchmarks page: "
+              f"{', '.join(missing)}", file=sys.stderr)
+    if not order:
+        print(f"warning: no op order read from {api_dir}; every Benchmarks page "
+              f"ranks its ops by verdict instead", file=sys.stderr)
+    return order
+# (slug, page title, families in display order). Pointwise first, with the
+# positional rotation beside it, then the reductions and the normalizations
+# built on them, the windowed kernels, the matrix multiply and the quantization
+# around it, then attention and the expert routing that follows it in a
+# transformer layer, sampling at the end of a decode step, then the
+# sequence-mixing kernels. A page is one family except where too few ops carry
+# one: `Conv & Pool` is two, `Other` the rest.
 DATA_PAGES = [
-    ("attention", "page.attention.title", ["attention"]),
-    ("linear-attention", "page.linear-attention.title",
-     ["linear_attention", "scan"]),
-    ("gemm-moe", "page.gemm-moe.title",
-     ["linear_algebra", "moe", "quantization"]),
-    ("elementwise-reduction", "page.elementwise-reduction.title",
-     ["elementwise", "reduction"]),
-    ("norm-conv-pool", "page.norm-conv-pool.title",
-     ["normalization", "convolution", "pool", "positional", "fft", "mhc",
-      "topk", "other"]),
+    ("elementwise", "Elementwise", ["elementwise"]),
+    ("rope", "RoPE", ["positional"]),
+    ("reduction", "Reduction", ["reduction"]),
+    ("normalization", "Normalization", ["normalization"]),
+    ("conv-pool", "Conv & Pool", ["pool", "convolution"]),
+    ("gemm", "GEMM", ["linear_algebra"]),
+    ("quantization", "Quantization & Dequantization", ["quantization"]),
+    ("attention", "Attention", ["attention"]),
+    ("moe", "MoE", ["moe"]),
+    ("sampling", "Sampling", ["sampling"]),
+    ("linear-attention", "Linear Attention", ["linear_attention"]),
+    ("ssm", "SSM", ["ssm"]),
+    ("other", "Other", ["topk", "fft", "mhc", "engram", "scan", "other"]),
 ]
 _KEYWORD_FAMILY = [
-    (("mamba", "deltanet", "gla", "linear_attn", "recurrence", "ssd", "ssm",
-      "engram"), "linear_attention"),
+    (("mamba", "ssd", "ssm"), "ssm"),
+    # Ahead of `conv`, which `EngramGateConv` would otherwise match. Engram is
+    # its own algorithm, published on its own API page, not a linear attention.
+    (("engram",), "engram"),
+    (("deltanet", "gla", "linear_attn", "recurrence"), "linear_attention"),
     (("cumsum", "cumulative", "scan", "cumprod"), "scan"),
     (("layer_norm", "rms_norm", "rmsnorm", "batch_norm", "group_norm",
       "ada_layer", "norm"), "normalization"),
     (("grouped_gemm", "gemm", "matmul", "linear"), "linear_algebra"),
     (("moe", "expert"), "moe"),
     (("conv",), "convolution"), (("pool",), "pool"), (("fft",), "fft"),
+    # Ahead of `fp8`: the FP8 lightning indexer is published on the attention
+    # API page, a module of its own rather than in the `attention` package.
+    (("lightning_indexer",), "attention"),
     (("quant", "fp8"), "quantization"),
     (("rope", "rotary", "positional"), "positional"),
     (("mhc",), "mhc"), (("topk", "top_k"), "topk"),
@@ -316,19 +186,36 @@ _KEYWORD_FAMILY = [
     (("reduce", "argmax", "argmin", "argreduce", "mean", "sum", "max", "min"),
      "reduction"),
 ]
-# The package decides the family; the keywords below only speak for ops the
-# layout does not place — a module rather than a package (`rope.py`), and the
-# mixed `sequence_modeling`. Every package that maps to a family belongs here:
-# `linear_attention` left out of it fell through to the keyword `linear` and
-# published linear-attention ops on the GEMM page.
+# The manifest declares each op's family under TileOPs' names; these are this
+# file's. `sequence_modeling` is absent: mHC and Engram publish on pages of
+# their own, so one family name cannot place them.
+_MANIFEST_FAMILY = {
+    "elementwise": "elementwise", "reduction": "reduction",
+    "attention": "attention", "pool": "pool", "norm": "normalization",
+    "moe": "moe", "linear_attention": "linear_attention",
+    "quantization": "quantization", "sampling": "sampling", "mamba": "ssm",
+    "rope": "positional", "gemm": "linear_algebra",
+    "convolution": "convolution", "fft": "fft",
+    # One op so far, and a rotation is not a quantization step: it publishes on
+    # Other rather than carrying a page of its own.
+    "transform": "other",
+}
+# For an op the manifest does not declare: its package, then the keywords above.
+# Every package that maps to a family belongs here — `linear_attention` left out
+# of it fell through to the keyword `linear` and published on the GEMM page.
 _MODULE_FAMILY = {"attention": "attention", "elementwise": "elementwise",
                   "reduction": "reduction", "norm": "normalization",
                   "moe": "moe", "gemm": "linear_algebra",
+                  "quantization": "quantization", "sampling": "sampling",
                   "linear_attention": "linear_attention",
-                  "mamba": "linear_attention"}
+                  "mamba": "ssm"}
 
 
-def family_of(op: str, op_module: str | None) -> str:
+def family_of(op: str, op_module: str | None,
+              manifest_family: str | None = None) -> str:
+    fam = _MANIFEST_FAMILY.get((manifest_family or "").lower())
+    if fam:
+        return fam
     mod = (op_module or "").lower()
     parts = mod.split(".")
     if len(parts) >= 4 and parts[0] == "tileops" and parts[1] == "ops":
@@ -373,53 +260,20 @@ def dtype_of(config_name: str) -> str | None:
 # so a metric added on the TileOPs side appears here without a code change.
 # Longer suffixes come first: device_busy_p10_ms must not match as latency_ms.
 _METRIC_SUFFIXES = (
-    "external_pending_note",
-    "eager_pool_ratio", "eager_pool_name", "eager_pool_note",
-    "handwritten_ratio_in_selection_session", "handwritten_selection_regime",
     "device_busy_p10_ms", "device_busy_p90_ms", "device_busy_ms",
-    "latency_p10_ms", "latency_p90_ms",
-    # The two D036 fields that end in `_latency_ms` themselves, so they are
-    # matched before the bare suffix claims them and files them under a tag
-    # named `baseline_runner_up`.
-    "runner_up_latency_ms", "handwritten_latency_ms",
-    "latency_ms", "gap_ms",
+    "latency_p10_ms", "latency_p90_ms", "latency_ms", "gap_ms",
     "uncounted_copy_ms", "bandwidth_tbs", "tflops", "ratio", "n_kernels",
-    "n_samples", "n_trials", "flops", "bytes", "compute_roof", "dtype", "timing",
-    # The regime the row was measured in. It sits after the two longer suffixes
-    # that end in it -- `handwritten_selection_regime` above -- so those keep
-    # being filed under `baseline` rather than under a tag named
-    # `baseline_handwritten_selection`. The publisher has written it since T269
-    # gate 2; reading it is what was missing.
-    "regime",
+    "n_samples", "flops", "bytes", "roof_key", "dtype", "timing",
     "variant",
-    # D036: who the comparison group was, who won it, and what it held. The
-    # harness has written `_us` for the two runner-up/handwritten times and
-    # `_latency_ms` for them at different points; both spellings are read, and
-    # `pool_size` comes before `pool` for the same reason as above.
-    "measurement_note", "name", "tier", "selection", "pool_size", "pool_json", "pool", "refused",
-    "runner_up_us", "runner_up", "handwritten_us", "handwritten",
 )
 _NUMERIC_METRICS = {
-    "eager_pool_ratio",
-    "handwritten_ratio_in_selection_session",
     "device_busy_ms", "device_busy_p10_ms", "device_busy_p90_ms",
     "latency_ms", "latency_p10_ms", "latency_p90_ms", "gap_ms",
     "uncounted_copy_ms", "tflops", "bandwidth_tbs", "ratio", "flops",
-    "bytes", "n_kernels", "n_samples", "n_trials",
-    "pool_size", "runner_up_us", "runner_up_latency_ms",
-    "handwritten_us", "handwritten_latency_ms",
+    "bytes", "n_kernels", "n_samples",
 }
-# The name the benchmark writes its comparison group under.
-#
-# Upstream writes it as an *alias* for whichever named baseline it timed first,
-# so there it duplicates an implementation under a name none has -- and it is
-# dropped whole, below, exactly when something else is present to duplicate.
-#
-# The Ascend fork writes it as the only comparison group there is: one D036 pool
-# per workload, with `baseline_name` saying which member of the pool won and
-# `baseline_pool` listing every member with its time and its provenance tier.
-# There is nothing to duplicate, so it is kept and it is what the Alternatives
-# column shows.
+# The alias the benchmark writes for its first baseline. Dropped whole: it
+# duplicates an implementation under a name none has, and its key set grows.
 _LEGACY_TAG = "baseline"
 
 
@@ -432,18 +286,12 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
         name = tc.attrib.get("name", "")
         skipped = tc.find("skipped")
         bad = tc.find("failure") if tc.find("failure") is not None else tc.find("error")
-        # T364. `phase` is a property of the row, like `shape`, not a metric of one
-        # implementation, so it carries no `<tag>_` prefix and the loop below would
-        # drop it. The publisher writes it only on second-phase rows, so its absence
-        # is what a first-phase row looks like and a snapshot published before T364
-        # reads as all-phase-one -- which is what it is.
-        phase = props.get("phase")
         if skipped is not None:
-            skips.append({"name": name, "op": props.get("op"), "phase": phase,
+            skips.append({"name": name, "op": props.get("op"),
                           "message": skipped.attrib.get("message", "")})
             continue
         if bad is not None:
-            failures.append({"name": name, "op": props.get("op"), "phase": phase,
+            failures.append({"name": name, "op": props.get("op"),
                              "message": bad.attrib.get("message", "")})
             continue
         if "op" not in props:
@@ -451,29 +299,21 @@ def parse_bench_xml(path: str) -> tuple[list[dict], list[dict], list[dict]]:
 
         impls: dict[str, dict] = defaultdict(dict)
         for key, val in props.items():
-            # `shape` is the case's own record of what it ran on, not a metric
-            # of one implementation, so it carries no `<tag>_` prefix and is
-            # read straight off the testcase below.
-            if key in ("op", "op_module", "shape", "phase"):
+            if key in ("op", "op_module"):
                 continue
             for suf in _METRIC_SUFFIXES:
                 if key.endswith("_" + suf):
                     tag = key[: -len(suf) - 1]
+                    if tag == _LEGACY_TAG:
+                        break
                     impls[tag][suf] = _num(val) if suf in _NUMERIC_METRICS else val
                     break
-        # See `_LEGACY_TAG`: an alias for a baseline that is also present under
-        # its own name is a duplicate row, and goes. The comparison group of a
-        # snapshot that publishes nothing else stays.
-        if any(t not in _OURS_TAGS and t != _LEGACY_TAG for t in impls):
-            impls.pop(_LEGACY_TAG, None)
         workloads.append({
             "name": name,
             "config": name.split("[")[-1].rstrip("]") if "[" in name else name,
             "op": props["op"],
             "op_module": props.get("op_module"),
             "impls": dict(impls),
-            "shape": props.get("shape"),
-            "phase": phase,
         })
     return workloads, failures, skips
 
@@ -525,12 +365,7 @@ def load_sol_engine(gpu: str, tileops: str = TILEOPS):
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         from tileops.perf.profile import find_profile
-        # The profile table is keyed without a space (``Ascend910B1``) while
-        # meta.json's ``gpu`` carries the human-readable form ``Ascend 910B1``
-        # that this page also prints, so a bare lookup misses and the SOL column
-        # silently disappears.  Try the printed form first, then the de-spaced
-        # one, so the label stays readable and the lookup still resolves.
-        profile = find_profile(gpu) or find_profile(gpu.replace(" ", ""))
+        profile = find_profile(gpu)
     except Exception as exc:  # noqa: BLE001 — degrade to an empty column
         print(f"warning: SOL column disabled ({exc})", file=sys.stderr)
         return None, None
@@ -582,57 +417,9 @@ def _busy_of(impl: dict) -> float | None:
     return _pos(impl.get("device_busy_ms")) or _pos(impl.get("latency_ms"))
 
 
-# --- The D036 candidate pool ------------------------------------------------
-# `baseline_pool` is one line of text per workload: every candidate the harness
-# built and timed, `name=<time>us (tier)`, joined by "; ", already ordered
-# fastest first. The winner of that race is the baseline the ratio divides by.
-_POOL_SEP = "; "
-# Greedy on the name, so the *last* `=` splits: a name carries `::`, `<>`, `|`
-# and `->` from a C++ template instantiation, and the time never carries one.
-_POOL_ENTRY = re.compile(r"^(?P<name>.+)=(?P<time>[^=]*?)\s*\((?P<tier>[^()]*)\)$")
-
-
-def parse_pool(pool: str) -> list[dict]:
-    """Every candidate in one workload's pool, in the order it was written.
-
-    A candidate name may itself contain the separator, so a chunk that does not
-    close with a `(tier)` is joined back onto the one before it rather than
-    dropped: a pool this function cannot parse must lose no member.
-
-    A time of `not-timed` is a *recorded absence*, kept as None. Rendering it as
-    0 would put a candidate that was never measured at the top of the pool.
-    """
-    out: list[dict] = []
-    buf = ""
-    for chunk in (pool or "").split(_POOL_SEP):
-        buf = f"{buf}{_POOL_SEP}{chunk}" if buf else chunk
-        m = _POOL_ENTRY.match(buf.strip())
-        if m is None:
-            continue
-        raw = m.group("time").strip()
-        us = _num(raw[:-2]) if raw.endswith("us") else None
-        out.append({"name": m.group("name").strip(),
-                    "ms": us / 1000 if us is not None else None,
-                    "raw_time": raw, "prov": m.group("tier").strip() or None})
-        buf = ""
-    if buf.strip():
-        # Unparseable tail: shown by name with no time, never discarded.
-        out.append({"name": buf.strip(), "ms": None, "raw_time": "", "prov": None})
-    return out
-
-
-def _ms_of(d: dict, *keys) -> float | None:
-    """A time in ms from the first key present, `_us` spellings converted."""
-    for k in keys:
-        v = _pos(d.get(k))
-        if v is not None:
-            return v / 1000 if k.endswith("_us") else v
-    return None
-
-
 def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
     """Derive every displayed metric for one benchmarked workload."""
-    tl = ours_of(w["impls"])
+    tl = w["impls"].get("tileops", {})
     busy = _busy_of(tl)
     tflops = _pos(tl.get("tflops"))
 
@@ -642,16 +429,13 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
         "dtype": tl.get("dtype") or dtype_of(w["config"]),
         "n_samples": tl.get("n_samples"),
         "variant": tl.get("variant"),
-        # Absent in a snapshot published before the regime was written per row.
-        # Absent is not "headline": an unlabelled row is one the page cannot
-        # vouch for either way, and it renders with no badge exactly as before.
-        "regime": tl.get("regime") or None,
         "sol": sol_of(tl, sol_engine),
     }
 
-    others = {t: d for t, d in w["impls"].items() if t not in _OURS_TAGS}
     rivals = {}
-    for tag, d in others.items():
+    for tag, d in w["impls"].items():
+        if tag.startswith("tileops"):
+            continue
         b_busy = _busy_of(d)
         if not b_busy:
             continue
@@ -660,51 +444,12 @@ def workload_metrics(w: dict, sol_engine=(None, None)) -> dict:
         # the write precision of the times alone.
         computed = (b_busy / busy) if busy else None
         recorded = _pos(d.get("ratio"))
-        if recorded is None and tag == _LEGACY_TAG and len(others) == 1:
-            # The Ascend snapshot records the ratio on the provider's own tag,
-            # since a workload there has exactly one comparison group. Read it
-            # only in that case, so a snapshot with several named rivals can
-            # never have one rival's ratio attributed to another.
-            recorded = _pos(tl.get("ratio"))
         rivals[tag] = {
             "tier": tier_of(tag), "busy_ms": b_busy,
             "speedup": recorded or computed,
             "computed_ratio": computed, "recorded_ratio": recorded,
         }
     m["rivals"] = rivals
-
-    # --- D036: the pool behind the one baseline the ratio used --------------
-    base = w["impls"].get(_LEGACY_TAG, {})
-    m["pool"] = parse_pool(base.get("pool", ""))
-    if base.get("pool_json"):
-        # Structured evidence cannot be mistaken for a candidate by splitting
-        # semicolons, equals signs or parentheses inside a tier/refusal note.
-        m["pool"] = [
-            {"name": c["name"], "prov": c.get("tier"),
-             "ms": None if c.get("device_us") is None else c["device_us"] / 1000,
-             "tier_note": c.get("tier_note", ""), "raw_time": "",
-             "external": c.get("in_process") is False, "n": c.get("n")}
-            for c in json.loads(base["pool_json"])]
-    m["pool_refused"] = base.get("refused", "")
-    m["external_pending_note"] = base.get("external_pending_note", "")
-    m["measurement_note"] = base.get("measurement_note", "")
-    # Older publishers hard-code n=3 in this one specific note. The receipt's
-    # explicit count is authoritative; unrelated measurement warnings survive.
-    if m["measurement_note"].startswith(
-            "MLIR cross-process yardstick corrected; n=3 < N>=5; provisional;"):
-        n = base.get("n_trials")
-        if isinstance(n, (int, float)):
-            m["measurement_note"] = (f"MLIR n={n:g} < 5 · provisional" if n < 5 else "")
-    m["pool_winner"] = base.get("name") or None
-    m["pool_selection"] = base.get("selection") or None
-    m["prov_tier"] = base.get("tier") or None
-    # The winner's own recorded time. It is the fallback for a winner whose pool
-    # line says `not-timed`, which is a gap on the harness side, not a zero.
-    m["baseline_ms"] = _busy_of(base)
-    # Selection-session metadata: its uncaptured callable ratio is not
-    # comparable to the captured headline. Never splice session times.
-    hw_ms = _ms_of(base, "handwritten_latency_ms", "handwritten_us")
-    m["hw"] = {"name": base.get("handwritten") or None, "ms": hw_ms}
     return m
 
 
@@ -740,33 +485,11 @@ def op_summary(metrics: list[dict]) -> dict:
     geometric-mean ratio here only orders the op sections.
     """
     s = {"workloads": len(metrics)}
-    # Which regimes this op's rows were measured in, and which of them are not
-    # the headline. Kept as the sorted list rather than a boolean, because an op
-    # whose rows straddle two regimes is a different and worse problem than one
-    # measured wholly in the other regime, and only the list can tell them apart.
-    # (In the 2026-09-16 snapshot none straddle: all 15 eager operators are
-    # wholly eager. The page must not depend on that staying true.)
-    s["regimes"] = sorted({m["regime"] for m in metrics if m.get("regime")})
-    s["off_headline"] = [r for r in s["regimes"] if r != headline_regime()]
-    # Two coverage readings, both per D006: whether this op was raced against a
-    # pool at all, and whether that pool held a tier-1 open-source candidate.
-    # An op whose pool is vendor-only is still measured against a real rival --
-    # it is simply not measured against an open-source library, and the index
-    # says so with its own denominator rather than blurring the two.
-    s["pooled"] = any(m.get("pool") for m in metrics)
-    s["handwritten"] = any(m.get("hw", {}).get("ms") for m in metrics)
-    s["tilelang_ref"] = any(
-        c.get("prov") == PROV_TILELANG_REF
-        and c.get("name", "").startswith("tilelang-ascend:")
-        and c.get("ms") is not None
-        for m in metrics for c in m.get("pool", []))
-    s["mlir_ref"] = any(c.get("external") for m in metrics for c in m.get("pool", []))
 
-    rated_metrics = [m for m in metrics if not m.get("measurement_note")]
-    tag, ratio = best_rival(rated_metrics, (TIER_LIB, TIER_TORCH))
+    tag, ratio = best_rival(metrics, (TIER_LIB, TIER_TORCH))
     ref_only = False
     if tag is None:
-        tag, ratio = best_rival(rated_metrics, (TIER_REF,))
+        tag, ratio = best_rival(metrics, (TIER_REF,))
         ref_only = tag is not None
     s.update(rival=tag, speedup=ratio, rival_ref_only=ref_only)
 
@@ -779,670 +502,6 @@ def op_summary(metrics: list[dict]) -> dict:
     else:
         s["status"] = UNRATED
     return s
-
-
-# --- User-visible strings --------------------------------------------------
-# Every string a reader sees, by locale. Only copy lives here: an op name, a
-# family name, a dtype, a baseline tag and a measured number all come out of
-# the snapshot, and the markdown that frames a string -- the `##`, the `- `,
-# the table pipes, the link targets -- is built by the page builders, so a
-# translation cannot break the page structure.
-#
-# The `zh` values are placeholders: the English text, verbatim. Translating
-# this section is a data edit and touches no code.
-STRINGS = {
-    # The strings the pages have always carried.
-    "en": {
-        # --- Shared
-        "link.reading": "How these numbers are taken",
-        # --- The data tables' two header rows
-        "table.head.workload": "Workload",
-        "table.head.ratio": "Ratio",
-        "table.head.device_time": "Device time",
-        "table.head.alternatives": "Alternatives",
-        "table.head.throughput": "Throughput",
-        "table.head.sol": "SOL",
-        "table.head.bound": "Bound",
-        "table.sub.ratio": "alt / ours",
-        "table.sub.device_time": "ms",
-        "table.sub.alt_name": "name",
-        "table.sub.alt_name_tiered": "name \u00b7 tier",
-        "table.sub.alt_time": "ms",
-        "table.sub.throughput": "TFLOP/s",
-        "table.sub.sol": "of ceiling",
-        "table.sub.bound": "by",
-        # --- D036: the comparison group, its members, and their provenance
-        "tier.handwritten": "open-source",
-        "tier.vendor": "vendor library",
-        "tier.tilelang_ref": "tilelang-ascend",
-        "tier.agent_written": "agent-written kernel",
-        "tier.title": (
-            "Where this kernel came from \u2014 not which one is faster. Click for "
-            "what a tier means."
-        ),
-        "regime.title": (
-            "Measured in a different regime from this page's headline `{headline}`, "
-            "so the ratio is not comparable with the rows around it. Click for what "
-            "that means."
-        ),
-        "alt.basis": "basis",
-        'alt.basis_title': 'The candidate used as the baseline in the headline measurement regime.',
-        "alt.untimed_title": (
-            "The pool line recorded no time for this candidate. The figure shown, "
-            "marked *, is the baseline latency the run published separately. Not a "
-            "measurement of zero."
-        ),
-        "alt.untimed_empty_title": (
-            "Not timed: the pool line recorded no time for this candidate, and the "
-            "run published none elsewhere. Not a measurement of zero."
-        ),
-        # --- The data pages' titles, in DATA_PAGES order
-        "page.attention.title": "Attention",
-        "page.linear-attention.title": "Linear Attention & SSM",
-        "page.gemm-moe.title": "GEMM, MoE & Quantization",
-        "page.elementwise-reduction.title": "Elementwise & Reduction",
-        "page.norm-conv-pool.title": "Norm, Conv, Pool & Other",
-        # T364: the second phase, on its own page and with its own denominator.
-        "page.phase-two.title": "Second-phase operators",
-        "phase2.banner.title": "A separate set, and a separate denominator",
-        "phase2.banner.what": (
-            "These operators are **outside the first-phase list** "
-            "(`docs/tasks/OPS-178.md`) that every other Benchmarks page is scoped "
-            "to. They are shown here because the harness already measured a real "
-            "opponent against them, not because the first phase grew."
-        ),
-        "phase2.banner.denominator": (
-            "**Nothing on this page is added to any count on the other pages.** The "
-            "overview's coverage figures, the per-family tallies and the "
-            "attainment counts are all first-phase only, and stay first-phase only. "
-            "This page's own tally, below, counts these operators and nothing else."
-        ),
-        "phase2.banner.selection": (
-            "An operator reaches this page only when the snapshot publishes a "
-            "ratio for it. One with no timed opponent is left out rather than "
-            "shown as a row of blanks. Operators the first-phase list names but "
-            "D018 deferred are not here either: a deferral is not a result."
-        ),
-        # T366: the same two sentences for a snapshot that names the list its first
-        # phase is drawn from. The two keys above are what a snapshot written before
-        # T366 -- whose first phase is OPS-178's -- still renders with.
-        "phase2.banner.what_list": (
-            "These operators are **not in `{name}`**, the first-phase acceptance "
-            "list (`{source}`) that the overview and the per-family data pages are "
-            "scoped to and that progress is reported against. They are shown here "
-            "because the harness already measured a real opponent against them, "
-            "not because the first phase grew."
-        ),
-        "phase2.banner.selection_list": (
-            "An operator reaches this page only when the snapshot publishes a "
-            "ratio for it. One with no timed opponent is left out rather than "
-            "shown as a row of blanks."
-        ),
-        # --- A data page's own prose
-        "data.tally": "**{n_ops} ops, {n_workloads} workloads** — {tally}.",
-        "data.tally_single": "**{n_ops} ops, {n_workloads} workloads.**",
-        'data.intro': 'One table per op, one row per workload. `Ratio` is the baseline device time divided by ours in the same measurement regime, so <span class="perf-ahead">green</span> is faster than it, <span class="perf-par">plain</span> is level with it, <span class="perf-behind">red</span> is slower. Times are in ms. {reading_link}.',
-        # --- The environment block
-        "env.heading": "Environment",
-        "env.missing.title": "The run did not publish its environment",
-        "env.missing.body": (
-            "Without it a number on these pages cannot be tied to the machine and "
-            "the stack that produced it. The nightly's publish step fills this in "
-            "through [`meta.json`]({url})."
-        ),
-        "env.not_published": "Not published by this run: {keys}.",
-        # --- The method block
-        "method.heading": "Method",
-        "method.one_process": (
-            "**One process, common inputs.** Every implementation of an op is "
-            "timed on the same tensors in the same process, in forward and then "
-            "reversed order so drift does not land on whichever ran last."
-        ),
-        "method.budget": (
-            "**Ascend nightly sampling: WARMUP=10 / REPEATS=30** per "
-            "implementation, reporting the median of the measured samples, "
-            "with the 192 MiB L2 evicted between iterations."
-        ),
-        "method.excluded": "**Compilation and workspace setup excluded.**",
-        "method.device_time": (
-            "**Device time is what is compared** — the union of the intervals the "
-            "device spent executing the call's kernels, collected through "
-            "torch_npu.profiler. "
-            "A run that cannot collect device activity fails rather than falling "
-            "back to a different clock."
-        ),
-        # --- The overview page
-        "index.title": "Benchmarks",
-        "index.snapshot.title": "Nightly snapshot",
-        "index.snapshot.line": (
-            "**GPU** {gpu} · **commit** [`{sha}`]({commit_url}) · **run date** "
-            "{date} · **{n_ops} ops**, {n_workloads} workloads"
-        ),
-        "index.snapshot.run_link": "· [nightly run]({url})",
-        "index.snapshot.rendered": (
-            "Page rendered {rendered} from the [latest snapshot]({url})."
-        ),
-        # T366: every count below moved on the day the first phase changed lists.
-        "index.scope.title": "The first phase is the acceptance list now",
-        "index.scope.body": (
-            "Since 2026-09-23 this overview and the per-family data pages are "
-            "scoped to **the {n_ops} operators of `{name}`**, the first-phase "
-            "acceptance list (`{source}`, {n_rows} rows; an operator that fills two "
-            "rows is counted once) — the list progress is reported against. Until "
-            "then these pages were scoped to the 158 operators of "
-            "`docs/tasks/OPS-178.md` that D018 kept. **What changed in these "
-            "counts on that day is the scope, not performance** — neither a "
-            "regression nor a gain: no ratio was re-measured for the change, and "
-            "moving an operator from one page to another changes none of its "
-            "numbers."
-        ),
-        "index.scope.moved": (
-            "Operators outside the list, Attention among them, are on the "
-            "[second-phase page]({link}) when the snapshot publishes a ratio for "
-            "them."
-        ),
-        "index.coverage.heading": "Coverage",
-        "index.coverage.rated": (
-            "**{rated} of {total} ops** are rated against a real alternative "
-            "measured on the identical workload. The denominator is the displayed "
-            "target set; unconnected targets retain empty tables. Unrated rows "
-            "have no measured comparison or only an eager reference."
-        ),
-        "index.coverage.regime": (
-            "**Not one measurement regime.** **{n_headline} of {total} ops** were "
-            "measured in this run's headline regime `{headline}`; **{n_off}** were "
-            "not ({off}). A ratio taken in one regime is not comparable with a "
-            "ratio taken in another, so the two counts are given separately and "
-            "**never added**. Every row and every op heading measured outside "
-            "`{headline}` carries a badge saying which regime it was."
-        ),
-        "index.coverage.attained": (
-            "**Clearing the harness threshold, per regime**: {parts}. Quoted from "
-            "the snapshot's own census, not recomputed here. The headline regime "
-            "is `{headline}`; **the other regimes' counts are listed so they can "
-            "be read, not so they can be summed into it**."
-        ),
-        "index.coverage.attained_one": "`{regime}` {n}/{of} ops ≥ {threshold}",
-        'index.coverage.pool': '**Each op is raced against a pool.** The fastest eligible candidate in the headline measurement regime becomes its baseline. The row lists all candidates with their individual times and provenance tiers.',
-        "index.coverage.handwritten": (
-            "**{n_hw} of {total} ops** have a tier-1 open-source baseline in "
-            "their pool at all — a kernel built from the source of a third-party Ascend operator library, "
-            "admitted only on evidence that the library's own compiled kernel "
-            "ran. Same denominator as above. This is the **stricter** of the two "
-            "readings, and the one to quote for a claim about open-source "
-            "libraries."
-        ),
-        "index.coverage.tilelang_ref": "**{n_tl}/{total} ops** have a measured `tilelang-ascend` candidate (tier `tilelang_ref`) in the published pool; this count can overlap the open-source count above.",
-        "index.coverage.vendor_only": (
-            "**For the other {n_vendor} of {total}**, the pool holds vendor "
-            "implementations only — a CANN built-in, or torch_npu's own dispatch. "
-            "Those rows are still measured against a real implementation of the "
-            "op on the identical workload, but a win there is **not** a win over "
-            "an open-source library. The tier badge on each line says which it "
-            "was."
-        ),
-        "index.coverage.absent": (
-            "**Absent from every table**: {n_failed} workloads errored and "
-            "{n_skipped} were skipped in this run."
-        ),
-        "index.data.heading": "Data",
-        "index.data.col_page": "Page",
-        "index.data.col_ops": "Ops",
-        "index.data.col_workloads": "Workloads",
-        # --- The reading page: opening
-        "reading.title": "How these numbers are taken",
-        "reading.intro": (
-            "Every data page answers one question: **how does TileOPs compare to "
-            "the fastest alternative implementation of the same op, on the same "
-            "workload?** Each op gets one table, with one row per workload. "
-            "Nothing is averaged across workloads: every number on the page "
-            "belongs to a single shape and dtype."
-        ),
-        # --- The reading page: who the comparison group is (D036)
-        "reading.baseline.heading": "Who the comparison is against",
-        'reading.baseline.formula': '`Ratio` = **baseline device time ÷ our device time**, for the same measurement regime and each (op, workload, dtype). Both sides are selected for that row’s own shape and dtype.',
-        'reading.baseline.pool': 'The baseline document decides which implementations may enter the comparison group. Measurement selects the fastest eligible candidate in the headline regime on the exact workload. The `Alternatives` column lists the candidates and marks the selected baseline as `basis`.',
-        "reading.baseline.tier1": (
-            "The `Alternatives` column lists every candidate's name, provenance "
-            "tier and measured device time, including open-source candidates. "
-            "Each row displays one ratio in the headline measurement regime. "
-            "MLIR candidates marked `eager` were measured without graph capture; "
-            "their times do not replace a captured graph baseline."
-        ),
-        "reading.baseline.single": (
-            "A pool of one is written `single_candidate`: only one opponent could "
-            "be built for that workload. It is still a measured comparison — "
-            "there was simply no race to run."
-        ),
-        # --- The reading page: what a tier says, and what it does not
-        "reading.tier.heading": "What a tier means",
-        "reading.tier.intro": (
-            "Every line in `Alternatives` carries a tier. **A tier records where "
-            "that kernel came from. It says nothing about which kernel is "
-            "faster.**"
-        ),
-        "reading.tier.col_tier": "Tier",
-        "reading.tier.col_meaning": "Meaning",
-        "reading.tier.handwritten_row": (
-            "A kernel out of an open-source Ascend library, reached through that "
-            "library's own entry point. Admitted only on evidence that the "
-            "library's own compiled kernel actually ran: a custom operator "
-            "package that is missing a kernel falls back to the CANN built-in "
-            "**silently**, with the call succeeding, the outputs correct and the "
-            "timings plausible. So provenance here is established by tracing "
-            "which binary the process opened, never by the call returning."
-        ),
-        "reading.tier.tilelang_ref_row": "Original example or test kernel from tilelang-ascend (Tile-AI), compiled with the same DSL/compiler. Admitted only after the harness source-provenance and numeric gates. This tier describes kernel origin, not speed.",
-        "reading.tier.torch_compile_row": (
-            "The same PyTorch program handed to `torch.compile` on this backend "
-            "(`aclgraph` or `ge`), timed as one more candidate in the pool. Not a "
-            "hand-written kernel and not a vendor dispatch: a compiler's answer to "
-            "the same problem. It carries the neutral badge because it is neither "
-            "of the two, and it wins often enough here that a reader should know "
-            "what beat us when it does."
-        ),
-        "reading.tier.agent_written_row": (
-            "A kernel an agent wrote, admitted to the pool by D060 under the same "
-            "source-provenance and numeric gates as the others. Like every tier "
-            "here it describes where the kernel came from, not how fast it is. No "
-            "row in the current snapshot carries it."
-        ),
-        "reading.tier.vendor_row": (
-            "A vendor implementation: a CANN built-in operator, or torch_npu's "
-            "own dispatch for the op. A real implementation on the identical "
-            "workload, and on this device frequently the fastest one."
-        ),
-        "reading.tier.not_faster": (
-            "So `open-source` beside a **slower** time than `vendor library` on the same "
-            "row is not an error, and for several op families here it is the "
-            "ordinary case. Reading the badge as a strength ranking is the one "
-            "mistake this column exists to prevent."
-        ),
-        "reading.tier.inventory": (
-            "The historical inventory covers **{total} elementwise, reduction, scan and dropout ops**. Counted on the snapshot this page is rendered from: **{got}/{total}** have at least one timed source candidate (`handwritten` or `tilelang_ref`), **{none}/{total}** have none, and **{unknown}/{total}** cannot be determined because this run publishes no workload for them. These are measured pool observations after the shape/dtype contract gate, not an exhaustive source inventory or a numerical-correctness pass rate. Refusals and workload coverage remain case-specific; beating a vendor implementation alone does not establish a win over an open-source kernel."
-        ),
-        "reading.regime.heading": "Which regime a row was measured in",
-        "reading.regime.intro": (
-            "A ratio is comparable with another ratio only if the two were taken "
-            "the same way. Every workload here is measured in a named "
-            "**regime**, and this run's headline regime is `{headline}` — the "
-            "regime the coverage bullets, the colours and the op orderings are "
-            "all about."
-        ),
-        "reading.regime.legacy": (
-            "A few operators have no measurement in that regime and are published "
-            "from an older record that only ever measured `eager`. Those rows are "
-            "**kept**: the number is a real measurement of a real workload, and "
-            "dropping them would shorten the page with no explanation. They are "
-            "**named** instead."
-        ),
-        "reading.regime.badge": (
-            "this row's ratio was taken in `eager`, not in `{headline}`. Read it "
-            "against other `eager` rows, never against the ones around it."
-        ),
-        "reading.regime.counts": (
-            "The same rule holds for every count on the overview: ops measured in "
-            "`{headline}` and ops measured otherwise are reported as two numbers "
-            "and are **never added into one**."
-        ),
-
-        "reading.colour.heading": "The colour is the verdict",
-        "reading.colour.col_meaning": "Meaning",
-        "reading.colour.behind": "Slower than the alternative — below {lo}×.",
-        "reading.colour.par": (
-            "Level with it — {lo}–{hi}×, inside measurement noise."
-        ),
-        "reading.colour.ahead": "Faster than it — {hi}× and above.",
-        "reading.colour.unrated": (
-            "No fast alternative to compare against — only a functional reference "
-            "(a name ending in `-{ref}`). The number means little."
-        ),
-        "reading.colour.none": "No alternative at all ran on this workload.",
-        "reading.colour.note": (
-            "A ratio is the alternative's device time divided by ours, so **above "
-            "1 means TileOPs is faster**."
-        ),
-        # --- The reading page: the columns table
-        "reading.columns.heading": "Columns",
-        "reading.columns.col_column": "Column",
-        "reading.columns.col_meaning": "Meaning",
-        "reading.columns.workload": (
-            "`W1`, `W2`, … — the key above each table spells each one out: the "
-            "benchmark's own id for it, the dtype it ran at, and every input "
-            "tensor as `name: shape, dtype`. Tensors sharing a shape are named "
-            "together, and each carries its own dtype, so a `mask` in `bool` says "
-            "so where it is read. After the tensors come the dimensions the op is "
-            "sized by rather than shaped by (`m`, `n`, `k` for a GEMM, "
-            "`num_experts` for MoE routing), then dimmed, the parameters the call "
-            "did not leave at the signature's default. A quantity the others "
-            "already fix — `max_seqlen_q` is `max(q_lens)` — is not repeated."
-        ),
-        "reading.columns.ratio": (
-            "`alt / ours` — the baseline's device time divided by ours, the one "
-            "number the colour grades. Candidate names, tiers and individual "
-            "times are listed in `Alternatives`."
-        ),
-        "reading.columns.device_time": (
-            "Milliseconds the device spent executing the call's kernels — the "
-            "union of their intervals. Every comparison on these pages uses it."
-        ),
-        'reading.columns.alternatives': 'One line per candidate, with its device time in ms and provenance tier. The line marked `basis` supplies the baseline for the headline ratio. Hover a shortened name to see its full binding. Times from different measurement regimes, including candidates marked `eager`, must be read in their own regime. Where a run publishes no pool, the lines are the named baselines it timed: tuned library kernels (`fla`, `mamba`, `fa3`, `triton`, …), native PyTorch ops (`{torch}`), or eager reference compositions whose names end in `-{ref}`.',
-        "reading.columns.throughput": (
-            "TFLOP/s: required FLOPs / device time. The count is analytic — the "
-            "op's `eval_roofline` formula evaluated on the workload's own shapes, "
-            "not a hardware counter — so it counts the work the problem demands, "
-            "not the instructions the kernel issued. Padding, recompute or a "
-            "masked-out tile is therefore invisible here, and the figure is only "
-            "comparable between implementations of the same op on the same "
-            "workload."
-        ),
-        "reading.columns.sol": (
-            "Share of the algorithmic speed-of-light: the fastest time physics "
-            "allows for the workload, divided by our device time. The `Ratio` "
-            "column says whether someone is faster today; SOL says how much "
-            "faster anyone could ever be. Details below."
-        ),
-        "reading.columns.bound": (
-            "The resource that sets the workload's floor: `mem` (HBM traffic), "
-            "`comp` (compute throughput), or `lat` — the workload is too small "
-            "for the model to judge, and its SOL number greys out with it."
-        ),
-        "reading.timing_note": (
-            "How that device time is measured — what it counts, what it leaves "
-            "out, and where it refuses to produce a number — is in [Benchmark "
-            "Timing](../timing.md)."
-        ),
-        "reading.test_marks": (
-            "Each op's heading carries its workload count and its test outcome (✅ "
-            "passed · ❌ failed · ⏭️ all skipped · `{empty}` no test matched)."
-        ),
-        # --- The reading page: speed of light
-        "reading.sol.heading": "Speed of light",
-        "reading.sol.intro": (
-            "**SOL** is *algorithmic* speed-of-light efficiency: `max(bytes / "
-            "bandwidth, FLOPs / compute roof) / device time`, priced against the "
-            "machine's *calibrated* ceilings — the bandwidth and compute rates "
-            "microbenchmarks actually reach on this GPU, not the spec sheet. 100% "
-            "means no implementation of this algorithm on this hardware can be "
-            "faster."
-        ),
-        "reading.sol.three": "Three statements delimit what a reading means:",
-        "reading.sol.bytes": (
-            "**Bytes are the algorithm's minimum traffic** — each input read "
-            "once, each output written once — not the DRAM traffic the kernel "
-            "generated. A kernel that moves data twice scores low; that is the "
-            "point."
-        ),
-        "reading.sol.flops": (
-            "**FLOPs follow the TileOPs counting convention** (a transcendental "
-            "counts as one), not per-instruction hardware cost; the metric does "
-            "not certify a special-function-bound kernel as at its limit."
-        ),
-        "reading.sol.roof": (
-            "**The compute roof is the unit an optimal implementation would use** "
-            "— declared per op, never inferred from the running kernel, so a "
-            "kernel on the wrong unit is measured against the right ceiling."
-        ),
-        "reading.sol.col_sol": "SOL",
-        "reading.sol.col_bound": "Bound",
-        "reading.sol.col_meaning": "Meaning",
-        "reading.sol.green_equal": "from {pct}",
-        "reading.sol.green_differ": (
-            "memory-bound from {mem}, compute-bound from {comp}"
-        ),
-        "reading.sol.green_unknown": (
-            "from the at-ceiling line the roofline spec sets"
-        ),
-        "reading.sol.row_ceiling": (
-            "At the achievable ceiling ({green}). The ceiling is an envelope over "
-            "access mixes, and a kernel's own mix caps below it, so the line "
-            "leaves room for every mix. Optimizing further buys at most the "
-            "remainder."
-        ),
-        "reading.sol.row_headroom": "Headroom remains.",
-        "reading.sol.row_lat": (
-            "The workload is too small for the model to judge — launch overhead "
-            "dominates the measurement, not the roofline — so the number is shown "
-            "but not graded."
-        ),
-        "reading.sol.row_anomaly": (
-            "Above the calibrated ceiling: the formula or the calibration is "
-            "wrong. Never read it as a fast kernel."
-        ),
-        "reading.sol.row_empty": (
-            "An input is missing: no roofline formula, a timing not collected "
-            "on the device, or no "
-            "GPU profile for the device."
-        ),
-        "reading.sol.spec_note": (
-            "The model, its thresholds and the formula-audit machinery are "
-            "specified in TileOPs [`docs/design/roofline.md`]({url}); the page "
-            "imports that implementation rather than re-deriving it."
-        ),
-        # --- The reading page: closing
-        "reading.shapes.heading": "Where the shapes come from",
-        "reading.shapes.body": (
-            "The shapes are read from the TileOPs [spec manifest]({url}), joined "
-            "to a row by the label and dtype the benchmark id is built from — so "
-            "a row states what its op is declared to take. A workload the "
-            "manifest does not declare — an edge-case probe written by hand "
-            "rather than driven by a spec — instead shows the shape the snapshot "
-            "recorded for that run, which is one measured call rather than a "
-            "declaration. Where neither is available, the row shows its "
-            "benchmark id alone, with no shapes under it."
-        ),
-        "reading.empty.heading": "Empty cells",
-        "reading.empty.body": (
-            "`{empty}` means an input to that metric was not recorded, never that "
-            "the value is zero: the op reported no FLOP count for that workload, "
-            "or no alternative ran on it."
-        ),
-        "reading.empty.untimed": (
-            "In the comparison group the same absence has its own spelling. A "
-            "candidate the run selected but never measured is recorded as "
-            "`not-timed`. Where the run published that baseline's time elsewhere, "
-            "the cell shows it followed by `*`, with the reason on the cell; "
-            "where it did not, the cell is `{empty}`. Neither is ever rendered as "
-            "`0`, which would read as an infinitely fast kernel."
-        ),
-    },
-    # Placeholders: English verbatim until translated.
-    "zh": {
-        # Written by the PM, not machine-translated. Three keys deliberately state
-        # what the Ascend fork actually does instead of translating the upstream CUDA
-        # prose, which is false for this data -- method.device_time, method.budget and
-        # reading.columns.device_time -- rewritten 2026-09-03 once D032 landed: the
-        # numbers really are device kernel time now and L2 really is cleared, so the
-        # earlier "this fork does neither" wording had become the misleading one.
-        "link.reading": "这些数字是怎么来的",
-        "table.head.workload": "工作负载",
-        "table.head.ratio": "比值",
-        "table.head.device_time": "耗时",
-        "table.head.alternatives": "对照实现",
-        "table.head.throughput": "吞吐",
-        "table.head.sol": "SOL",
-        "table.head.bound": "瓶颈",
-        "table.sub.ratio": "对照 / 我们",
-        "table.sub.device_time": "ms",
-        "table.sub.alt_name": "名称",
-        "table.sub.alt_name_tiered": "名称 · 档位",
-        "table.sub.alt_time": "ms",
-        "table.sub.throughput": "TFLOP/s",
-        "table.sub.sol": "占天花板",
-        "table.sub.bound": "受限于",
-        "tier.handwritten": "开源库",
-        "tier.vendor": "厂商库",
-        "tier.tilelang_ref": "tilelang-ascend",
-        "tier.agent_written": "Agent 编写 kernel",
-        "tier.title": "这一档说的是这个 kernel 的来源，不是谁更快。点击查看档位的定义。",
-        "regime.title": "测量口径与本页主口径 `{headline}` 不同，比值与周围各行不可比。点击查看这意味着什么。",
-        "alt.basis": "基准",
-        'alt.basis_title': '主测量口径所选的基准候选。',
-        "alt.untimed_title": "候选池那一行没有记下这个候选的时间。这里显示的（带 * 的）是本次运行另外发布的基线耗时。**它不是「测出来是零」。**",
-        "alt.untimed_empty_title": "没有计时：候选池那一行没有记下这个候选的时间，本次运行别处也没有。**这不是「测出来是零」。**",
-        "page.attention.title": "Attention",
-        "page.linear-attention.title": "Linear Attention 与 SSM",
-        "page.gemm-moe.title": "GEMM、MoE 与量化",
-        "page.elementwise-reduction.title": "Elementwise 与归约",
-        "page.norm-conv-pool.title": "Norm、Conv、Pool 及其它",
-        "page.phase-two.title": "第二阶段算子",
-        "phase2.banner.title": "独立的一组，独立的分母",
-        "phase2.banner.what": (
-            "这些算子**不在第一阶段名单**（`docs/tasks/OPS-178.md`）里，"
-            "而 Benchmarks 的其它每一页都只覆盖那份名单。"
-            "它们出现在这里，是因为 harness 已经为它们实测到了一个真实对手，"
-            "**不是因为第一阶段变大了**。"
-        ),
-        "phase2.banner.denominator": (
-            "**本页的任何数字都不会被加进其它页面的任何计数里。**"
-            "总览页的覆盖率、各家族小计、达标数，全部只统计第一阶段，并且继续只统计第一阶段。"
-            "下面那行本页自己的小计，只数这一组算子，不数别的。"
-        ),
-        "phase2.banner.selection": (
-            "只有快照真的为一个算子发布了比值，它才会出现在这一页；"
-            "没有实测到对手的算子会被留在页面之外，而不是渲染成一行空白。"
-            "第一阶段名单里被 D018 推迟的算子同样不在这里 —— **推迟不是成果**。"
-        ),
-        "phase2.banner.what_list": (
-            "这些算子**不在 `{name}` 这份第一阶段验收清单**（`{source}`）里 —— "
-            "总览页和各家族数据页都只覆盖这份清单，对上汇报的进度也以它为准。"
-            "它们出现在这里，是因为 harness 已经为它们实测到了一个真实对手，"
-            "**不是因为第一阶段变大了**。"
-        ),
-        "phase2.banner.selection_list": (
-            "只有快照真的为一个算子发布了比值，它才会出现在这一页；"
-            "没有实测到对手的算子会被留在页面之外，而不是渲染成一行空白。"
-        ),
-        "data.tally": "**{n_ops} 个算子，{n_workloads} 个工作负载** —— {tally}。",
-        "data.tally_single": "**{n_ops} 个算子，{n_workloads} 个工作负载。**",
-        'data.intro': '每个算子一张表，每个工作负载一行。`比值` 是同一测量口径下基准的耗时除以我们的耗时，所以 <span class="perf-ahead">绿色</span> 表示我们更快，<span class="perf-par">无色</span> 表示持平，<span class="perf-behind">红色</span> 表示我们更慢。时间单位是 ms。{reading_link}。',
-        "env.heading": "运行环境",
-        "env.missing.title": "本次运行没有发布它的环境信息",
-        "env.missing.body": "没有它，本页任何一个数字都无法和产出它的机器与软件栈对应起来。night-bench 的发布步骤通过 [`meta.json`]({url}) 填写这一段。",
-        "env.not_published": "本次运行未发布：{keys}。",
-        "method.heading": "测量方法",
-        "method.one_process": "**同一个进程、同一批输入。** 一个算子的所有实现都在同一个进程里、用同一批张量计时，先正序再逆序各跑一遍 —— 这样漂移不会只落在最后跑的那个实现上。",
-        "method.budget": "**Ascend nightly 每个实现的采样设置为 WARMUP=10 / REPEATS=30**，报告测量样本的**中位数**，并在**每次迭代之间驱逐 192 MiB L2**。",
-        "method.excluded": "**编译和 workspace 准备的时间不计入。**",
-        "method.device_time": "**被比较的是 device 时间** —— 一次调用在 device 上执行它各个 kernel 的**区间并集**，通过 `torch_npu.profiler` 采集。取不到 device 活动的运行会**失败**，而不是退回另一个时钟。每个工作负载另外保留一份 host 挂钟读数作端到端参考，但**比值用的是 device 时间**：这台机器上 host 与 device 之差是每次测量、两侧各约 40–50 µs 的常数，用 host 计时会把便宜工作负载的比值**推向 1.0**（我们输时遮丑、赢时削峰）。",
-        "index.title": "Benchmark",
-        "index.snapshot.title": "Night-bench 快照",
-        "index.snapshot.line": "**硬件** {gpu} · **提交** [`{sha}`]({commit_url}) · **运行日期** {date} · **{n_ops} 个算子**，{n_workloads} 个工作负载",
-        "index.snapshot.run_link": " · [本次运行]({url})",
-        "index.snapshot.rendered": "页面渲染于 {rendered}，数据取自[最新快照]({url})。",
-        "index.scope.title": "第一阶段现在就是那份验收清单",
-        "index.scope.body": (
-            "自 2026-09-23 起，总览页和各家族数据页都只覆盖 "
-            "**`{name}` 这份第一阶段验收清单的 {n_ops} 个算子**（`{source}`，{n_rows} 行，"
-            "占两行的算子只算一次）—— 对上汇报进度用的就是这份清单。"
-            "在此之前，这些页面覆盖的是 `docs/tasks/OPS-178.md` 里 D018 保留下来的 158 个算子。"
-            "**那一天这些计数的变化，是口径变了，不是性能退了（也不是性能进了）**："
-            "这次调整没有重测任何一个比值，一个算子从一页挪到另一页，它的任何数字都不会变。"
-        ),
-        "index.scope.moved": (
-            "清单之外的算子（Attention 也在其中）只要快照为它发布了比值，"
-            "就在[第二阶段页]({link})上。"
-        ),
-        "index.coverage.heading": "覆盖情况",
-        "index.coverage.rated": "**{total} 个算子里有 {rated} 个**是在完全相同的工作负载上与一个真实对照实现比较的。分母是本页展示的目标集合；阶段一未接入的算子保留空表。未评级的行没有实测比较，或只有 eager 参考实现。",
-        "index.coverage.regime": "**不是一个测量口径。** **{total} 个算子里有 {n_headline} 个**是在本次运行的主口径 `{headline}` 下测的，**{n_off} 个不是**（{off}）。不同口径下的比值**不可比**，所以这两个数分开给，**绝不相加**。每一个不在 `{headline}` 口径下的行、以及每一个这样的算子标题，都带一个说明它是哪个口径的徽章。",
-        "index.coverage.attained": "**按口径分开的达标数**：{parts}。这是从快照自带的普查里**引用**的，不是本页重算的。主口径是 `{headline}`；**其它口径的数列在这里是为了能被读到，不是为了被加进主口径**。",
-        "index.coverage.attained_one": "`{regime}` {n}/{of} 个算子 ≥ {threshold}",
-        'index.coverage.pool': '**每个算子对的是一个候选池。** 主测量口径下符合准入条件的最快候选成为基准。整行保留所有候选及其各自耗时和来源档位。',
-        "index.coverage.handwritten": "**{total} 个算子里有 {n_hw} 个**的候选池里**存在** tier-1 开源库基线 —— 也就是从第三方 Ascend 算子库的源码编出来的 kernel，且只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳。分母同上。这是两个口径里**更严**的那一个，**凡是关于「第三方算子库」的说法都应该引这个数**。",
-        "index.coverage.tilelang_ref": "**{n_tl}/{total} 个算子**的已发布候选池中实测包含 `tilelang-ascend`（`tilelang_ref` 档位）；与上面的开源候选覆盖数可能重叠。",
-        "index.coverage.vendor_only": "**剩下 {total} 里的 {n_vendor} 个**，候选池里只有厂商库实现 —— CANN 内置算子，或 torch_npu 自己的分发。这些行仍然是在完全相同的工作负载上与一个真实实现比较，但**在那里赢了不等于赢过第三方算子库**。每一行的来源徽章会说清它到底是哪一档。",
-        "index.coverage.absent": "**所有表格里都没出现的**：本次运行有 {n_failed} 个工作负载报错、{n_skipped} 个被跳过。",
-        "index.data.heading": "数据页",
-        "index.data.col_page": "页面",
-        "index.data.col_ops": "算子数",
-        "index.data.col_workloads": "工作负载数",
-        "reading.title": "这些数字是怎么来的",
-        "reading.intro": "每个数据页只回答一个问题：**在同一个工作负载上，TileOPs 与同一算子最快的其它实现相比如何？** 每个算子一张表，每个工作负载一行。**不做跨工作负载的平均** —— 页面上每一个数字都只属于一个具体的 shape 和 dtype。",
-        "reading.baseline.heading": "对照的是谁",
-        'reading.baseline.formula': '`比值` = **基准耗时 ÷ 我们的耗时**，在同一测量口径下，按每个 (算子, 工作负载, dtype) 分别计算。两边都按该行的 shape 和 dtype 选择实现。',
-        'reading.baseline.pool': '基线文档决定哪些实现有资格进入对照组。实测在确切工作负载上，选择主测量口径下符合准入条件的最快候选。「对照实现」列保留各候选，所选基准标为 `基准`。',
-        "reading.baseline.tier1": "「对照实现」列保留每个候选的名称、来源档位和实测耗时，包括开源库候选。每行只显示主测量口径的一个比值。标为 `eager` 的 MLIR 候选未经 graph 捕获，其耗时不替代 graph 主比值的基准。",
-        "reading.baseline.single": "只有一个候选的池，harness 记作 `single_candidate`：那个工作负载上只建得起一个对手。它**仍然是一次实测比较** —— 只是没有可比的第二家。",
-        "reading.tier.heading": "档位是什么意思",
-        "reading.tier.intro": "`对照实现` 里的每一行都带一个档位。**档位记录的是这个 kernel 的来源，它完全不说明谁更快。**",
-        "reading.tier.col_tier": "档位",
-        "reading.tier.col_meaning": "含义",
-        "reading.tier.handwritten_row": "从**第三方 Ascend 算子库的源码**编出来的 kernel，通过那个库自己的入口点调用。只有拿到「该库自己编出来的 kernel 确实跑了」的证据才被接纳：一个**缺 kernel 的自定义算子包会静默回落到 CANN 内置**，调用照样成功、输出照样正确、时间照样看着合理。所以这里的来源认定靠的是**追踪进程实际打开了哪个二进制**，绝不是「调用没报错」。",
-        "reading.tier.tilelang_ref_row": "tilelang-ascend（Tile-AI）原始示例或测试 kernel，与我们使用相同 DSL/编译器；通过源码来源证据和数值门禁后才进入实测候选池。此档位说明 kernel 来源，不代表速度排名。",
-        "reading.tier.torch_compile_row": "把同一段 PyTorch 程序交给这块后端上的 `torch.compile`（`aclgraph` 或 `ge`）编出来的实现，作为候选池里的一员一起实测。它既不是手写 kernel，也不是厂商分发，而是**编译器对同一个问题给出的答案**。正因为两边都不属于，它用的是中性徽章；而它在这里赢的次数不少，读者有必要知道赢我们的到底是什么。",
-        "reading.tier.agent_written_row": "由 agent 编写的 kernel，按 D060 与其它档位同样的源码来源证据和数值门禁进入候选池。和这张表里每一个档位一样，它说明的是 kernel 的**来源**，不是它的速度。当前快照中没有任何一行属于这个档位。",
-        "reading.tier.vendor_row": "厂商实现：CANN 内置算子，或 torch_npu 自己对这个算子的分发。它是**完全相同工作负载上的一个真实实现**，而且在这块硬件上**经常就是最快的那个**。",
-        "reading.tier.not_faster": "所以同一行里 `开源库` 的时间**比 `厂商库` 慢**，**不是错误**；在这里的好几个算子族上，这就是常态。**把这个徽章读成强弱排名，正是这一列存在的目的所要防止的那个误解。**",
-        "reading.tier.inventory": "历史普查的分母为 **{total} 个 elementwise、reduction、scan、dropout 算子**。**按本页所渲染的这份快照当场算出**：**{got}/{total} 个**至少有一个 `handwritten` 或 `tilelang_ref` 来源候选取得实测时间，**{none}/{total} 个**没有，另有 **{unknown}/{total} 个**因本次运行没有发布任何 workload 而无法判定。这是 shape/dtype 契约门之后的实测候选池覆盖，不是穷尽源码普查，也不是数值正确性通过率。逐 workload 的实际候选与拒绝原因以记录为准；只赢过厂商实现不能证明赢过开源 kernel。",
-        "reading.regime.heading": "这一行是在哪个口径下测的",
-        "reading.regime.intro": "一个比值只和**同口径**的另一个比值可比。这里每个工作负载都在一个具名的**测量口径（regime）**下测得，本次运行的主口径是 `{headline}` —— 覆盖情况那几条、颜色、算子排序，说的全是这个口径。",
-        "reading.regime.legacy": "有几个算子在这个口径下压根没有测量，发布出来的是一份只测过 `eager` 的旧记录。这些行**保留** —— 那是一次真实工作负载上的真实测量，删掉会让页面凭空变短而且不给理由。取而代之的做法是**把它标出来**。",
-        "reading.regime.badge": "这一行的比值是在 `eager` 下测的，不是 `{headline}`。它只能和其它 `eager` 行比，**绝不能**和它上下的那些行比。",
-        "reading.regime.counts": "概览页上的每一个计数都守同一条规矩：`{headline}` 口径下的算子数和其它口径下的算子数分成两个数报，**绝不合并成一个**。",
-        "reading.colour.heading": "颜色就是结论",
-        "reading.colour.col_meaning": "含义",
-        "reading.colour.behind": "比对照实现慢 —— 低于 {lo}×。",
-        "reading.colour.par": "与它持平 —— {lo}–{hi}×，落在测量噪声内。",
-        "reading.colour.ahead": "比它快 —— {hi}× 及以上。",
-        "reading.colour.unrated": "没有快的对照实现可比 —— 只有一个功能参考实现（名字以 `-{ref}` 结尾）。**这个数字意义不大。**",
-        "reading.colour.none": "这个工作负载上没有任何对照实现跑过。",
-        "reading.colour.note": "比值 = 对照实现的耗时 ÷ 我们的耗时，所以**大于 1 表示 TileOPs 更快**。",
-        "reading.columns.heading": "各列含义",
-        "reading.columns.col_column": "列",
-        "reading.columns.col_meaning": "含义",
-        "reading.columns.workload": "`W1`、`W2`、… —— 每张表上方的图例会把每一个展开：benchmark 自己给它的 id、它跑的 dtype，以及每个输入张量（写成 `名称: shape, dtype`）。形状相同的张量并列在一起，但**各自带自己的 dtype**，所以一个 `bool` 的 `mask` 会在被读到的地方就标明。张量之后是那些**决定算子规模但不决定形状**的维度（GEMM 的 `m`/`n`/`k`，MoE 路由的 `num_experts`），再往后是灰色的、调用时**没有沿用签名默认值**的参数。已经能由其它量确定的不再重复 —— 例如 `max_seqlen_q` 就是 `max(q_lens)`。",
-        "reading.columns.ratio": "`对照 / 我们` —— **基准**的耗时除以我们的耗时。**颜色评的就是这一个数。** 各候选的名称、档位和逐候选耗时见「对照实现」列。",
-        "reading.columns.device_time": "本次调用在 device 上执行它各个 kernel 的**区间并集**，单位毫秒。本页所有比较都用它。每个工作负载另存了一份 host 挂钟读数作端到端参考 —— 两者之差约 40–50 µs，所以**便宜的工作负载用 host 计时会把比值推向 1.0**。详见「测量方法」一节。",
-        'reading.columns.alternatives': '每个候选占一行，各自带耗时（ms）和来源档位。标为 `基准` 的候选用于主比值。名称缩写可悬停查看完整绑定。不同测量口径的耗时应按各自口径解读，包括标为 `eager` 的候选。若运行未发布候选池，则显示实测的具名基线：调优过的库 kernel（`fla`、`mamba`、`fa3`、`triton` 等）、PyTorch 原生算子（`{torch}`），或名字以 `-{ref}` 结尾的 eager 参考拼装实现。',
-        "reading.columns.throughput": "TFLOP/s：所需 FLOPs ÷ 耗时。这个 FLOP 数是**解析算出来的** —— 用算子的 `eval_roofline` 公式代入该工作负载自己的 shape，**不是硬件计数器** —— 所以它算的是**问题本身要求的工作量**，不是 kernel 实际发出的指令。padding、重算、被 mask 掉的 tile 在这里都看不见；这个数**只在同一算子、同一工作负载的不同实现之间可比**。",
-        "reading.columns.sol": "占算法光速（speed-of-light）的比例：该工作负载在物理上最快可能的时间 ÷ 我们的耗时。`比值` 那一列说的是**今天有没有人比我们快**；SOL 说的是**任何人最多还能快多少**。详见下文。",
-        "reading.columns.bound": "决定这个工作负载下限的资源：`mem`（HBM 搬运）、`comp`（计算吞吐），或 `lat` —— 工作负载太小，模型无法判定，它的 SOL 数字也会随之置灰。",
-        "reading.timing_note": "这个耗时具体怎么测的 —— 算进了什么、漏掉了什么、什么情况下它拒绝给出数字 —— 见 [Benchmark 怎么计时](../timing.md)。",
-        "reading.test_marks": "每个算子的标题上带着它的工作负载数和测试结果（✅ 通过 · ❌ 失败 · ⏭️ 全部跳过 · `{empty}` 没有匹配到测试）。",
-        "reading.sol.heading": "光速（Speed of light）",
-        "reading.sol.intro": "**SOL** 是**算法**意义上的光速效率：`max(字节数 / 带宽, FLOPs / 计算屋顶) / 耗时`，其中的天花板用的是这台机器**标定过**的值 —— 微基准在这块硬件上**实际达到**的带宽和计算速率，不是规格书上的数。100% 意味着这个算法在这块硬件上不可能有更快的实现。",
-        "reading.sol.three": "三句话界定一个 SOL 读数的含义：",
-        "reading.sol.bytes": "**字节数是算法的最小搬运量** —— 每个输入读一次、每个输出写一次 —— **不是** kernel 实际产生的 DRAM 流量。一个把数据搬两遍的 kernel 会得低分；**这正是它该得低分的地方**。",
-        "reading.sol.flops": "**FLOPs 按 TileOPs 的计数约定**（一个超越函数算一次），不是按指令的硬件代价。所以这个指标**不会**把一个受特殊函数单元限制的 kernel 认证为已到极限。",
-        "reading.sol.roof": "**计算屋顶取的是「最优实现会用哪个单元」** —— 每个算子显式声明，**绝不从正在跑的 kernel 反推**。所以一个跑在错误单元上的 kernel，衡量它的仍然是那个正确的天花板。",
-        "reading.sol.col_sol": "SOL",
-        "reading.sol.col_bound": "瓶颈",
-        "reading.sol.col_meaning": "含义",
-        "reading.sol.green_equal": "自 {pct} 起",
-        "reading.sol.green_differ": "访存受限自 {mem} 起，计算受限自 {comp} 起",
-        "reading.sol.green_unknown": "以 roofline 规格设定的「已到天花板」线为界",
-        "reading.sol.row_ceiling": "已到可达天花板（{green}）。这条天花板是对各种访存组合取的**包络**，而一个 kernel 自己的组合会低于包络，所以这条线给每种组合都留了余量。再优化最多也只能拿到剩下那一点。",
-        "reading.sol.row_headroom": "还有余量。",
-        "reading.sol.row_lat": "工作负载太小，模型无法判定 —— **主导测量的是启动开销，不是 roofline** —— 所以数字照给，但不评级。",
-        "reading.sol.row_anomaly": "高于标定的天花板：说明**公式或标定有一个是错的**。**绝不能读成「这是个快 kernel」。**",
-        "reading.sol.row_empty": "缺少某个输入：没有 roofline 公式、计时方式不是 device 侧采集，或者这个设备没有硬件档案。",
-        "reading.sol.spec_note": "这个模型、它的阈值以及公式审计机制，规定在 TileOPs 的 [`docs/design/roofline.md`]({url}) 里；本页直接导入那份实现，而不是自己重新推导一遍。",
-        "reading.shapes.heading": "shape 是从哪来的",
-        "reading.shapes.body": "shape 是从 TileOPs 的 [spec manifest]({url}) 里读出来的，按 benchmark id 里的 label 和 dtype 关联到对应行 —— 所以一行给出的是这个算子**声明**可以接受的形状。**manifest 没有声明的工作负载** —— 也就是人工编写的、不由 spec 驱动的边界用例探针 —— 改为显示快照为那次运行**记录下来的**形状：那是实测的一次调用，不是一份声明。两者都没有时，这一行只显示 benchmark id，下面没有 shape。",
-        "reading.empty.heading": "空单元格",
-        "reading.empty.body": "`{empty}` 表示**这个指标的某个输入没有被记录**，**绝不表示值是零**：可能是该算子在这个工作负载上没有报告 FLOP 数，或者根本没有对照实现在它上面跑过。",
-        "reading.empty.untimed": "在对照组里，同一种「缺失」有它自己的写法。**被选中却从未被实测**的候选，记作 `not-timed`。如果本次运行在别处发布了那个基线的时间，单元格就显示那个值并跟一个 `*`，把原因写在单元格的提示里；如果连别处也没有，单元格就是 `{empty}`。**两种情况都绝不会渲染成 `0`** —— 那会被读成一个无限快的 kernel。",
-    },
-}
-
-# The default locale a missing or untranslated key falls back to.
-DEFAULT_LANG = "en"
-# The locales the renderer writes, and the file suffix each one takes. The
-# suffix is what mkdocs-static-i18n reads in `docs_structure: suffix` mode.
-LANG_SUFFIX = {"en": ".md", "zh": ".zh.md"}
-
-
-def _S(lang: str, key: str, **fmt) -> str:
-    """One user-visible string, in `lang`, with its values substituted.
-
-    An untranslated key falls back to the default locale rather than
-    rendering a blank or a key name: a page with one string still to
-    translate stays readable.
-    """
-    table = STRINGS.get(lang) or STRINGS[DEFAULT_LANG]
-    text = table.get(key) or STRINGS[DEFAULT_LANG][key]
-    return text.format(**fmt) if fmt else text
 
 
 # --- Markdown helpers ------------------------------------------------------
@@ -1503,11 +562,7 @@ def op_link(op: str, module: str | None, ref: str) -> str:
         rel = "src/" + module.replace(".", "/") + ".py"
         if os.path.exists(os.path.join(TILEOPS, rel)):
             return f"{_GH}/blob/{ref}/{rel}"
-    # `repo:` scopes the search, and it scoped it to UPSTREAM while the host was
-    # already this fork: every one of these links searched tile-ai/TileOPs for a
-    # symbol that may only exist here. Percent-encoded, which is why a grep for
-    # `tile-ai/TileOPs` never found it (T283).
-    return f"{_GH}/search?q=repo%3Ayyttt6%2FTileOPs+{op}&type=code"
+    return f"{_GH}/search?q=repo%3Atile-ai%2FTileOPs+{op}&type=code"
 
 
 def _op_cell(op: str, module: str | None, ref: str) -> str:
@@ -1567,84 +622,111 @@ def _bound_cell(sol: dict | None) -> str:
 # Every number belongs to one workload: a median over shapes orders of magnitude
 # apart matches no reproducible run. HTML because Markdown cannot span a heading
 # across columns; no class, because the CSS keys off `table:not([class])`.
-def detail_header(lang: str = DEFAULT_LANG, tiered: bool = False) -> tuple[str, ...]:
-    return (
-        "<table>",
-        "<thead>",
-        "<tr>",
-        # These three say what the row is; the rule after them divides that from
-        # what it measured. Each spans both header rows, so the rule has no gap.
-        f'<th rowspan="2" class="colsep">{_S(lang, "table.head.workload")}</th>',
-        f'<th>{_S(lang, "table.head.ratio")}</th>',
-        f'<th>{_S(lang, "table.head.device_time")}</th>',
-        f'<th colspan="2">{_S(lang, "table.head.alternatives")}</th>',
-        f'<th>{_S(lang, "table.head.throughput")}</th>',
-        f'<th>{_S(lang, "table.head.sol")}</th>',
-        f'<th>{_S(lang, "table.head.bound")}</th>',
-        "</tr>",
-        # The second row carries what a header word cannot: the unit, and which way
-        # the ratio divides. Every numeric column states its own on the same line.
-        "<tr>",
-        f'<th class="subhead">{_S(lang, "table.sub.ratio")}</th>',
-        f'<th class="subhead">{_S(lang, "table.sub.device_time")}</th>',
-        # The sub-head names the tier badge only where the snapshot published
-        # tiers. Promising a tier the rows do not carry is worse than no label.
-        f'<th class="subhead">'
-        f'{_S(lang, "table.sub.alt_name_tiered" if tiered else "table.sub.alt_name")}'
-        f"</th>",
-        f'<th class="subhead">{_S(lang, "table.sub.alt_time")}</th>',
-        f'<th class="subhead">{_S(lang, "table.sub.throughput")}</th>',
-        f'<th class="subhead">{_S(lang, "table.sub.sol")}</th>',
-        f'<th class="subhead">{_S(lang, "table.sub.bound")}</th>',
-        "</tr>",
-        "</thead>",
-        "<tbody>",
-    )
+DETAIL_HEADER = (
+    "<table>",
+    "<thead>",
+    "<tr>",
+    # These two say what the row is; the rule after them divides that from
+    # what it measured. Each spans both header rows, so the rule has no gap.
+    '<th rowspan="2">Workload</th>',
+    '<th rowspan="2" class="colsep">dtype</th>',
+    "<th>Ratio</th>",
+    "<th>Device time</th>",
+    '<th colspan="2">Alternatives</th>',
+    "<th>Throughput</th>",
+    "<th>SOL</th>",
+    "<th>Bound</th>",
+    "</tr>",
+    # The second row carries what a header word cannot: the unit, and which way
+    # the ratio divides. Every numeric column states its own on the same line.
+    "<tr>",
+    '<th class="subhead">alt / ours</th>',
+    '<th class="subhead">ms</th>',
+    '<th class="subhead">name</th>',
+    '<th class="subhead">ms</th>',
+    '<th class="subhead">TFLOP/s</th>',
+    '<th class="subhead">of ceiling</th>',
+    '<th class="subhead">by</th>',
+    "</tr>",
+    "</thead>",
+    "<tbody>",
+)
 
 
 DETAIL_FOOTER = ("</tbody>", "</table>")
 
 
-def _stack(cells: list[str], pick: int = 0) -> str:
+def _stack(cells: list[str]) -> str:
     """One line per alternative, fastest first. Both sub-columns stack in the
     same order, so they read across without a nested table.
 
-    Only one line stays at full strength: `pick`, the alternative `Ratio`
-    divides by. The others are context, and reading them as equals costs a
-    reader the moment of finding which bar was actually cleared. `pick` is a
-    parameter rather than always the first line because a pool whose winner the
-    harness did not write first must still be marked on the line that won.
+    Only the first line stays at full strength: it is the one `Ratio` divides
+    by. The slower alternatives are context, and reading them as equals costs a
+    reader the moment of finding which bar was actually cleared.
     """
     if not cells:
         return EMPTY
-    if len(cells) == 1:
-        return cells[0]
-    return "<br>".join(
-        c if i == pick else f'<span class="alt-slow">{c}</span>'
-        for i, c in enumerate(cells))
+    head, *rest = cells
+    if not rest:
+        return head
+    tail = "<br>".join(f'<span class="alt-slow">{c}</span>' for c in rest)
+    return f"{head}<br>{tail}"
 
 
-WORKLOAD_CODE = "W"
+def _label_of(w: dict, m: dict) -> tuple[str, list[str]]:
+    """The manifest label a row ran under, and the dtypes its case id names.
+
+    A case id is the label followed by one dtype per dtype index the case
+    assigns, so `square-b4-float8_e4m3fn-bfloat16` is the label `square-b4` at
+    `fp8e4m3/bf16`. A row with no manifest entry strips the trailing dtype names
+    off its own id; an id that ends in none is its own label.
+    """
+    config, spec = w["config"], w.get("spec")
+    label = spec.label if spec and spec.label else None
+    if label and config.startswith(label + "-"):
+        tokens = config[len(label) + 1:].split("-")
+    elif label:
+        tokens = [spec.dtype] if spec.dtype else []
+    else:
+        parts = config.split("-")
+        tokens = []
+        while len(parts) > 1 and parts[-1] in workload_shape.DTYPE_ABBR:
+            tokens.insert(0, parts.pop())
+        label = "-".join(parts)
+        if not tokens and m.get("dtype"):
+            tokens = [m["dtype"]]
+    return label, tokens
 
 
-def _facts(spec) -> OrderedDict:
-    """Every scalar a workload sets, as name -> (value, kind).
+def _dtype_text(tokens: list[str]) -> str:
+    return "/".join(workload_shape.abbr_dtype(t) for t in tokens) or EMPTY
 
-    The symbols of the tensor templates come first, since those are the numbers
-    the shapes are made of; then the dimensions the manifest names outright,
-    then the parameters, which are how the op was called rather than how big it
-    is and stay dimmed wherever they are printed.
+
+def _label_html(label: str) -> str:
+    """A label that may wrap after any hyphen, and nowhere else."""
+    return html.escape(label).replace("-", "-<wbr>")
+
+
+def _facts(spec, dtypes=()) -> OrderedDict:
+    """Every scalar a workload sets but its dtype, as name -> (value, kind).
+
+    The symbols of the tensor templates come first, marked `sym` since a row's
+    concrete shapes already state them; then the dimensions the manifest names
+    outright, then the parameters, dimmed wherever they are printed. A parameter set to one of
+    the row's `dtypes` — an `out_dtype` — is part of the case id, and the
+    dtype column states it.
     """
     facts = OrderedDict()
-    if spec.dtype:
-        facts["dtype"] = (workload_shape.abbr_dtype(spec.dtype), "dim")
+    if not spec:
+        return facts
     if spec.symbolic:
         for name, value in spec.bindings.items():
-            facts[name] = (str(value), "dim")
+            facts[name] = (str(value), "sym")
     for name, value in spec.dims:
         facts.setdefault(name, (value, "dim"))
     for name, value in spec.params:
-        facts[name] = (value, "param")
+        if value not in dtypes:
+            facts[name] = (value, "param")
     return facts
 
 
@@ -1680,10 +762,13 @@ def _cells(entries) -> str:
 
 _TAG = __import__("re").compile(r"<[^>]+>")
 
-# How wide a line of entries may be before it is set differently, in characters
-# of the key's monospace against the content column.
-WRAP_TENSORS = 96   # a tensor list wraps -> one tensor per line
-WRAP_DELTA = 74     # a row's own scalars wrap -> id and scalars on two lines
+# How wide a tensor list may be before it is set one tensor per line, in
+# characters of the key's monospace against the content column.
+WRAP_TENSORS = 96
+
+
+# Past this a label wraps in the key's label column; its cluster stacks instead.
+LONG_LABEL = 32
 
 
 def _width(entries) -> int:
@@ -1691,87 +776,131 @@ def _width(entries) -> int:
     return sum(len(_TAG.sub("", body)) + 3 for body, _ in entries)
 
 
-def _cluster(rows: list) -> list:
-    """An op's workloads, grouped by what they have in common.
+def _tensors_of(specs: list, bases: list, symbolic: bool = True):
+    """One tensor list for every dtype a label ran at, or None if none exists.
 
-    The key is the description with every size taken out: which tensors, named
-    together how, in the manifest's symbols. The dtype is not part of it — a
-    workload in `f16` beside one in `bf16` carries that as one more thing that
-    varies. A tensor in a dtype of its own does split the group, since then the
-    tensor list itself differs.
+    Returns `(kind, [(names, shape, dtype)])`: `kind` is `"sym"` where the
+    shapes are the manifest's symbols, `"con"` where they are concrete. A
+    tensor states a dtype where it is the same in every row and not the row's
+    own — an `f32` bias beside `bf16` and `f16` inputs — and none where it
+    follows the row. A row's own dtype is `bases[i]`, the first one its dtype
+    column shows, so a case named by an `out_dtype` marks every input not in
+    it. Any other difference between the rows leaves no one list true for all
+    of them. `symbolic=False` asks for the concrete list alone.
     """
-    groups = OrderedDict()
-    for code, w in rows:
-        spec = w.get("spec")
-        if not spec:
-            key = None
-        elif spec.symbolic:
-            key = ("sym", *(c for c, _ in _tensors_html(spec.symbolic,
-                                                        spec.dtype)))
+    if not all(specs):
+        return None
+    lists = [("sym", s.symbolic) if symbolic and s.symbolic else ("con", s.tensors)
+             for s in specs]
+    kind, first = lists[0]
+    if any(k != kind or [e[:2] for e in es] != [e[:2] for e in first]
+           for k, es in lists):
+        return None
+    out = []
+    for i, (names, shape, _) in enumerate(first):
+        dtypes = [es[i][2] or s.dtype for s, (_, es) in zip(specs, lists, strict=True)]
+        if all(d == b for d, b in zip(dtypes, bases, strict=True)):
+            out.append((names, shape, None))
+        elif len(set(dtypes)) == 1:
+            out.append((names, shape, dtypes[0]))
         else:
-            # No template to write the shapes in: the row prints its own, so
-            # the group is only there to hold workloads taking the same tensors.
-            key = ("con", *(n for n, _, _ in spec.tensors))
-        groups.setdefault(key, []).append((code, w))
-    return list(groups.values())
+            return None
+    return kind, out
 
 
-def workload_key(rows: list) -> list:
-    """What each row of an op's table ran on, listed above it.
+def label_groups(workloads: list, metrics: list) -> list:
+    """An op's rows, one group per label, groups clustered by shape.
 
-    An op's workloads are nearly the same run at several sizes, so what they
-    share is stated once — in the manifest's own symbols, `q k [B, H, DK]` — and
-    each row carries only the symbols that vary on it. Inside the table's first
-    column the same shapes would squeeze the measurements off the window.
+    Returns clusters of groups, each group a dict of `label`, `facts` (the
+    scalars it was set to), `tensors` (see `_tensors_of`), `concrete` (the same
+    tensors with the symbols substituted) and `rows`, a list of
+    `(dtype, metrics)`. The snapshot lists an op's rows in the manifest's
+    order, and every level keeps the order it first meets its members in, so a
+    size sweep reads in the order the manifest declares it.
 
-    Order follows the table's rows, so `W3` is the third row.
+    A label whose dtypes differ in anything but the dtype — another shape,
+    another symbol value — is one group per description, each under the same
+    label: folding them would state one row's shapes for another's numbers.
+
+    A cluster holds the groups written in the same symbols: which tensors,
+    named together how. The dtype is not part of it. Groups with concrete
+    shapes cluster by tensor names alone, since each prints its own shapes.
     """
-    if not rows:
+    buckets = OrderedDict()
+    for w, m in zip(workloads, metrics, strict=True):
+        label, dtypes = _label_of(w, m)
+        spec = w.get("spec")
+        facts = _facts(spec, dtypes)
+        base = dtypes[0] if dtypes else spec and spec.dtype
+        buckets.setdefault((label, tuple(facts.items())), []).append(
+            (spec, facts, _dtype_text(dtypes), m, base))
+
+    groups = []
+    for (label, _), members in buckets.items():
+        parts = [members]
+        if _tensors_of([mb[0] for mb in members], [mb[4] for mb in members]) is None:
+            split = OrderedDict()
+            for member in members:
+                spec = member[0]
+                key = spec and (spec.symbolic, spec.tensors, spec.dtype, member[4])
+                split.setdefault(repr(key), []).append(member)
+            parts = list(split.values())
+        for part in parts:
+            specs, bases = [mb[0] for mb in part], [mb[4] for mb in part]
+            groups.append({"label": label, "facts": part[0][1],
+                           "tensors": _tensors_of(specs, bases),
+                           "concrete": _tensors_of(specs, bases, symbolic=False),
+                           "rows": [(mb[2], mb[3]) for mb in part]})
+
+    clusters = OrderedDict()
+    for group in groups:
+        t = group["tensors"]
+        key = (None if t is None else
+               (t[0], *t[1]) if t[0] == "sym" else (t[0], *(n for n, _, _ in t[1])))
+        clusters.setdefault(key, []).append(group)
+    return list(clusters.values())
+
+
+def workload_key(clusters: list) -> list:
+    """What each label of an op's table ran on, listed above it.
+
+    Labels written in the same symbols share one template, `q, k: [B, H, DK]`,
+    stated once; each label prints its shapes substituted, `q, k: [1, 8, 128]`.
+    What every label of a cluster shares goes above them, only when there are
+    two or more. Order follows the table's row groups.
+    """
+    if not clusters:
         return []
     blocks = []
-    for group in _cluster(rows):
-        specs = [w.get("spec") for _, w in group]
-        if not specs[0]:
-            # No manifest entry: the id is all there is to say. Still a group
-            # and still a list, so the code column lines up with every other
-            # op's and the styling is the one thing that does not vary.
-            bare = "".join(
-                f'<li><b>{code}</b><span class="wl-delta"></span>'
-                f'<code class="wl-id">{html.escape(w["config"])}</code></li>'
-                for code, w in group)
-            blocks.append('<div class="wl-group"><ul class="wl-rows">'
-                          + bare + "</ul></div>")
-            continue
-        facts = [_facts(s) for s in specs]
-        # A symbolic template describes the whole group only where every
-        # workload in it resolved to the same symbols.
-        symbolic = specs[0].symbolic
-        if not all(s.symbolic == symbolic for s in specs):
-            symbolic = None
-        shared = [n for n in facts[0]
-                  if all(f.get(n) == facts[0][n] for f in facts)]
-
-        head = _tensors_html(symbolic, specs[0].dtype) if symbolic else []
+    for cluster in clusters:
+        facts = [OrderedDict((n, v) for n, v in g["facts"].items()
+                             if not (g["concrete"] and v[1] == "sym"))
+                 for g in cluster]
+        for f, g in zip(facts, cluster, strict=True):
+            dtypes = list(OrderedDict.fromkeys(d for d, _ in g["rows"]))
+            f["dtype"] = (", ".join(dtypes), "dim")
+        shared = ([n for n in facts[0]
+                   if all(f.get(n) == facts[0][n] for f in facts)]
+                  if len(cluster) > 1 else [])
+        # One cluster is one symbolic template, stated once above its labels.
+        tensors = cluster[0]["tensors"]
+        symbolic = tensors is not None and tensors[0] == "sym"
+        head = _tensors_html(tensors[1], None) if symbolic else []
         scalars = [_fact_html(n, *facts[0][n]) for n in shared]
 
-        rows_html, deltas = [], []
-        for (code, _), spec, fact in zip(group, specs, facts, strict=True):
-            varies = [_fact_html(n, *v) for n, v in fact.items()
-                      if n not in shared]
-            # Without a template the group has nothing to hold in common, so
-            # the row states its own tensors outright.
-            if not symbolic:
-                varies = _tensors_html(spec.tensors, spec.dtype) + varies
-            deltas.append(varies)
+        rows_html = []
+        for group, fact in zip(cluster, facts, strict=True):
+            # A long row breaks between tensors and scalars before inside either.
+            tensor_cells = (_tensors_html(group["concrete"][1], None)
+                            if group["concrete"] else [])
+            scalar_cells = [_fact_html(n, *v) for n, v in fact.items()
+                            if n not in shared]
+            parts = "".join(f'<span class="wl-part">{_cells(c)}</span>'
+                            for c in (tensor_cells, scalar_cells) if c)
+            flow = f'<span class="wl-flow">{parts}</span>' if parts else ""
             rows_html.append(
-                f'<li><b>{code}</b><span class="wl-delta">'
-                + _cells(varies) +
-                f'</span><code class="wl-id">{html.escape(spec.label)}</code></li>')
-        # Where one row's scalars are wider than the column, the whole group is
-        # set on two lines — id under the code, scalars under that — so every
-        # row in it breaks the same way.
-        long = (" wl-long" if any(_width(d) > WRAP_DELTA for d in deltas)
-                else "")
+                f'<li><code class="wl-id">{_label_html(group["label"])}</code>'
+                f'<span class="wl-delta">{flow}</span></li>')
 
         block = []
         # Tensors and scalars on lines of their own: what the op takes, then how
@@ -1782,174 +911,36 @@ def workload_key(rows: list) -> list:
             block.append(f'<p class="wl-shared{stack}">{_cells(head)}</p>')
         if scalars:
             block.append(f'<p class="wl-shared">{_cells(scalars)}</p>')
-        block.append(f'<ul class="wl-rows{long}">' + "".join(rows_html) + "</ul>")
+        long = any(len(g["label"]) > LONG_LABEL for g in cluster)
+        block.append(f'<ul class="wl-rows{" wl-long" if long else ""}">'
+                     + "".join(rows_html) + "</ul>")
         blocks.append(f'<div class="wl-group">{"".join(block)}</div>')
     return ['<div class="wl-key">', *blocks, "</div>", ""]
 
 
-# --- The Alternatives column, for a snapshot that publishes a D036 pool -----
-# A candidate names its binding and then how that binding is reached: `-> ` a
-# C++ template instantiation, ` / ` the second entry point of a two-phase aclnn
-# call. Both run past a hundred characters, and the cells in this table do not
-# wrap, so one of them would set the width of the whole page. The identifying
-# head is shown and the full string stays on the cell as its title.
-_POOL_REACH = (" -> ", " / ")
-
-
-def _short_candidate(name: str, prov: str | None) -> str:
-    if prov == PROV_TILELANG_REF and name.startswith("tilelang-ascend:"):
-        return "tilelang-ascend"
-    short = name.split()[0] if ":" in name.split()[0] else name
-    for sep in _POOL_REACH:
-        short = short.split(sep)[0].strip()
-    # `torch_npu eager (vendor)` carries its own tier in its name, and the badge
-    # beside it says the same thing. Drop the repeat, never a different suffix.
-    if prov and short.endswith(f"({prov})"):
-        short = short[: -len(prov) - 2].strip()
-    return short or name
-
-
-def _tier_badge(prov: str | None, lang: str, name: str = "") -> str:
-    """The provenance tier, badged and linking to what a tier means.
-
-    Clickable on purpose: a reader who meets `handwritten` beside a slower time
-    than `vendor` has to be able to reach the sentence saying that a tier is
-    about where the kernel came from and not about which is faster.
-    """
-    if not prov:
-        return ""
-    label = _S(lang, PROV_LABEL_KEY[prov]) if prov in PROV_LABEL_KEY else prov
-    # Historical snapshots also attach tilelang_ref to the separate MLIR replay.
-    # Keep its library identity; it is not a tilelang-ascend source candidate.
-    if prov == PROV_TILELANG_REF and name.startswith("tilelang-mlir-ascend"):
-        label = "tilelang-mlir-ascend"
-    cls = PROV_CLASS.get(prov, "tier-other")
-    return (f' <a class="tier {cls}" href="{PROV_HREF}"'
-            f' title="{html.escape(_S(lang, "tier.title"), quote=True)}">'
-            f"{html.escape(label)}</a>")
-
-
-def _regime_badge(regime: str | None, lang: str) -> str:
-    """The measurement regime, badged, when it is not the headline one.
-
-    Returns the empty string for the headline regime and for a row that never
-    said which regime it was: badging every row would make the badge scenery,
-    and the only thing a reader has to be stopped by is a number taken a
-    different way from the ones above and below it.
-
-    Off the verdict axis and off the tier axis on purpose -- it is neither a
-    result nor a provenance -- so it is an outline, in ink, in neither hue.
-    Clickable, because "this row is eager" means nothing without the sentence
-    saying eager and graph ratios are not comparable.
-    """
-    if not regime or regime == headline_regime():
-        return ""
-    return (f' <a class="regime-off" href="{REGIME_HREF}"'
-            f' title="{html.escape(_S(lang, "regime.title", headline=headline_regime()), quote=True)}">'
-            f"{html.escape(regime)}</a>")
-
-
-def _pool_name_cell(c: dict, is_pick: bool, lang: str) -> str:
-    short = _short_candidate(c["name"], c["prov"])
-    body = f"<code>{html.escape(short)}</code>"
-    if short != c["name"]:
-        body = (f'<abbr title="{html.escape(c["name"], quote=True)}">'
-                f"{body}</abbr>")
-    pick = ""
-    if is_pick:
-        pick = (f' <span class="alt-pick"'
-                f' title="{html.escape(_S(lang, "alt.basis_title"), quote=True)}">'
-                f'{html.escape(_S(lang, "alt.basis"))}</span>')
-    note = c.get("tier_note")
-    if note and c.get("external"):
-        n = c.get("n")
-        threshold = (f" n={n}; below N>=5 publication threshold."
-                     if isinstance(n, (int, float)) and n < 5 else "")
-        note = re.sub(r"\s*n=\d+; below N>=5 publication threshold\.", threshold, note)
-    evidence = (f' <abbr title="{html.escape(note, quote=True)}">ⓘ</abbr>'
-                if note else "")
-    if c.get("external"):
-        n = c.get("n")
-        sample_note = (f'n={n} &lt; 5 · provisional' if isinstance(n, (int, float)) and n < 5
-                       else f'n={n}' if isinstance(n, (int, float)) and n >= 5
-                       else 'n=unknown · provisional')
-        evidence += f' <small>eager · {sample_note}</small>'
-    return body + _tier_badge(c["prov"], lang, c["name"]) + evidence + pick
-
-
-def _pool_time_cell(c: dict, fallback_ms: float | None, lang: str) -> str:
-    """One candidate's device time, or a marked stand-in when it has none.
-
-    `not-timed` is the harness recording that it never measured this candidate.
-    The winner's time is published separately, so it is shown and marked as the
-    stand-in it is; a loser's is not, and the cell stays the empty marker.
-    Neither may render as `0`, which would read as an infinitely fast kernel.
-    """
-    if c["ms"] is not None:
-        return _sig_ms(c["ms"])
-    if fallback_ms:
-        return (f'<span class="alt-untimed"'
-                f' title="{html.escape(_S(lang, "alt.untimed_title"), quote=True)}">'
-                f"{_sig_ms(fallback_ms)}*</span>")
-    return (f'<span class="alt-untimed"'
-            f' title="{html.escape(_S(lang, "alt.untimed_empty_title"), quote=True)}">'
-            f"{EMPTY}</span>")
-
-
-def _pool_cells(m: dict, lang: str) -> tuple[str, str]:
-    """The two Alternatives sub-columns for a workload that raced a pool."""
-    pool = m["pool"]
-    names = [c["name"] for c in pool]
-    # The winner is named outright by the snapshot; matching on it rather than
-    # taking the first line means the mark cannot drift from the number the
-    # ratio used if the pool is ever written in another order.
-    pick = names.index(m["pool_winner"]) if m["pool_winner"] in names else 0
-    refused = m.get("pool_refused")
-    evidence = (f' <abbr title="{html.escape(refused, quote=True)}">ⓘ</abbr>'
-                if refused else "")
-    return (
-        _stack([_pool_name_cell(c, i == pick, lang)
-                for i, c in enumerate(pool)], pick) + evidence,
-        _stack([_pool_time_cell(c, m["baseline_ms"] if i == pick else None, lang)
-                for i, c in enumerate(pool)], pick),
-    )
-
-
-def detail_row(code: str, m: dict, lang: str = DEFAULT_LANG) -> str:
+def detail_row(dtype: str, m: dict, label: str | None = None,
+               span: int = 1) -> str:
+    """One measured row. The first row of a label group carries the label,
+    spanning the group's dtype rows."""
     ordered = sorted(m["rivals"].items(), key=lambda kv: kv[1]["busy_ms"])
-    if m.get("pool"):
-        names, times = _pool_cells(m, lang)
-    else:
-        # Without a pool line this printed the raw tag, so an op whose adapter
-        # produced no per-case race record read `baseline` -- which is exactly the
-        # column a reader needs to answer "is the opponent real?".  Prefer the
-        # winner's name when the snapshot carries one; it is the kernel that
-        # actually ran, e.g. `aclnnSoftplus_SoftplusV2_SoftplusV2` rather than
-        # `baseline`.  Falls back to the tag when there is no name at all.
-        def _rival_label(t: str) -> str:
-            name = m.get("pool_winner") if t == _LEGACY_TAG else None
-            return html.escape(name or t)
-        names = _stack([f"<code>{_rival_label(t)}</code>" for t, _ in ordered])
-        times = _stack([_sig_ms(r["busy_ms"]) for _, r in ordered])
-    if m.get("external_pending_note"):
-        names += f'<br><small>{html.escape(m["external_pending_note"])}</small>'
+    names = _stack([f"<code>{html.escape(t)}</code>" for t, _ in ordered])
+    times = _stack([_sig_ms(r["busy_ms"]) for _, r in ordered])
     # Against the fastest non-reference alternative, so a win over an eager
     # reference is not painted as a win over a real one — see `_ratio_cell`.
     real = [r for _, r in ordered if r["tier"] != TIER_REF and r["speedup"]]
     weak = [r for _, r in ordered if r["tier"] == TIER_REF and r["speedup"]]
     gap = _ratio_cell(real[0]["speedup"] if real else
                       weak[0]["speedup"] if weak else None,
-                      rated=bool(real) and not m.get("measurement_note"))
-    if m.get("measurement_note"):
-        gap += (f'<br><small title="{html.escape(m["measurement_note"], quote=True)}">'
-                f'{html.escape(m["measurement_note"])}</small>')
-    # On the Ratio cell rather than in a column of its own: the badge qualifies
-    # one number, and a column would make a reader scan sideways to find out
-    # that the number they just read is not on the same footing as the rest.
-    gap += _regime_badge(m.get("regime"), lang)
+                      rated=bool(real))
+    name = ""
+    if label is not None:
+        rowspan = f' rowspan="{span}"' if span > 1 else ""
+        name = (f'<td class="wl-name"{rowspan}>'
+                f"<code>{_label_html(label)}</code></td>")
     return (
         "<tr>"
-        f'<td class="colsep"><b>{code}</b></td>'
+        f"{name}"
+        f'<td class="colsep">{html.escape(dtype)}</td>'
         f"<td>{gap}</td>"
         f"<td>{_sig_ms(m['busy_ms'])}</td>"
         f"<td>{names}</td>"
@@ -1972,7 +963,7 @@ ENV_ORDER = ["image", "gpu", "driver", "cuda", "torch", "tilelang", "timer"]
 _ENV_HIDE = {"warmup_ms", "repeat_ms"}
 
 
-def env_block(meta: dict, timing: str | None, lang: str = DEFAULT_LANG) -> list[str]:
+def env_block(meta: dict, timing: str | None) -> list[str]:
     """The stack the numbers were produced on, from the published meta.json."""
     # A nested value is an inventory, not a fact for this table.
     env = {k: v for k, v in (meta.get("environment") or {}).items()
@@ -1980,11 +971,13 @@ def env_block(meta: dict, timing: str | None, lang: str = DEFAULT_LANG) -> list[
     packages = meta.get("packages") or (meta.get("environment") or {}).get("packages") or {}
     if timing and "timer" not in env:
         env["timer"] = timing
-    lines = [f'## {_S(lang, "env.heading")}', ""]
+    lines = ["## Environment", ""]
     if not env:
         lines += [
-            f'!!! warning "{_S(lang, "env.missing.title")}"', "",
-            "    " + _S(lang, "env.missing.body", url=_NB), "",
+            '!!! warning "The run did not publish its environment"', "",
+            "    Without it a number on these pages cannot be tied to the "
+            "machine and the stack that produced it. The nightly's publish "
+            f"step fills this in through [`meta.json`]({_NB}).", "",
         ]
     else:
         keys = ([k for k in ENV_ORDER if k in env]
@@ -1995,283 +988,227 @@ def env_block(meta: dict, timing: str | None, lang: str = DEFAULT_LANG) -> list[
         missing = [k for k in ("image", "driver", "cuda", "torch", "tilelang")
                    if k not in env and k not in packages]
         if missing:
-            lines += ["", _S(lang, "env.not_published",
-                             keys=", ".join(f"`{k}`" for k in missing))]
+            lines += ["", "Not published by this run: "
+                      + ", ".join(f"`{k}`" for k in missing) + "."]
     # The installed-package inventory is not published here: a few hundred rows,
     # and the versions that matter are in the table above. The snapshot carries
     # it for anyone reproducing a run.
     return lines + [""]
 
 
-def method_block(lang: str = DEFAULT_LANG) -> list[str]:
+def method_block() -> list[str]:
     """How the numbers were taken. Fixed policy of the benchmark layer.
 
     Kept to what changes how a number should be read. The reasoning behind the
     compared quantity lives on the reading page, not here.
     """
     return [
-        f'## {_S(lang, "method.heading")}', "",
-        *("- " + _S(lang, k) for k in ("method.one_process", "method.budget",
-                                       "method.excluded",
-                                       "method.device_time")),
-        ("- MLIR 对手在子进程测量，以父子进程共同 case 标尺的中位数之比校正；"
-         "每轮同时测量 case 与固定 global 标尺。仅进入 eager 池；候选旁标明实际 N，"
-         "N<5 或样本数未知的候选保留 provisional 标注，不计入达标数。"
-         if lang == "zh" else
-         "- MLIR opponents are measured in a subprocess and corrected by the ratio "
-         "of common case-yardstick medians, with fresh case and fixed global yardsticks "
-         "in every round. They enter the eager pool only. Each candidate shows its actual N; "
-         "N<5 or unknown counts remain provisional and do not count as attainment."),
+        "## Method", "",
+        "- **One process, common inputs.** Every implementation of an op is "
+        "timed on the same tensors in the same process, in forward and then "
+        "reversed order so drift does not land on whichever ran last.",
+        "- **A fixed warmup and measurement budget** per implementation, "
+        "reported as the median over however many samples fit in it, with L2 "
+        "cleared between iterations.",
+        "- **Compilation and workspace setup excluded.**",
+        "- **Device time is what is compared** — the union of the intervals the "
+        "device spent executing the call's kernels, collected through CUPTI. A "
+        "run that cannot collect device activity fails rather than falling back "
+        "to a different clock.",
         "",
     ]
 
 
 def index_page(args, meta: dict, rows: list[tuple],
                by_page: dict, timing: str | None,
-               n_workloads: int, n_failed: int, n_skipped: int,
-               lang: str = DEFAULT_LANG, notice: list[str] | None = None) -> str:
+               n_workloads: int, n_failed: int, n_skipped: int) -> str:
     run_id = meta.get("run_id")
     head = [
-        f'# {_S(lang, "index.title")}', "",
-        f'!!! info "{_S(lang, "index.snapshot.title")}"', "",
-        "    " + _S(lang, "index.snapshot.line",
-                    gpu=args.gpu, sha=args.commit[:12],
-                    commit_url=f"{_GH}/commit/{args.commit}", date=args.date,
-                    n_ops=len(rows), n_workloads=n_workloads),
+        "# Benchmarks", "",
+        '!!! info "Nightly snapshot"', "",
+        f"    **GPU** {args.gpu} · **commit** "
+        f"[`{args.commit[:12]}`]({_GH}/commit/{args.commit}) · "
+        f"**run date** {args.date} · **{len(rows)} ops**, {n_workloads} workloads",
     ]
     if run_id:
-        head.append("    " + _S(lang, "index.snapshot.run_link",
-                                url=f"{_GH}/actions/runs/{run_id}"))
+        head.append(f"    · [nightly run]({_GH}/actions/runs/{run_id})")
     if args.rendered:
-        head += ["", "    " + _S(lang, "index.snapshot.rendered",
-                                 rendered=args.rendered, url=_NB)]
+        head += ["", f"    Page rendered {args.rendered} from the "
+                 f"[latest snapshot]({_NB})."]
     head.append("")
-    # T366: right under the snapshot box, above every count it qualifies.
-    head += notice or []
 
-    lines = head + env_block(meta, timing, lang) + method_block(lang)
+    lines = head + env_block(meta, timing) + method_block()
 
     # What the run covers and how far to trust it — the qualifications a reader
     # needs before reading any single number off a data page.
     by = Counter(s["status"] for _, _, s, _, _ in rows)
     rated = len(rows) - by[UNRATED]
-    total = len(rows)
-    lines += [f'## {_S(lang, "index.coverage.heading")}', "",
-              "- " + _S(lang, "index.coverage.rated",
-                        rated=rated, total=total)]
-    # The regime split of that same denominator. Written only when the snapshot
-    # actually holds more than the headline regime: a run measured wholly one way
-    # needs no qualification, and a bullet that always fires would be the kind of
-    # standing disclaimer readers learn to skip.
-    off = sorted({r for _, _, s, _, _ in rows for r in s.get("off_headline", ())})
-    if off:
-        head = headline_regime()
-        n_head = sum(1 for _, _, s, _, _ in rows
-                     if head in s.get("regimes", ()) and not s.get("off_headline"))
-        per = {r: sum(1 for _, _, s, _, _ in rows if r in s.get("off_headline", ()))
-               for r in off}
-        lines.append("- " + _S(lang, "index.coverage.regime", headline=head,
-                               n_headline=n_head, total=total,
-                               n_off=sum(per.values()),
-                               off=" · ".join(f"`{r}` {n}" for r, n in per.items())))
-        # The publisher's own tally, rendered only where the snapshot carries it.
-        # The renderer does not own the attainment line -- the harness does, and
-        # every coverage record states it -- so this is quoted, never recomputed:
-        # a second implementation of "how many cleared 0.70" is a second answer.
-        census = meta.get("regime_census") or {}
-        att = census.get("attainment") or {}
-        if att and RENDER_ATTAINMENT_LINE:
-            parts = []
-            for reg in sorted(att):
-                a = att[reg]
-                parts.append(_S(lang, "index.coverage.attained_one", regime=reg,
-                                n=a["ops_at_or_above_threshold"],
-                                of=a["ops_with_published_ratio"],
-                                threshold=a["threshold"]))
-            lines.append("- " + _S(lang, "index.coverage.attained",
-                                   parts=" · ".join(parts),
-                                   headline=census.get("headline_regime") or head))
-    # Two numbers over the same denominator, and the denominator said out loud:
-    # how many ops were raced against a pool, and how many of those pools held a
-    # tier-1 open-source candidate at all. They are far apart on this device,
-    # and a page that reported only the first would read as if every comparison
-    # here were against an open-source library. It is not — see the tier badge
-    # on each row, and `reading.md`.
-    if any(s.get("pooled") for _, _, s, _, _ in rows):
-        n_hw = sum(1 for _, _, s, _, _ in rows if s.get("handwritten"))
-        lines += ["- " + _S(lang, "index.coverage.pool", total=total),
-                  "- " + _S(lang, "index.coverage.handwritten",
-                            n_hw=n_hw, total=total),
-                  "- " + _S(lang, "index.coverage.tilelang_ref",
-                            n_tl=sum(bool(s.get("tilelang_ref")) for _, _, s, _, _ in rows),
-                            total=total)]
-        n_vendor = sum(bool(s["workloads"]) and not s.get("handwritten")
-                       and not s.get("tilelang_ref") and not s.get("mlir_ref")
-                       for _, _, s, _, _ in rows)
-        if n_vendor:
-            lines.append("- " + _S(lang, "index.coverage.vendor_only",
-                                   n_vendor=n_vendor, total=total))
+    lines += ["## Coverage", "",
+              f"- **{rated} of {len(rows)} ops** are measured against a real "
+              "alternative — a tuned library kernel or a native PyTorch op — on "
+              "the identical workload. The rest run against an eager reference "
+              "only, which is not a bar worth reporting a win against."]
     if n_failed or n_skipped:
-        lines.append("- " + _S(lang, "index.coverage.absent",
-                               n_failed=n_failed, n_skipped=n_skipped))
-    lines += ["", f'[{_S(lang, "link.reading")}](reading.md)', ""]
+        lines.append(f"- **Absent from every table**: {n_failed} workloads "
+                     f"errored and {n_skipped} were skipped in this run.")
+    lines += ["", "[How these numbers are taken](reading.md)", ""]
 
     # Entry table into the data pages. Coverage only: the per-page verdict
     # tallies belong on the page that shows the rows behind them.
-    lines += [f'## {_S(lang, "index.data.heading")}', "",
-              f'| {_S(lang, "index.data.col_page")} '
-              f'| {_S(lang, "index.data.col_ops")} '
-              f'| {_S(lang, "index.data.col_workloads")} |',
-              "| --- | --- | --- |"]
-    for slug, title_key, _ in DATA_PAGES:
+    lines += ["## Data", "",
+              "| Page | Ops | Workloads |", "| --- | --- | --- |"]
+    for slug, title, _ in DATA_PAGES:
         page_rows = by_page.get(slug, [])
         if not page_rows:
             continue
         n_w = sum(s["workloads"] for _, _, s, _, _ in page_rows)
-        lines.append(f"| [{_S(lang, title_key)}]({slug}.md) "
-                     f"| {len(page_rows)} | {n_w} |")
+        lines.append(f"| [{title}]({slug}.md) | {len(page_rows)} | {n_w} |")
     return "\n".join(lines) + "\n"
 
 
-def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG,
-                 inventory: dict | None = None) -> str:
+def reading_page(sol_engine=(None, None)) -> str:
     lo, hi = PAR_BAND
     mod = sol_engine[0]
     # The at-ceiling lines belong to the roofline tool; quote them from it so
     # this page can never disagree with the nightly report.
     if mod is not None and mod.SOL_GREEN_MEMORY == mod.SOL_GREEN_COMPUTE:
-        green_txt = _S(lang, "reading.sol.green_equal",
-                       pct=f"{mod.SOL_GREEN_MEMORY:.0%}")
+        green_txt = f"from {mod.SOL_GREEN_MEMORY:.0%}"
     elif mod is not None:
-        green_txt = _S(lang, "reading.sol.green_differ",
-                       mem=f"{mod.SOL_GREEN_MEMORY:.0%}",
-                       comp=f"{mod.SOL_GREEN_COMPUTE:.0%}")
+        green_txt = (f"memory-bound from {mod.SOL_GREEN_MEMORY:.0%}, "
+                     f"compute-bound from {mod.SOL_GREEN_COMPUTE:.0%}")
     else:
-        green_txt = _S(lang, "reading.sol.green_unknown")
+        green_txt = "from the at-ceiling line the roofline spec sets"
     lines = [
-        f'# {_S(lang, "reading.title")}', "",
-        _S(lang, "reading.intro"), "",
-        # Before the colour and before the columns: a reader cannot grade a
-        # ratio without knowing who is on the other side of it, and this is the
-        # question the page previously did not answer at all.
-        f'## {_S(lang, "reading.baseline.heading")}', "",
-        _S(lang, "reading.baseline.formula"), "",
-        _S(lang, "reading.baseline.pool"), "",
-        _S(lang, "reading.baseline.tier1"), "",
-        _S(lang, "reading.baseline.single"), "",
-        # An explicit id: the tier badges on every data row link here, and a
-        # slug generated from the Chinese heading would not be this string.
-        f'## {_S(lang, "reading.tier.heading")} '
-        + "{#" + PROV_ANCHOR + "}", "",
-        _S(lang, "reading.tier.intro"), "",
-        f'| {_S(lang, "reading.tier.col_tier")} '
-        f'| {_S(lang, "reading.tier.col_meaning")} |',
+        "# How these numbers are taken", "",
+        "Every data page answers one question: **how does TileOPs compare to the "
+        "fastest alternative implementation of the same op, on the same "
+        "workload?** Each op gets one table, with one row per workload. Nothing "
+        "is averaged across workloads: every number on the page belongs to a "
+        "single shape and dtype.", "",
+        "## The colour is the verdict", "",
+        "| | Meaning |",
         "| --- | --- |",
-        f'| <span class="tier tier-hw">{_S(lang, "tier.handwritten")}</span> | '
-        + _S(lang, "reading.tier.handwritten_row") + " |",
-        f'| <span class="tier tier-other">{_S(lang, "tier.tilelang_ref")}</span> | '
-        + _S(lang, "reading.tier.tilelang_ref_row") + " |",
-        f'| <span class="tier tier-vendor">{_S(lang, "tier.vendor")}</span> | '
-        + _S(lang, "reading.tier.vendor_row") + " |",
-        # T364.  Two tiers the harness emits that this legend did not list, so a
-        # reader meeting either badge on a data row had nothing to click through to.
-        # `torch_compile` is the one that matters: it wins 196 of the published rows
-        # and its badge prints the raw tier name, so the cell below prints the SAME
-        # raw name rather than a prettier one a reader could not match to the badge.
-        '| <span class="tier tier-other">torch_compile</span> | '
-        + _S(lang, "reading.tier.torch_compile_row") + " |",
-        f'| <span class="tier tier-other">{_S(lang, "tier.agent_written")}</span> | '
-        + _S(lang, "reading.tier.agent_written_row") + " |",
+        f'| <span class="perf-behind">0.74×</span> | Slower than the '
+        f"alternative — below {lo:.2f}×. |",
+        f'| <span class="perf-par">1.02×</span> | Level with it — '
+        f"{lo:.2f}–{hi:.2f}×, inside measurement noise. |",
+        f'| <span class="perf-ahead">1.42×</span> | Faster than it — '
+        f"{hi:.2f}× and above. |",
+        f'| <span class="perf-unrated">18.06×</span> | No fast alternative to '
+        f"compare against — only a functional reference (a name ending in "
+        f"`-{TIER_REF}`). The number means little. |",
+        f'| <span class="perf-none">{NA}</span> | No alternative at all ran on '
+        "this workload. |",
         "",
-        _S(lang, "reading.tier.not_faster"), "",
-        # Computed, never retyped: see `inventory_counts`. A caller with no
-        # metrics to count reports the whole cohort as undetermined, which is
-        # what "nothing was measured" honestly reads as.
-        _S(lang, "reading.tier.inventory",
-           **(inventory or inventory_counts({}))), "",
-        # A third axis, and the one a reader cannot infer from anything else on
-        # the page: how the row was measured. An explicit id, for the same
-        # reason the tier heading has one -- the badge on every off-headline row
-        # links here, and a slug generated from the Chinese heading would not be
-        # this string in both locales.
-        f'## {_S(lang, "reading.regime.heading")} ' + "{#" + REGIME_ANCHOR + "}", "",
-        _S(lang, "reading.regime.intro", headline=headline_regime()), "",
-        _S(lang, "reading.regime.legacy"), "",
-        '<a class="regime-off" href="#">eager</a> — '
-        + _S(lang, "reading.regime.badge", headline=headline_regime()), "",
-        _S(lang, "reading.regime.counts", headline=headline_regime()), "",
-        f'## {_S(lang, "reading.colour.heading")}', "",
-        f'| | {_S(lang, "reading.colour.col_meaning")} |',
+        "A ratio is the alternative's device time divided by ours, so **above 1 "
+        "means TileOPs is faster**.", "",
+        "## Columns", "",
+        "| Column | Meaning |",
         "| --- | --- |",
-        '| <span class="perf-behind">0.74×</span> | '
-        + _S(lang, "reading.colour.behind", lo=f"{lo:.2f}") + " |",
-        '| <span class="perf-par">1.02×</span> | '
-        + _S(lang, "reading.colour.par", lo=f"{lo:.2f}", hi=f"{hi:.2f}") + " |",
-        '| <span class="perf-ahead">1.42×</span> | '
-        + _S(lang, "reading.colour.ahead", hi=f"{hi:.2f}") + " |",
-        '| <span class="perf-unrated">18.06×</span> | '
-        + _S(lang, "reading.colour.unrated", ref=TIER_REF) + " |",
-        f'| <span class="perf-none">{NA}</span> | '
-        + _S(lang, "reading.colour.none") + " |",
+        "| **Workload** | The label the TileOPs spec manifest gives the "
+        "workload, once per group of rows that ran it at several dtypes. The "
+        "key above each table spells each label out: every input tensor as "
+        "`name: shape, dtype`, tensors sharing a shape named together, and a "
+        "tensor in a dtype of its own — a `mask` in `bool` — saying so where it "
+        "is read, and a template shared by several labels, `q, k: [B, H, DK]`, "
+        "stated once above them. After the tensors come the dimensions the op is sized by "
+        "rather than shaped by (`m`, `n`, `k` for a GEMM, `num_experts` for MoE "
+        "routing), then dimmed, the parameters the call did not leave at the "
+        "signature's default, then the dtypes the label ran at. A quantity the "
+        "others already fix — `max_seqlen_q` is `max(q_lens)` — is not "
+        "repeated. Labels and rows keep the manifest's order. |",
+        "| **dtype** | The dtype the row ran at; a case with two dtype indices "
+        "names both, `fp8e4m3/bf16`. |",
+        "| **Ratio** | `alt / ours` — the fastest alternative's device time "
+        "divided by ours, the one number the colour grades. |",
+        "| **Device time** | Milliseconds the device spent executing the call's "
+        "kernels — the union of their intervals. Every comparison on these "
+        "pages uses it. |",
+        "| **Alternatives** | One line per other implementation measured on this "
+        "workload, fastest first, with its own device time in ms. A tuned "
+        f"library kernel (`fla`, `mamba`, `fa3`, `triton`, …), a native PyTorch "
+        f"op (`{TIER_TORCH}`), or a name ending in `-{TIER_REF}` — an eager "
+        "composition of PyTorch ops, which is not a bar worth reporting a win "
+        "against. Divide any of them by our device time to get the ratio "
+        "against that one. |",
+        "| **Throughput** | TFLOP/s: required FLOPs / device time. The count is "
+        "analytic — the op's `eval_roofline` formula evaluated on the workload's "
+        "own shapes, not a hardware counter — so it counts the work the problem "
+        "demands, not the instructions the kernel issued. Padding, recompute or "
+        "a masked-out tile is therefore invisible here, and the figure is only "
+        "comparable between implementations of the same op on the same "
+        "workload. |",
+        "| **SOL** | Share of the algorithmic speed-of-light: the fastest time "
+        "physics allows for the workload, divided by our device time. The "
+        "`Ratio` column says whether someone is faster today; SOL says how much "
+        "faster anyone could ever be. Details below. |",
+        "| **Bound** | The resource that sets the workload's floor: `mem` (HBM "
+        "traffic), `comp` (compute throughput), or `lat` — the workload is too "
+        "small for the model to judge, and its SOL number greys out with it. |",
         "",
-        _S(lang, "reading.colour.note"), "",
-        f'## {_S(lang, "reading.columns.heading")}', "",
-        f'| {_S(lang, "reading.columns.col_column")} '
-        f'| {_S(lang, "reading.columns.col_meaning")} |',
-        "| --- | --- |",
-        f'| **{_S(lang, "table.head.workload")}** | '
-        + _S(lang, "reading.columns.workload") + " |",
-        f'| **{_S(lang, "table.head.ratio")}** | '
-        + _S(lang, "reading.columns.ratio") + " |",
-        f'| **{_S(lang, "table.head.device_time")}** | '
-        + _S(lang, "reading.columns.device_time") + " |",
-        f'| **{_S(lang, "table.head.alternatives")}** | '
-        + _S(lang, "reading.columns.alternatives",
-             torch=TIER_TORCH, ref=TIER_REF) + " |",
-        f'| **{_S(lang, "table.head.throughput")}** | '
-        + _S(lang, "reading.columns.throughput") + " |",
-        f'| **{_S(lang, "table.head.sol")}** | '
-        + _S(lang, "reading.columns.sol") + " |",
-        f'| **{_S(lang, "table.head.bound")}** | '
-        + _S(lang, "reading.columns.bound") + " |",
+        "How that device time is measured — what it counts, what it leaves out, "
+        "and where it refuses to produce a number — is in "
+        "[Benchmark Timing](../timing.md).",
         "",
-        _S(lang, "reading.timing_note"),
+        "Each op's heading carries its workload count and its test outcome "
+        "(✅ passed · ❌ failed · ⏭️ all skipped · "
+        f"`{EMPTY}` no test matched).",
         "",
-        _S(lang, "reading.test_marks", empty=EMPTY),
+        "## Speed of light", "",
+        "**SOL** is *algorithmic* speed-of-light efficiency: "
+        "`max(bytes / bandwidth, FLOPs / compute roof) / device time`, priced "
+        "against the machine's *calibrated* ceilings — the bandwidth and "
+        "compute rates microbenchmarks actually reach on this GPU, not the "
+        "spec sheet. 100% means no implementation of this algorithm on this "
+        "hardware can be faster.", "",
+        "Three statements delimit what a reading means:", "",
+        "1. **Bytes are the algorithm's minimum traffic** — each input read "
+        "once, each output written once — not the DRAM traffic the kernel "
+        "generated. A kernel that moves data twice scores low; that is the "
+        "point.",
+        "2. **FLOPs follow the TileOPs counting convention** (a transcendental "
+        "counts as one), not per-instruction hardware cost; the metric does "
+        "not certify a special-function-bound kernel as at its limit.",
+        "3. **The compute roof is the unit an optimal implementation would "
+        "use** — declared per op, never inferred from the running kernel, so a "
+        "kernel on the wrong unit is measured against the right ceiling.",
         "",
-        f'## {_S(lang, "reading.sol.heading")}', "",
-        _S(lang, "reading.sol.intro"), "",
-        _S(lang, "reading.sol.three"), "",
-        *(f"{i}. " + _S(lang, k) for i, k in
-          enumerate(("reading.sol.bytes", "reading.sol.flops",
-                     "reading.sol.roof"), 1)),
-        "",
-        f'| {_S(lang, "reading.sol.col_sol")} '
-        f'| {_S(lang, "reading.sol.col_bound")} '
-        f'| {_S(lang, "reading.sol.col_meaning")} |',
+        "| SOL | Bound | Meaning |",
         "| --- | --- | --- |",
-        '| <span class="perf-ahead">92%</span> | mem | '
-        + _S(lang, "reading.sol.row_ceiling", green=green_txt) + " |",
-        '| 63% | mem | ' + _S(lang, "reading.sol.row_headroom") + " |",
+        f'| <span class="perf-ahead">92%</span> | mem | At the achievable '
+        f"ceiling ({green_txt}). The ceiling is an envelope over access "
+        "mixes, and a kernel's own mix caps below it, so the line leaves "
+        "room for every mix. Optimizing further buys at most the "
+        "remainder. |",
+        "| 63% | mem | Headroom remains. |",
         '| <span class="perf-unrated">41%</span> | '
-        '<span class="perf-unrated">lat</span> | '
-        + _S(lang, "reading.sol.row_lat") + " |",
-        '| <span class="perf-unrated">⚠ 108%</span> | mem | '
-        + _S(lang, "reading.sol.row_anomaly") + " |",
-        f"| `{EMPTY}` | `{EMPTY}` | "
-        + _S(lang, "reading.sol.row_empty") + " |",
+        '<span class="perf-unrated">lat</span> | The workload is too '
+        "small for the model to judge — launch overhead dominates the "
+        "measurement, not the roofline — so the number is shown but not "
+        "graded. |",
+        '| <span class="perf-unrated">⚠ 108%</span> | mem | Above the '
+        "calibrated ceiling: the formula or the calibration is wrong. Never "
+        "read it as a fast kernel. |",
+        f"| `{EMPTY}` | `{EMPTY}` | An input is missing: no roofline formula, "
+        "a non-CUPTI timing, or no GPU profile for the device. |",
         "",
-        _S(lang, "reading.sol.spec_note",
-           url=f"{_GH}/blob/main/docs/design/roofline.md"),
+        "The model, its thresholds and the formula-audit machinery are "
+        "specified in TileOPs "
+        f"[`docs/design/roofline.md`]({_GH}/blob/main/docs/design/roofline.md); "
+        "the page imports that implementation rather than re-deriving it.",
         "",
-        f'## {_S(lang, "reading.shapes.heading")}', "",
-        _S(lang, "reading.shapes.body",
-           url=f"{_GH}/tree/main/src/tileops/manifest"),
+        "## Where the shapes come from", "",
+        "The snapshot records what each workload measured, not what it ran on: "
+        "the shapes are read from the TileOPs [spec manifest]"
+        f"({_GH}/tree/main/src/tileops/manifest/spec), joined to a row by the label "
+        "and dtype the benchmark id is built from. A workload the manifest does "
+        "not declare — a benchmark written by hand rather than driven by a spec "
+        "— shows that id alone, with no shapes under it.",
         "",
-        f'## {_S(lang, "reading.empty.heading")}', "",
-        _S(lang, "reading.empty.body", empty=EMPTY),
-        "",
-        _S(lang, "reading.empty.untimed", empty=EMPTY),
+        "## Empty cells", "",
+        f"`{EMPTY}` means an input to that metric was not recorded, never that "
+        "the value is zero: the op reported no FLOP count for that workload, or "
+        "no alternative ran on it.",
         "",
     ]
     return "\n".join(lines) + "\n"
@@ -2279,37 +1216,42 @@ def reading_page(sol_engine=(None, None), lang: str = DEFAULT_LANG,
 
 def data_page(title: str, fams: list[str], rows_by_fam: dict,
               metrics_by_op: dict, workloads_of: dict, ref: str,
-              lang: str = DEFAULT_LANG, banner: list[str] | None = None) -> str:
-    # Widest lead first, then level, then behind, then the unrated. Every op is
-    # listed either way; this only decides what a reader meets first.
+              api_order: dict[str, int] | None = None) -> str:
+    # The fallback for an op the API reference does not name: widest lead first,
+    # then level, then behind, then the unrated.
     rank = {AHEAD: 0, PAR: 1, BEHIND: 2, UNRATED: 3}
+    api_order = api_op_order() if api_order is None else api_order
     present = [f for f in fams if rows_by_fam.get(f)]
     n_ops = sum(len(rows_by_fam[f]) for f in present)
     n_workloads = sum(s["workloads"] for f in present
                       for _, _, s, _, _ in rows_by_fam[f])
     tally = " · ".join(
-        f"{family_title(f, lang)} {len(rows_by_fam[f])}" for f in present)
+        f"{FAMILY_TITLE.get(f, f)} {len(rows_by_fam[f])}" for f in present)
     lines = [f"# {title}", "",
-             _S(lang, "data.tally", n_ops=n_ops, n_workloads=n_workloads,
-                tally=tally)
+             f"**{n_ops} ops, {n_workloads} workloads** — {tally}."
              if len(present) > 1 else
-             _S(lang, "data.tally_single", n_ops=n_ops,
-                n_workloads=n_workloads), "",
-             _S(lang, "data.intro",
-                reading_link=f'[{_S(lang, "link.reading")}](reading.md)'), ""]
-    # T364: the second phase's page says what it is before it shows a number. No
-    # caller passes one for the five pages that existed before, so those render the
-    # bytes they always did.
-    if banner:
-        lines += banner + [""]
+             f"**{n_ops} ops, {n_workloads} workloads.**", "",
+             "One table per op, one row per workload. `Ratio` is the fastest "
+             "other implementation's device time divided by ours, so "
+             '<span class="perf-ahead">green</span> is faster than it, '
+             '<span class="perf-par">plain</span> is level with it, '
+             '<span class="perf-behind">red</span> is slower. Times are in ms. '
+             "[How these numbers are taken](reading.md).", ""]
+    op_h = "##" if len(present) == 1 else "###"
     for fam in fams:
         rows = rows_by_fam.get(fam)
         if not rows:
             continue
-        # Within a band, the widest margin first.
-        rows = sorted(rows, key=lambda r: (rank.get(r[2]["status"], 9),
-                                           -(r[2]["speedup"] or 0), r[0]))
-        lines += [f"## {family_title(fam, lang)}", ""]
+        # The order the API reference names the ops in, so a reader who knows
+        # one section finds the other laid out the same way. An op it does not
+        # name follows the ones it does, widest lead first within a verdict band.
+        rows = sorted(rows, key=lambda r: (
+            api_order.get(r[0].removesuffix("Op"), len(api_order)),
+            rank.get(r[2]["status"], 9), -(r[2]["speedup"] or 0), r[0]))
+        # A page holding one family would repeat its own H1 as the only
+        # section heading, so the ops sit directly under the H1 instead.
+        if len(present) > 1:
+            lines += [f"## {FAMILY_TITLE.get(fam, fam)}", ""]
         # One table per op rather than one per family: the op name would
         # otherwise repeat down the widest column of every row. The `datatable`
         # wrapper is a styling hook — see extra.css.
@@ -2318,85 +1260,19 @@ def data_page(title: str, fams: list[str], rows_by_fam: dict,
             # count is the length of the list under it, and a tick on every op
             # says nothing. Only a mark that warns survives.
             warn = f" <small>{tmark}</small>" if tmark in ("❌", "⏭️") else ""
-            # And on the heading as well as on each row: an op measured entirely
-            # in another regime would otherwise only say so once per row, which a
-            # reader scanning headings for "who is behind" never reaches.
-            for reg in _summary.get("off_headline", ()):
-                warn += _regime_badge(reg, lang)
-            ordered = sorted(zip(workloads_of[op], metrics_by_op[op], strict=True),
-                             key=lambda z: z[0]["config"])
-            coded = [(f"{WORKLOAD_CODE}{i}", w)
-                     for i, (w, _) in enumerate(ordered, 1)]
-            tiered = any(c["prov"] for _, m in ordered for c in m.get("pool", ()))
-            lines += [f"### {_op_cell(op, module, ref)}{warn}",
-                      "", *workload_key(coded),
+            clusters = label_groups(workloads_of[op], metrics_by_op[op])
+            lines += [f"{op_h} {_op_cell(op, module, ref)}{warn}",
+                      "", *workload_key(clusters),
                       # No `markdown="1"`, and no blank line until `</div>`: a
                       # blank line would end the raw-HTML block mid-table.
-                      '<div class="datatable">',
-                      *detail_header(lang, tiered)]
-            for (code, _), (_, m) in zip(coded, ordered, strict=True):
-                lines.append(detail_row(code, m, lang))
+                      '<div class="datatable">', *DETAIL_HEADER]
+            for group in (g for c in clusters for g in c):
+                rows = group["rows"]
+                for i, (dtype, m) in enumerate(rows):
+                    lines.append(detail_row(dtype, m, group["label"] if i == 0 else None,
+                                            len(rows)))
             lines += [*DETAIL_FOOTER, "</div>", ""]
     return "\n".join(lines) + "\n"
-
-
-# --- The second phase (T364) -----------------------------------------------
-# One page, outside `DATA_PAGES`, holding the operators the snapshot marks
-# `phase=2`.  Outside that list on purpose: `DATA_PAGES` is what the overview's
-# entry table iterates and what `page_of_family` routes a family to, and a second
-# phase that appeared in either would be a second phase folded into the first
-# phase's denominators -- the one thing this page exists not to do.  It reaches
-# the nav through `hooks.py`, which lists the generated files rather than this
-# table.
-PHASE_TWO_SLUG = "phase-two"
-# Every family, in the display order the five data pages use between them, so an
-# operator lands under the same heading it would have landed under there.
-PHASE_TWO_FAMILIES = [f for _slug, _key, fams in DATA_PAGES for f in fams]
-
-
-def phase_two_banner(lang: str = DEFAULT_LANG, source: str | None = None) -> list[str]:
-    """The admonition that has to be read before any number on that page.
-
-    `source` is the list the snapshot's first phase is drawn from. A snapshot that
-    names none predates T366, and gets the banner it was published under.
-    """
-    what = (_S(lang, "phase2.banner.what_list", name=_list_name(source), source=source)
-            if source else _S(lang, "phase2.banner.what"))
-    selection = _S(lang, "phase2.banner.selection_list" if source
-                   else "phase2.banner.selection")
-    return [f'!!! warning "{_S(lang, "phase2.banner.title")}"', "",
-            "    " + what, "",
-            "    " + _S(lang, "phase2.banner.denominator"), "",
-            "    " + selection]
-
-
-# --- The first phase's list (T366) -----------------------------------------
-# The list `phase_one_ops` was drawn from, as the snapshot names it in
-# `phase_one_source`. A snapshot written before T366 names none; its first phase is
-# `docs/tasks/OPS-178.md`'s, and it renders the pages it always did. The overview's
-# notice is tied to this one list rather than to any list, because what it says --
-# the counts left OPS-178's 158 operators on 2026-09-23 -- is true of the move to
-# this list and of no other.
-PHASE_ONE_OPLIST150 = "docs/reports/R267-data/oplist150.json"
-
-
-def _list_name(source: str) -> str:
-    """`docs/reports/R267-data/oplist150.json` -> `oplist150`."""
-    return os.path.splitext(os.path.basename(source))[0]
-
-
-def phase_one_notice(source: str | None, n_ops: int, n_rows: str | None,
-                     phase_two: bool, lang: str = DEFAULT_LANG) -> list[str]:
-    """The overview's admonition that the first phase changed lists, or nothing."""
-    if source != PHASE_ONE_OPLIST150:
-        return []
-    lines = [f'!!! warning "{_S(lang, "index.scope.title")}"', "",
-             "    " + _S(lang, "index.scope.body", n_ops=n_ops, n_rows=n_rows,
-                         name=_list_name(source), source=source), ""]
-    # The link only where the page it points at was written.
-    if phase_two:
-        lines += ["    " + _S(lang, "index.scope.moved", link=f"{PHASE_TWO_SLUG}.md"), ""]
-    return lines
 
 
 # --- Main ------------------------------------------------------------------
@@ -2445,118 +1321,39 @@ def main():
     if args.meta and os.path.exists(args.meta):
         with open(args.meta, encoding="utf-8") as f:
             meta = json.load(f)
-    # The regime the run itself calls its headline, so the badge marks rows against
-    # the run's own answer rather than against a constant compiled in here. A
-    # snapshot that publishes no meta.json, or an older one that never wrote the
-    # field, falls back to the D032 default and badges nothing it cannot justify.
-    global _HEADLINE_REGIME
-    _HEADLINE_REGIME = ((meta.get("environment") or {}).get("headline_regime")
-                        or DEFAULT_HEADLINE_REGIME)
 
     workloads, failures, skips = parse_bench_xml(args.bench_xml)
-    # T364.  Taken off the front of the lists, before the phase-one scope filter
-    # below, and never put back: everything downstream of that filter -- the
-    # coverage counts, the family tallies, the attainment status, the five data
-    # pages -- is the first phase and only the first phase.  (The inventory
-    # sentence is not a phase count; see where it is computed.)  The second phase
-    # gets its own copies of the same machinery further down.
-    p2_workloads = [w for w in workloads if w.get("phase") == "2"]
-    p2_failures = [w for w in failures if w.get("phase") == "2"]
-    p2_skips = [w for w in skips if w.get("phase") == "2"]
-    suite = ET.parse(args.bench_xml).getroot()
-    scope = json.loads(suite.get("phase_one_ops", "null"))
-    # T366: the list that scope was drawn from, where the snapshot names it.
-    scope_source = suite.get("phase_one_source")
-    if scope is not None:
-        # T366.  The publisher's `phase` mark and this scope are two gates over one
-        # snapshot, and together they have to partition it: a row in neither would
-        # be published and shown on no page, and a second-phase row inside the
-        # scope would be shown on two.  A snapshot the publisher wrote holds
-        # neither, so one that does is refused here rather than rendered with rows
-        # silently lost or doubled -- and the deploy keeps the page it had.
-        every = workloads + failures + skips
-        stray = sorted({str(w["op"]) for w in every
-                        if w.get("phase") != "2" and w["op"] not in scope})
-        twice = sorted({str(w["op"]) for w in every
-                        if w.get("phase") == "2" and w["op"] in scope})
-        if stray or twice:
-            raise SystemExit(
-                "the snapshot's two phase gates disagree -- outside phase_one_ops "
-                f"and not marked phase 2: {stray}; marked phase 2 but inside "
-                f"phase_one_ops: {twice}")
-        workloads = [w for w in workloads if w["op"] in scope]
-        failures = [w for w in failures if w["op"] in scope]
-        skips = [w for w in skips if w["op"] in scope]
     tests = (parse_test_xml(args.test_xml)
              if args.test_xml and os.path.exists(args.test_xml) else {})
 
     unclassified = sorted({
         t for w in workloads for t in w["impls"]
-        if t not in _OURS_TAGS and t not in _KNOWN_TAGS})
-    timings = Counter(ours_of(w["impls"]).get("timing")
+        if not t.startswith("tileops") and t not in _KNOWN_TAGS})
+    timings = Counter(w["impls"].get("tileops", {}).get("timing")
                       for w in workloads).most_common(1)
     timing = timings[0][0] if timings else None
 
     sol_engine = load_sol_engine(args.gpu, args.tileops)
 
-    # The spec manifest declares a workload's label and its shapes together, so
-    # it is what the id is resolved against first. Where it declares no such
-    # label — an edge-case probe the harness added, not a spec-driven workload —
-    # the snapshot's own `shape` property is read instead. Neither: the row keeps
-    # the benchmark's own id and no shapes, see `workload_key`.
-    manifest = (workload_shape.load_manifest(args.manifest_dir)
-                if os.path.isdir(args.manifest_dir) else {})
+    # The snapshot names a workload but does not carry its shapes; the spec
+    # manifest declares both, under the same label. Ops it does not declare
+    # keep the benchmark's own id — see `workload_cell`.
+    has_manifest = os.path.isdir(args.manifest_dir)
+    manifest = workload_shape.load_manifest(args.manifest_dir) if has_manifest else {}
+    parametric = workload_shape.Parametric(
+        args.tileops,
+        workload_shape.load_adts(args.manifest_dir) if has_manifest else {})
     undeclared = set()
-    from_snapshot = set()
     for w in workloads:
         entry = manifest.get(w["op"])
-        w["spec"] = workload_shape.describe(entry, w["config"]) if entry else None
-        w["spec_source"] = "manifest" if w["spec"] else None
+        w["spec"] = (workload_shape.describe(entry, w["config"], w["op"], parametric)
+                     if entry else None)
         if not w["spec"]:
-            recorded = None
-            if w.get("shape"):
-                try:
-                    recorded = json.loads(w["shape"])
-                except (TypeError, ValueError):
-                    recorded = None
-            # The dtype is the one the run recorded, so the `<label>-<dtype>`
-            # id can be split on it rather than on its last hyphen: a label is
-            # allowed to contain one, and `legacy-probe-1-int32` does.
-            w["spec"] = workload_shape.describe_recorded(
-                entry, w["config"], recorded,
-                ours_of(w["impls"]).get("dtype"))
-            if w["spec"]:
-                w["spec_source"] = "snapshot"
-                from_snapshot.add(w["op"])
-            else:
-                undeclared.add(w["op"])
-
-    # The same resolution for the second phase, kept in a loop of its own so the
-    # `undeclared` / `from_snapshot` sets above -- which the run reports on stderr --
-    # stay first-phase sets and the notes they print do not move.
-    p2_undeclared = set()
-    for w in p2_workloads:
-        entry = manifest.get(w["op"])
-        w["spec"] = workload_shape.describe(entry, w["config"]) if entry else None
-        if not w["spec"]:
-            recorded = None
-            if w.get("shape"):
-                try:
-                    recorded = json.loads(w["shape"])
-                except (TypeError, ValueError):
-                    recorded = None
-            w["spec"] = workload_shape.describe_recorded(
-                entry, w["config"], recorded, ours_of(w["impls"]).get("dtype"))
-            if not w["spec"]:
-                p2_undeclared.add(w["op"])
+            undeclared.add(w["op"])
 
     metrics_by_op: dict[str, list[dict]] = defaultdict(list)
     workloads_of: dict[str, list[dict]] = defaultdict(list)
     module_of: dict[str, str | None] = {}
-    # An unconnected stage-one operator is progress information: render its
-    # heading and empty table even when no coverage file or passing case exists.
-    for op in scope or []:
-        metrics_by_op[op] = []
     for w in workloads:
         metrics_by_op[w["op"]].append(workload_metrics(w, sol_engine))
         workloads_of[w["op"]].append(w)
@@ -2568,103 +1365,47 @@ def main():
     for op, ms in metrics_by_op.items():
         s = op_summary(ms)
         row = (op, module_of.get(op), s, _test_mark(tests.get(op)), ref)
-        fam = family_of(op, module_of.get(op))
+        fam = family_of(op, module_of.get(op),
+                        (manifest.get(op) or {}).get("family"))
         rows_by_fam[fam].append(row)
         by_page[page_of_family(fam)].append(row)
         all_rows.append(row)
 
-    # The second phase's own copies. Separate dicts, not separate keys in the ones
-    # above: a single dict is a single denominator, and `op_summary` /
-    # `inventory_counts` / the coverage bullets all read whatever is in it.
-    p2_metrics_by_op: dict[str, list[dict]] = defaultdict(list)
-    p2_workloads_of: dict[str, list[dict]] = defaultdict(list)
-    p2_module_of: dict[str, str | None] = {}
-    for w in p2_workloads:
-        p2_metrics_by_op[w["op"]].append(workload_metrics(w, sol_engine))
-        p2_workloads_of[w["op"]].append(w)
-        p2_module_of.setdefault(w["op"], w["op_module"])
-    p2_rows_by_fam: dict[str, list[tuple]] = defaultdict(list)
-    for op, ms in p2_metrics_by_op.items():
-        p2_rows_by_fam[family_of(op, p2_module_of.get(op))].append(
-            (op, p2_module_of.get(op), op_summary(ms), _test_mark(tests.get(op)), ref))
-
     ratio_drift = []
     for op in metrics_by_op:
         ratio_drift += collect_ratio_drift(workloads_of[op], metrics_by_op[op])
-    # T366 moved operators between the phases; a check that followed only the first
-    # would have stopped looking at every one that left it.
-    for op in p2_metrics_by_op:
-        ratio_drift += collect_ratio_drift(p2_workloads_of[op], p2_metrics_by_op[op])
     out_dir = args.out_dir or os.path.join(REPO, "docs", "benchmarks")
     os.makedirs(out_dir, exist_ok=True)
-    # The 91-op cohort is a fixed historical list, not a phase: T366 took 24 of its
-    # operators out of the first phase, and counting the cohort there alone would
-    # report them as "cannot be determined" while the second-phase page shows them
-    # measured. The phases share no operator, so the merge loses nothing.
-    cohort = {**p2_metrics_by_op, **metrics_by_op}
-    # One file per page per locale: `<slug>.md` for the default language and
-    # `<slug>.zh.md` beside it, which is the layout mkdocs-static-i18n reads in
-    # `docs_structure: suffix` mode. A locale still carrying English
-    # placeholders renders as English, which is what the fallback would have
-    # served anyway.
-    pages = {}
-    for lang, suffix in LANG_SUFFIX.items():
-        pages[f"index{suffix}"] = index_page(
-            args, meta, all_rows, by_page, timing, len(workloads),
-            len(failures), len(skips), lang=lang,
-            notice=phase_one_notice(scope_source, len(scope or ()),
-                                    suite.get("phase_one_rows"),
-                                    bool(p2_rows_by_fam), lang))
-        pages[f"reading{suffix}"] = reading_page(
-            sol_engine, lang=lang, inventory=inventory_counts(cohort))
-        for slug, title_key, fams in DATA_PAGES:
-            if any(rows_by_fam.get(f) for f in fams):
-                pages[f"{slug}{suffix}"] = data_page(
-                    _S(lang, title_key), fams, rows_by_fam, metrics_by_op,
-                    workloads_of, ref, lang=lang)
-        # T364. Written only when the snapshot carries second-phase rows, so a
-        # snapshot published before T364 renders exactly the pages it always did
-        # -- no empty page, and no nav entry leading to one.
-        if p2_rows_by_fam:
-            pages[f"{PHASE_TWO_SLUG}{suffix}"] = data_page(
-                _S(lang, "page.phase-two.title"), PHASE_TWO_FAMILIES,
-                p2_rows_by_fam, p2_metrics_by_op, p2_workloads_of, ref, lang=lang,
-                banner=phase_two_banner(lang, scope_source))
+    pages = {
+        "index.md": index_page(args, meta, all_rows, by_page,
+                               timing, len(workloads), len(failures),
+                               len(skips)),
+        "reading.md": reading_page(sol_engine),
+    }
+    api_order = api_op_order()  # read once, not once per page
+    for slug, title, fams in DATA_PAGES:
+        if any(rows_by_fam.get(f) for f in fams):
+            pages[f"{slug}.md"] = data_page(title, fams, rows_by_fam,
+                                            metrics_by_op, workloads_of, ref,
+                                            api_order)
     for name, text in pages.items():
         with open(os.path.join(out_dir, name), "w", encoding="utf-8") as f:
             f.write(text)
 
-    print(f"wrote {len(pages)} pages to {out_dir} in "
-          f"{len(LANG_SUFFIX)} locales: {len(all_rows)} ops, "
+    print(f"wrote {len(pages)} pages to {out_dir}: {len(all_rows)} ops, "
           f"{len(workloads)} workloads, {len(failures)} failed, "
           f"{len(skips)} skipped")
-    # A SECOND line, never folded into the one above: that line is what the deploy
-    # log is diffed on, and the whole point of T364 is that its numbers do not move.
-    if p2_workloads or p2_failures or p2_skips:
-        print(f"  phase 2 (own page, own denominator): {len(p2_metrics_by_op)} ops, "
-              f"{len(p2_workloads)} workloads, {len(p2_failures)} failed, "
-              f"{len(p2_skips)} skipped")
-        if p2_undeclared:
-            print("  note: phase-2 workloads with neither a manifest entry nor a "
-                  "recorded shape show their benchmark id and no shapes: "
-                  + ", ".join(sorted(p2_undeclared)), file=sys.stderr)
     if ratio_drift:
         print(f"warning: {len(ratio_drift)} workloads where the recorded ratio "
               "disagrees with the computed one", file=sys.stderr)
     if unclassified:
         print("warning: baseline tags with no tier: "
               + ", ".join(unclassified), file=sys.stderr)
-    n_snapshot = sum(1 for w in workloads if w.get("spec_source") == "snapshot")
-    if n_snapshot:
-        print(f"note: {n_snapshot} workloads across {len(from_snapshot)} ops are "
-              "not declared in the manifest, so their shapes come from the "
-              "snapshot's own record of the run: "
-              + ", ".join(sorted(from_snapshot)), file=sys.stderr)
     n_undeclared = sum(1 for w in workloads if not w["spec"])
     if n_undeclared:
         print(f"warning: {n_undeclared} workloads across "
-              f"{len(undeclared)} ops have neither a manifest entry nor a "
-              "recorded shape, so they show their benchmark id and no shapes: "
+              f"{len(undeclared)} ops have no manifest entry, so they show "
+              "their benchmark id and no shapes: "
               + ", ".join(sorted(undeclared)), file=sys.stderr)
 
 

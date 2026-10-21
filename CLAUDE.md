@@ -47,29 +47,18 @@ Never edit these by hand — change what produces them.
 |-------|-------------|
 | `docs/api/` | mkdocstrings, from TileOPs docstrings |
 | `docs/design/` | `include-markdown`, mirroring TileOPs `docs/design/` |
-| `docs/benchmarks/` | `scripts/gen_ascend950_pages.py`, from validated `data/ascend950/`; `scripts/sync_ascend950_ci.py` refreshes correctness CI. Old 910B1 renderer/data are retained for the archive. |
+| `docs/benchmarks/` | `scripts/gen_bench_pages.py` from a validated remote official snapshot, gated by `scripts/render_official_ascend950.py`. |
 
 `hooks.py` rewrites the repo-relative paths mirrored content arrives with, and
 expands the single `Benchmarks` nav entry to whichever pages the renderer produced.
 
 ## Ascend 950 publication
 
-The current renderer keeps release correctness and historical v2 performance in separate pages.
-Do not label unlocked development results as TileLang 0.1.15 release performance.
-See README.md for data import, CI refresh and the complete 910B1 backup.
-
-## Historical 910B1 benchmark renderer
-
-They answer one question per workload: how TileOPs compares to the fastest other
-implementation of the same op on that workload.
-
-| Rule | Detail |
-|------|--------|
-| No aggregates | One table per op, one row per workload. An op's workloads span shapes orders of magnitude apart, so a median matches no reproducible run and a mean ratio hides which shape is behind. |
-| The colour is the verdict | `Ratio` sits right after the workload name: red behind, plain ink level, green ahead, grey where the only rival is an eager `-ref`. |
-| Device time | The compared quantity is `device_busy_ms`, never wall-clock span. |
-| Two questions | `Ratio` says whether someone else's kernel is faster; `SOL` says how much faster the hardware allows anyone to go, with the binding resource (`mem`/`comp`/`lat`) in its own `Bound` column. The SOL arithmetic and thresholds are imported from the TileOPs checkout's roofline tool (M5) — never re-derived in this repo. |
-| Workload shapes | The snapshot names a workload but does not carry its shapes. `scripts/workload_shape.py` reads them from the TileOPs spec manifest, joined by the `<label>-<dtype>` the benchmark id is built from, at the commit the benchmark ran on. A workload the manifest does not declare keeps its id and gets no shapes — never a guessed one. |
+Use the upstream `gen_bench_pages.py` layout. `render_official_ascend950.py` gates
+snapshots by remote publisher, formal protocol and successful clock/guard evidence.
+No eligible snapshot means an empty performance section. Correctness-only results,
+historical v2 timings, logs and archive documentation do not belong in that section.
+The local CI never publishes. See README.md for the remote nightly and archive paths.
 
 ## Bilingual pages (en / zh)
 

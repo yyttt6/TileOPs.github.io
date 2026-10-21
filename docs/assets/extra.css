@@ -280,11 +280,11 @@ body,
   line-height: 1.65;
 }
 
-/* Selection in the accent, weak enough that the ink stays the darkest thing on
- * the page.
+/* Selection in the accent, strong enough to read against the tinted table
+ * cells, light enough that the ink stays legible on it.
  */
 ::selection {
-  background: rgba(124, 92, 174, 0.22);
+  background: rgba(124, 92, 174, 0.42);
 }
 
 /* Headings carry a violet rule whose weight tracks the level. Only h1 takes the
@@ -436,6 +436,54 @@ body,
  */
 .md-typeset a code {
   color: var(--tf-teal);
+}
+
+/* Every link in running text carries an arrow, so it reads as a link before it
+ * is hovered: east for a page on this site, north-east for one that leaves it.
+ * An absolute link back to this site counts as one on it. Hover lifts a teal wash from the underline and nudges the arrow. Scoped to
+ * prose — paragraphs, list items, table cells — so headings' permalinks, the
+ * nav, buttons, badges and the page cards keep their own look, and no page's
+ * Markdown has to mark a link for it.
+ */
+.md-typeset :is(p, li, td, dd):not(.page-cards > li) a:not(.md-button, :has(img)) {
+  padding: 0 0.08em;
+  margin: 0 -0.08em;
+  border-radius: 0.15em;
+  background: linear-gradient(var(--tf-teal-tint), var(--tf-teal-tint)) 0 100% / 100% 0 no-repeat;
+  transition: background-size 160ms ease, text-decoration-color 160ms ease;
+}
+
+.md-typeset :is(p, li, td, dd):not(.page-cards > li) a:not(.md-button, :has(img)):is(:hover, :focus-visible) {
+  background-size: 100% 100%;
+}
+
+.md-typeset :is(p, li, td, dd):not(.page-cards > li) a:not(.md-button, :has(img))::after {
+  content: "";
+  display: inline-block;
+  width: 0.62em;
+  height: 0.62em;
+  margin-left: 0.18em;
+  vertical-align: 0.06em;
+  background-color: currentcolor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2012'%3E%3Cpath%20d='M2%206h8M6.5%202.5%2010%206l-3.5%203.5'%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2012'%3E%3Cpath%20d='M2%206h8M6.5%202.5%2010%206l-3.5%203.5'%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: 0.7;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.md-typeset :is(p, li, td, dd):not(.page-cards > li) a[href^="http"]:not([href^="https://tile-ai.github.io/TileOPs.github.io/"], .md-button, :has(img))::after {
+  vertical-align: 0.12em;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2012'%3E%3Cpath%20d='M4%202h6v6M10%202%202.5%209.5'%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2012'%3E%3Cpath%20d='M4%202h6v6M10%202%202.5%209.5'%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.md-typeset :is(p, li, td, dd):not(.page-cards > li) a:not(.md-button, :has(img)):is(:hover, :focus-visible)::after {
+  opacity: 1;
+  transform: translateX(0.1em);
+}
+
+.md-typeset :is(p, li, td, dd):not(.page-cards > li) a[href^="http"]:not([href^="https://tile-ai.github.io/TileOPs.github.io/"], .md-button, :has(img)):is(:hover, :focus-visible)::after {
+  transform: translate(0.08em, -0.08em);
 }
 
 /* A rule between sections, drawn as light rather than as a line. */
@@ -634,7 +682,11 @@ html[lang="zh"] .md-typeset .keystone {
   text-align: center;
 }
 
-.md-typeset .datatable table:not([class]) td.colsep {
+/* The label spans its dtype rows, and wraps at a hyphen rather than widening
+ * the column: an attention label runs past seventy characters.
+ */
+.md-typeset .datatable table:not([class]) td.wl-name {
+  white-space: normal;
   text-align: left;
 }
 
@@ -669,8 +721,8 @@ html[lang="zh"] .md-typeset .keystone {
 }
 
 /* Two header rows, still one middle rule: it belongs under the whole header
- * block, not between its halves. The `Workload` cell spans both rows, so its
- * own bottom edge already sits on that line.
+ * block, not between its halves. The `Workload` and `dtype` cells span both
+ * rows, so their own bottom edges already sit on that line.
  */
 /* Each header word underlined thin and grey — under `Alternatives` that also
  * says how far a header spanning two columns reaches. The heavy rule stays
@@ -698,9 +750,15 @@ html[lang="zh"] .md-typeset .keystone {
 
 /* A cool cast on the names, so the teal rule divides a label column from ink
  * measurements rather than sitting between them. The same in every row: a
- * colour that never varies cannot be mistaken for a verdict.
+ * colour that never varies cannot be mistaken for a verdict. As wide as the
+ * label up to 18em and no narrower: a table squeezed to the page would
+ * otherwise break the label at every hyphen.
  */
-.md-typeset .datatable table:not([class]) td.colsep code {
+.md-typeset .datatable table:not([class]) td.wl-name code {
+  display: inline-block;
+  width: max-content;
+  max-width: 18em;
+  white-space: normal;
   color: #316c6f;
 }
 
@@ -741,93 +799,6 @@ html[lang="zh"] .md-typeset .keystone {
 
 .md-typeset .perf-none {
   color: var(--md-default-fg-color--light);
-}
-
-/* Baseline provenance badges: where the kernel on the other side came from.
- *
- * Deliberately off the verdict axis. Green and rose mean faster and slower
- * everywhere else on this site, so a tier painted in either would be claiming
- * that a hand-written kernel is the stronger one -- and a tier makes no claim
- * about speed at all. The two hues are the site's structural violet and its
- * aside teal, at one weight and one chroma, so they read as two labels rather
- * than as a ranking. Each badge links to what a tier means, because a reader
- * who meets `handwritten` beside a slower time needs that sentence.
- */
-.md-typeset .tier {
-  font-family: var(--tf-mono);
-  font-size: 0.84em;
-  font-weight: 400;
-  padding: 0.05em 0.35em;
-  border-radius: 2px;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.md-typeset .tier-hw {
-  color: var(--tf-violet-dark);
-  background: var(--tf-violet-wash);
-}
-
-.md-typeset .tier-vendor {
-  color: var(--tf-teal);
-  background: var(--tf-teal-soft);
-}
-
-/* A tier the renderer does not know: shown as written, in neither hue. */
-.md-typeset .tier-other {
-  color: var(--tf-muted);
-  background: rgba(106, 100, 120, 0.08);
-}
-
-/* The measurement regime, when it is not the page's headline one.
- *
- * A third axis, and it had to look like neither of the other two. Green and
- * rose are the verdict; the two badge hues are provenance. This one is about
- * how the number was taken, so it is an outline in ink and no fill at all: it
- * reads as a qualifier on the figure beside it rather than as a result or as a
- * label for someone else's kernel. It appears only on rows and headings that
- * are NOT the headline regime, so a page measured one way carries none of them.
- */
-.md-typeset .regime-off {
-  font-family: var(--tf-mono);
-  font-size: 0.84em;
-  font-weight: 400;
-  padding: 0.05em 0.35em;
-  margin-left: 0.3em;
-  border: 1px solid var(--tf-ink-tint);
-  border-radius: 2px;
-  color: var(--tf-ink);
-  background: none;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-/* Which member of the pool the Ratio column divided by. Ink, not a verdict
- * colour: it marks where the number came from, not whether that is good.
- */
-.md-typeset .alt-pick {
-  font-family: var(--tf-body);
-  font-size: 0.8em;
-  font-weight: 700;
-  color: var(--tf-ink);
-}
-
-/* A candidate the run selected but never timed. Muted and italic, so a
- * stand-in figure cannot be read across the row as a measurement.
- */
-.md-typeset .alt-untimed {
-  color: var(--tf-muted);
-  font-style: italic;
-}
-
-/* A candidate's name is shown by its identifying head; the full binding --
- * template instantiation, second aclnn entry point -- is the title. Dotted, so
- * there is something to tell the reader to hover.
- */
-.md-typeset .datatable table:not([class]) abbr {
-  text-decoration: underline dotted rgba(26, 23, 32, 0.35);
-  text-underline-offset: 0.25em;
-  cursor: help;
 }
 
 /* What the heading is about, not part of it: body face, running-text weight.
@@ -1278,12 +1249,10 @@ html[lang="zh"] .md-nav__title {
   text-align: left;
 }
 
-/* The workload key carries the shapes at the width of the page, so the table
- * holds only `W1`, `W2`, … and the measurements.
- */
 /* The workload key: what an op's workloads have in common, stated once, and
- * what varies, one line per workload. Three columns — code, what varies, the
- * benchmark's own id — so a reader compares down a column.
+ * what varies, one line per label. Two columns — the label, what varies — so a
+ * reader compares down a column. It carries the shapes at the width of the
+ * page, so the table holds only the labels and the measurements.
  */
 .md-typeset .wl-key {
   margin: 0.35em 0 0.8em;
@@ -1311,7 +1280,7 @@ html[lang="zh"] .md-nav__title {
 .md-typeset .wl-key .wl-shared {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.15em 0.32em;
+  row-gap: 0.15em;
   margin: 0 0 0.15em;
   font-size: inherit;
   line-height: inherit;
@@ -1322,17 +1291,26 @@ html[lang="zh"] .md-nav__title {
   margin-bottom: 0.2em;
 }
 
+/* A middot between entries, not a second rule: punctuation separates without
+ * claiming to align. Each entry holds its middot in its left padding; the line
+ * is shifted left by that padding and clipped, so no line starts with one.
+ */
+.md-typeset .wl-key .wl-shared,
+.md-typeset .wl-key .wl-flow {
+  margin-left: -1.1em;
+  clip-path: inset(0 0 0 1.1em);
+}
+
 .md-typeset .wl-key .wl-cell {
+  position: relative;
+  padding-left: 1.1em;
   white-space: nowrap;
 }
 
-/* A middot between entries, not a second rule: the rule after the code falls in
- * the same place on every row, a rule between entries would land wherever the
- * previous name ended. Punctuation separates without claiming to align.
- */
-.md-typeset .wl-key .wl-cell + .wl-cell::before {
+.md-typeset .wl-key .wl-cell::before {
   content: "·";
-  margin-right: 0.32em;
+  position: absolute;
+  left: 0.25em;
   color: rgba(26, 23, 32, 0.5);
   font-weight: 400;
 }
@@ -1367,90 +1345,67 @@ html[lang="zh"] .md-nav__title {
   }
 }
 
+/* One column: each label on its own line, what it ran on under it. Two columns
+ * put a label and its shapes side by side, and the eye then reads across a gap
+ * that changes width from one key to the next.
+ */
 .md-typeset .wl-key ul.wl-rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  align-items: baseline;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* The id ranges right, off the same edge on every row, so the middle column is
- * free to be as long as one workload needs without ragging the rest.
- */
 .md-typeset .wl-key ul.wl-rows li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 0.9em;
-  margin: 0;
+  display: contents;
 }
 
-.md-typeset .wl-key ul.wl-rows b {
-  flex: 0 0 2.1em;
-  color: var(--tf-violet);
-  font-weight: 700;
+.md-typeset .wl-key ul.wl-rows .wl-id {
+  margin-top: 0.4em;
 }
 
-/* A hairline between the code and what it ran on — the same rule the table
- * draws between the workload column and its measurements.
+.md-typeset .wl-key ul.wl-rows li:first-child .wl-id {
+  margin-top: 0;
+}
+
+/* A hairline between the label and what it ran on — the same rule the table
+ * draws between the workload columns and their measurements.
  */
 .md-typeset .wl-key .wl-delta {
-  display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  gap: 0.15em 0.32em;
   padding-left: 0.9em;
   border-left: 1px solid rgba(26, 23, 32, 0.2);
+}
+
+/* Tensors, then scalars: one line when both fit, else the scalars wrap whole. */
+.md-typeset .wl-key .wl-flow,
+.md-typeset .wl-key .wl-part {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.15em;
+}
+
+.md-typeset .wl-key .wl-part {
+  min-width: 0;
 }
 
 .md-typeset .wl-key .wl-delta:empty {
   border-left: 0;
 }
 
-/* A tensor list wider than the column: one tensor per line, and no middots —
- * stacked entries are already separated by the line break.
- */
+/* A tensor list wider than the column: one tensor per line. */
 .md-typeset .wl-key .wl-shared.wl-stack {
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
 }
 
-.md-typeset .wl-key .wl-shared.wl-stack .wl-cell + .wl-cell::before {
-  content: none;
-  margin-right: 0;
-}
-
-/* Scalars wider than the column: the id takes the first line beside the code,
- * the scalars the second, with the rule running down both.
- */
-.md-typeset .wl-key ul.wl-long li {
-  margin-bottom: 0.3em;
-}
-
-.md-typeset .wl-key ul.wl-long li:last-child {
-  margin-bottom: 0;
-}
-
-.md-typeset .wl-key ul.wl-long .wl-id {
-  order: 1;
-  flex: 1 1 auto;
-  margin-left: 0;
-  padding-left: 0.9em;
-  border-left: 1px solid rgba(26, 23, 32, 0.2);
-}
-
-.md-typeset .wl-key ul.wl-long .wl-delta {
-  order: 2;
-  flex: 0 0 calc(100% - 3em);
-  margin-left: 3em;
-}
-
 .md-typeset .wl-key .wl-id {
-  flex: 0 0 auto;
-  margin-left: auto;
   padding: 0;
   background: transparent;
-  color: var(--tf-muted);
+  color: #316c6f;
 }
 
 /* A tensor's name is not its shape, and a symbol is not its value: teal
@@ -1466,16 +1421,6 @@ html[lang="zh"] .md-nav__title {
 .md-typeset .wl-key .wl-dim .wl-k {
   color: var(--tf-muted);
 }
-
-/* The workload column is now two characters wide, so it centres like the
- * numbers rather than ranging left as a label did.
- */
-.md-typeset .datatable table:not([class]) td.colsep b {
-  color: var(--tf-violet);
-  font-weight: 700;
-}
-
-
 
 /* Roofline figure (performance-guides/memory-bound). Log-log, so the two decades
    between an elementwise kernel and the ridge stay legible. Teal is the roof,
@@ -1760,4 +1705,144 @@ html[lang="zh"] .md-nav__title {
   font-size: 0.7rem;
   line-height: 1.7;
   text-align: left;
+}
+
+/* A blog post's subtitle: the line under the H1 that says what the post is
+ * about, so the H1 itself stays one short line.
+ */
+.md-typeset .post-subtitle {
+  margin: -0.6rem 0 1.6rem;
+  color: var(--tf-muted);
+  font-family: var(--tf-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* A section index's page list, drawn as cards by topic. `hooks.py` marks the
+ * lists; each item is a link, which becomes the card's title, and a line of
+ * description under it. Groups alternate violet and teal: a faint fill of that
+ * colour, a rule along the card's top, a numbered kicker, and a small corner of
+ * tiles that fills in on hover. Two columns where the page
+ * has the width, one below.
+ */
+.md-typeset:has(> ul.page-cards) {
+  counter-reset: page-card;
+}
+
+.md-typeset ul.page-cards {
+  --card-accent: var(--tf-violet);
+  --card-tint: rgba(90, 62, 133, 0.08);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1rem;
+  margin: 0.9rem 0 1.8rem;
+  padding: 0;
+  list-style: none;
+}
+
+.md-typeset ul.page-cards:nth-of-type(even) {
+  --card-accent: var(--tf-teal);
+  --card-tint: rgba(22, 112, 107, 0.08);
+}
+
+.md-typeset ul.page-cards > li {
+  position: relative;
+  overflow: hidden;
+  min-height: 7.2rem;
+  margin: 0;
+  padding: 1.05rem 1.2rem 1.9rem;
+  border: 1px solid var(--tf-line);
+  border-top: 3px solid var(--card-accent);
+  border-radius: 0.6rem;
+  background: var(--card-tint);
+  box-shadow: 0 1px 2px rgba(27, 19, 39, 0.05);
+  color: var(--tf-muted);
+  font-size: 0.74rem;
+  line-height: 1.6;
+  counter-increment: page-card;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+/* The kicker: the card's number in the index, in the group's accent. */
+.md-typeset ul.page-cards > li::before {
+  content: counter(page-card, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--card-accent);
+  font-family: var(--tf-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* A corner of tiles, faint until the card is hovered. */
+.md-typeset ul.page-cards > li::after {
+  content: "";
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 46px;
+  height: 46px;
+  background-color: var(--card-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='46'%20height='46'%3E%3Crect%20x='0'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.9'/%3E%3Crect%20x='12'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.5'/%3E%3Crect%20x='0'%20y='12'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.5'/%3E%3Crect%20x='24'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.25'/%3E%3Crect%20x='12'%20y='12'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.3'/%3E%3Crect%20x='0'%20y='24'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.25'/%3E%3Crect%20x='36'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.12'/%3E%3Crect%20x='24'%20y='12'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.15'/%3E%3Crect%20x='12'%20y='24'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.15'/%3E%3Crect%20x='0'%20y='36'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.12'/%3E%3C/svg%3E") right top / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='46'%20height='46'%3E%3Crect%20x='0'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.9'/%3E%3Crect%20x='12'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.5'/%3E%3Crect%20x='0'%20y='12'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.5'/%3E%3Crect%20x='24'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.25'/%3E%3Crect%20x='12'%20y='12'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.3'/%3E%3Crect%20x='0'%20y='24'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.25'/%3E%3Crect%20x='36'%20y='0'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.12'/%3E%3Crect%20x='24'%20y='12'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.15'/%3E%3Crect%20x='12'%20y='24'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.15'/%3E%3Crect%20x='0'%20y='36'%20width='10'%20height='10'%20rx='1.5'%20fill='%23000'%20fill-opacity='0.12'/%3E%3C/svg%3E") right top / contain no-repeat;
+  opacity: 0.18;
+  transition: opacity 180ms ease, transform 180ms ease;
+  pointer-events: none;
+}
+
+.md-typeset ul.page-cards > li:hover,
+.md-typeset ul.page-cards > li:focus-within {
+  border-color: var(--card-accent);
+  box-shadow: 0 14px 30px -18px rgba(27, 19, 39, 0.45);
+  transform: translateY(-3px);
+}
+
+.md-typeset ul.page-cards > li:hover::after,
+.md-typeset ul.page-cards > li:focus-within::after {
+  opacity: 0.6;
+  transform: scale(1.06);
+}
+
+/* The title's link covers the whole card, so the card is one click target. */
+.md-typeset ul.page-cards > li > a:first-child {
+  display: block;
+  max-width: calc(100% - 3.2rem);
+  margin-bottom: 0.35rem;
+  color: var(--md-default-fg-color);
+  font-family: var(--tf-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.md-typeset ul.page-cards > li > a:first-child::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* The arrow sits in the card's bottom-right corner, so a title that wraps never
+ * leaves it alone on a line.
+ */
+.md-typeset ul.page-cards > li > a:first-child::after {
+  content: "→";
+  position: absolute;
+  right: 1.2rem;
+  bottom: 0.9rem;
+  color: var(--card-accent);
+  font-size: 1rem;
+  transition: transform 180ms ease;
+}
+
+.md-typeset ul.page-cards > li:hover > a:first-child::after {
+  transform: translateX(0.25em);
+}
+
+html[lang="zh"] .md-typeset ul.page-cards > li > a:first-child {
+  font-weight: 700;
 }

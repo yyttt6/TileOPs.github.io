@@ -1,22 +1,16 @@
 # How a benchmark is timed
 
-## Ascend 950
+## Ascend 950 official CI
 
-The website separates **TileLang 0.1.15 correctness CI** from the latest available
-**historical development timings**. [Measurement scope](benchmarks/reading.md)
-records the two protocols; [results](benchmarks/index.md) gives their dates and evidence.
+Only the dedicated remote Ascend 950 CI publishes performance data. Local CI
+remains an internal check. The official protocol requires matched baselines,
+correctness, **3 warmups / 15 independent profiler windows**, **1 GiB cache eviction**,
+a verified frequency lock with readback and restoration, and the shared host device lock.
+The score is the mean device execution interval union from `torch_npu.profiler.profile`;
+there is no Event or wall-clock fallback.
 
-The development v2 protocol uses **3 warmups / 15 independent profiler windows**,
-**1 GiB cache eviction**, and the mean of summed device kernel durations.
-Clock locking was not established. These results do not certify release performance.
-
-The shared release protocol also uses 3/15 and 1 GiB eviction, but requires a
-verified clock policy and measures device execution interval unions. Formal
-measurement is pending that clock control and matching baselines. Both formal
-timers use `torch_npu.profiler.profile`, with no Event timing fallback.
-
-Use the [shared benchmark entry](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md).
-The earlier [910B1 data and protocol are archived](benchmarks/archive.md).
+No eligible performance snapshot is available yet. See [Benchmarks](benchmarks/index.md)
+and the [shared protocol](https://github.com/yyttt6/TileOPs/blob/ascend950/docs/ascend950/development.md).
 
 ## Upstream NVIDIA timing reference
 
