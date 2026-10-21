@@ -80,8 +80,14 @@ the dedicated `ascend950-production` ARM64 runner. Publication requires that job
 to succeed. Site-only deployments reuse the latest successful remote artifact;
 they never fetch results from the local correctness runner.
 
-The remote environment lives at `/workspace/user_data/tileops-ci`. Deploy
-`ci/ascend950-env.sh` as `env.sh` and the site configuration as `site.json` there.
+Persistent configuration and source backups live at
+`/workspace/user_data/tileops-ci`. Deploy `ci/ascend950-env.sh` as `env.sh` and the
+site configuration as `site.json` there. Install Python, the runtime, `bin/uv`,
+the runner and its working directory under `/opt/tileops-ci` on the container's
+local filesystem. The platform's shared FUSE volume reproduced duplicate bytes
+on append writes with both Python and Node; it must not hold active runner files,
+virtual environments or compiler caches. Keep the runtime's package freeze at
+`/workspace/user_data/tileops-ci/runtime-freeze.txt`.
 The example intentionally leaves `host_reservation_confirmed` false: an
 administrator must provide host-shared reservation/PID visibility and a verified
 clock lock/restore tool before device execution. Merely having `npu-smi` inside
@@ -90,7 +96,8 @@ bypass an unavailable host interface.
 
 The runner listener starts with `ci/start-ascend950-runner.sh`. In a container
 without systemd, the platform's startup hook must invoke it again after container
-restart. It performs no device work; each benchmark command acquires the separate
+restart. Recreate local installations if the platform replaces the container's
+local filesystem. It performs no device work; each benchmark command acquires the separate
 host NPU reservation. Raw evidence is retained in Actions artifacts, outside the
 public performance pages. An empty baseline factory list produces no performance
 rows; baseline source identity and matched measurements are required to populate

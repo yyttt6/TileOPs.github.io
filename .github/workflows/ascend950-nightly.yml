@@ -64,9 +64,9 @@ jobs:
         run: |
           set -eo pipefail
           source /workspace/user_data/tileops-ci/env.sh
-          /workspace/user_data/tileops-ci/bin/uv pip install --python "$VIRTUAL_ENV/bin/python" \
+          /opt/tileops-ci/bin/uv pip install --python "$VIRTUAL_ENV/bin/python" \
             --constraint /workspace/user_data/tileops-ci/runtime-freeze.txt --editable measured-tileops
-          /workspace/user_data/tileops-ci/bin/uv pip check --python "$VIRTUAL_ENV/bin/python"
+          /opt/tileops-ci/bin/uv pip check --python "$VIRTUAL_ENV/bin/python"
           python scripts/remote_nightly.py \
             --tileops measured-tileops \
             --config /workspace/user_data/tileops-ci/site.json \

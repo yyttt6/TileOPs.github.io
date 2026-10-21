@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-prefix=/workspace/user_data/tileops-ci
+prefix=/opt/tileops-ci
 cd "$prefix/actions-runner"
 export RUNNER_ALLOW_RUNASROOT=1
 # This lock prevents duplicate CPU-only runner listeners. Device reservations
