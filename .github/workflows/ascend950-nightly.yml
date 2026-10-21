@@ -54,6 +54,11 @@ jobs:
           ref: ${{ needs.contracts.outputs.source_commit }}
           path: measured-tileops
           persist-credentials: false
+      - name: Verify host reservation and clock prerequisites
+        run: |
+          python3 scripts/remote_preflight.py \
+            --config /workspace/user_data/tileops-ci/site.json \
+            --output "$RUNNER_TEMP/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-preflight.json"
       - name: Run exact checkout through the shared host reservation
         shell: bash
         run: |
@@ -72,7 +77,9 @@ jobs:
         with:
           name: ascend950-raw-evidence
           overwrite: true
-          path: ${{ runner.temp }}/official-950-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/official-950-${{ github.run_id }}-${{ github.run_attempt }}
+            ${{ runner.temp }}/official-950-${{ github.run_id }}-${{ github.run_attempt }}-preflight.json
           retention-days: 90
           if-no-files-found: error
       - name: Publish validated snapshot artifact

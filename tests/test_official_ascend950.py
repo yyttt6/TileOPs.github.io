@@ -11,6 +11,7 @@ import ascend950_snapshot as snapshot
 import gen_bench_pages as pages
 import pytest
 import yaml
+from remote_preflight import inspect
 from render_official_ascend950 import render
 
 
@@ -171,3 +172,13 @@ def test_nightly_only_remote_and_at_utc_midnight():
     assert "ascend950-production" in workflow["jobs"]["benchmark"]["runs-on"]
     assert workflow["jobs"]["publish"]["needs"] == "benchmark"
     assert "needs.contracts.outputs.source_commit" in json.dumps(workflow)
+
+
+def test_unprovisioned_remote_fails_before_runtime_imports(tmp_path):
+    config = tmp_path / "site.json"
+    config.write_text('{"host_reservation_confirmed": false}')
+    report = inspect(config)
+    assert report["status"] == "blocked"
+    assert report["hardware_started"] is False
+    assert any("not confirmed" in error for error in report["errors"])
+    assert any("clock_config" in error for error in report["errors"])
