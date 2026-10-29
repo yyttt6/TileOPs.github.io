@@ -2,17 +2,33 @@
 import html
 import json
 import math
+import re
 import shutil
 from collections import defaultdict
 from pathlib import Path
 
-from gen_bench_pages import DATA_PAGES
+from gen_bench_pages import (
+    DATA_PAGES,
+    DETAIL_FOOTER,
+    DETAIL_HEADER,
+    _label_html,
+    _sig_ms,
+    _stack,
+)
+from workload_shape import DTYPE_ABBR
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def cell(value):
     return html.escape(str(value)).replace('|', '&#124;').replace('\n', ' ')
+
+
+def label_dtype(case):
+    parts, dtypes = case.split('-'), []
+    while len(parts) > 1 and parts[-1] in DTYPE_ABBR:
+        dtypes.insert(0, DTYPE_ABBR[parts.pop()])
+    return '-'.join(parts), '/'.join(dtypes) or '·'
 
 
 def render():
@@ -43,8 +59,8 @@ def render():
              'cache snapshot, so **Ratio = NaN** and TileOPs latency is **—**. '
              'This does not rate unfinished operators or claim performance acceptance.\n\n'
              'Machines are displayed separately; results from different hosts or software cohorts '
-             'are not used to calculate a speedup. Each baseline cell shows microseconds; '
-             '`D` = profiler device latency, `H` = complete host round-trip latency. '
+             'are not used to calculate a speedup. Times are in milliseconds. '
+             'Device execution and host round-trip measurements have separate tables. '
              'Platform default clocks; 3 warmups, 15 samples and 1 GiB cache eviction. '
              'Only cache records with complete successful correctness and guard receipts are included. '
              'The most recent valid record per host / baseline / case is shown.\n\n'
@@ -60,6 +76,17 @@ def render():
                   for host in ('local', 'server1', 'server2')]
         index.append('| ' + cell(lib) + ' | ' + ' | '.join(map(str, counts + [sum(counts)])) + ' |\n')
     index.append('\n## Data\n\n| Page | Operators | Workloads | Baseline measurements |\n| --- | ---: | ---: | ---: |\n')
+    (out / 'method.md').write_text('# How these numbers are taken\n\n' + intro +
+        'Device execution time is the profiler measurement of device work. Host round-trip '
+        'time also includes dispatch and synchronization overhead. They are labelled in table '
+        'headings and kept separate; neither is substituted for the other. The downloadable '
+        'snapshot retains the exact metric and machine cohort for every measurement.\n\n'
+        'Ratio, TileOPs device time, throughput, SOL and bound remain unavailable when '
+        'the corresponding TileOPs measurement or roofline calibration is absent.\n')
+    order = {}
+    for api in sorted((ROOT / 'docs/api').glob('*.md')):
+        for name in re.findall(r'^::: tileops\.(?:\w+\.)+(\w+)\s*$', api.read_text(), re.MULTILINE):
+            order.setdefault(name.removesuffix('Op'), len(order))
     assigned = set()
     for slug, title, families in DATA_PAGES:
         selected = [r for r in rows if r['workload'].get('family', 'other') in families]
@@ -68,26 +95,51 @@ def render():
                          {f for _, _, fs in DATA_PAGES for f in fs}]
         if not selected:
             continue
-        text = [f'# {title}\n\n', intro]
+        text = [f'# {title}\n\n',
+                f"{len({r['op'] for r in selected})} ops, "
+                f"{len({(r['op'], r['case']) for r in selected})} workloads.\n\n",
+                'One table per op and measurement cohort, one row per workload and dtype. '
+                'Times are in ms. Ratio is NaN until a matching TileOPs timing is available. '
+                '[How these numbers are taken](method.md).\n\n']
         grouped = defaultdict(list)
         for row in selected:
             grouped[row['op']].append(row)
             assigned.add((row['host'], row['library'], row['op'], row['case']))
-        for op, values in sorted(grouped.items()):
-            text.append(f'## {cell(op)}\n\n')
-            libs = sorted({r['library'] for r in values})
-            text.append('| Workload | Machine | Ratio | TileOPs (µs) | ' + ' | '.join(cell(x) + ' (µs)' for x in libs) + ' |\n')
-            text.append('| --- | --- | ---: | ---: | ' + ' | '.join('---:' for _ in libs) + ' |\n')
-            workloads = defaultdict(dict)
+        for op, values in sorted(grouped.items(), key=lambda x: (order.get(x[0].removesuffix('Op'), 10000), x[0])):
+            text.append(f'## {cell(op.removesuffix("Op"))}\n\n')
+            specs = {}
             for row in values:
-                workloads[(row['case'], row['host'])][row['library']] = row
-            for (case, host), measures in sorted(workloads.items()):
-                cells = []
-                for lib in libs:
-                    r = measures.get(lib)
-                    cells.append('—' if r is None else f"{r['latency_us']:.3f} {'D' if r['metric'] == 'device_latency_ms' else 'H'}")
-                text.append('| ' + cell(case) + ' | ' + host + ' | NaN | — | ' + ' | '.join(cells) + ' |\n')
-            text.append('\n')
+                label, dtype = label_dtype(row['case'])
+                shapes = '; '.join(f'{name}: {tensor[0]}' for name, tensor in
+                                   row['workload'].get('tensors', {}).items())
+                specs.setdefault(label, (shapes, set()))[1].add(dtype)
+            text.append('<div class="wl-key"><ul class="wl-rows">\n')
+            for label, (shapes, dtypes) in sorted(specs.items()):
+                text.append(f'<li><code class="wl-id">{_label_html(label)}</code>'
+                            f'<span class="wl-delta">{cell(shapes)} · dtype={cell(", ".join(sorted(dtypes)))}</span></li>\n')
+            text.append('</ul></div>\n\n')
+            cohorts = defaultdict(lambda: defaultdict(list))
+            for row in values:
+                cohorts[(row['host'], row['metric'])][row['case']].append(row)
+            for (host, metric), workloads in sorted(cohorts.items()):
+                kind = 'Device execution time' if metric == 'device_latency_ms' else 'Host round-trip time'
+                text.append(f'### {cell(host)} · {kind}\n\n')
+                text.append('\n'.join(DETAIL_HEADER) + '\n')
+                groups = defaultdict(list)
+                for case, measures in workloads.items():
+                    label, dtype = label_dtype(case)
+                    groups[label].append((dtype, measures))
+                for label, dtype_rows in sorted(groups.items()):
+                    for number, (dtype, measures) in enumerate(sorted(dtype_rows)):
+                        measures.sort(key=lambda r: (r['latency_us'], r['library']))
+                        names = _stack([f"<code>{cell(r['library'])}</code>" for r in measures])
+                        times = _stack([_sig_ms(r['latency_us'] / 1000) for r in measures])
+                        name = (f'<td class="wl-name" rowspan="{len(dtype_rows)}">'
+                                f'<code>{_label_html(label)}</code></td>') if number == 0 else ''
+                        text.append(f'<tr>{name}<td class="colsep">{cell(dtype)}</td>'
+                                    f'<td>NaN</td><td>—</td><td>{names}</td><td>{times}</td>'
+                                    '<td>·</td><td>·</td><td>·</td></tr>\n')
+                text.append('\n'.join(DETAIL_FOOTER) + '\n\n')
         (out / (slug + '.md')).write_text(''.join(text))
         index.append(f'| [{title}]({slug}.md) | {len(grouped)} | '
                      f"{len({(r['op'], r['case']) for r in selected})} | {len(selected)} |\n")

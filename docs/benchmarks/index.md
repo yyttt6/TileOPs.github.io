@@ -4,7 +4,7 @@ Baseline cache progress · Ascend 950DT · snapshot 2026-10-29T14:10:43+00:00
 
 Latencies are measured baseline results. TileOPs timings are not included in this cache snapshot, so **Ratio = NaN** and TileOPs latency is **—**. This does not rate unfinished operators or claim performance acceptance.
 
-Machines are displayed separately; results from different hosts or software cohorts are not used to calculate a speedup. Each baseline cell shows microseconds; `D` = profiler device latency, `H` = complete host round-trip latency. Platform default clocks; 3 warmups, 15 samples and 1 GiB cache eviction. Only cache records with complete successful correctness and guard receipts are included. The most recent valid record per host / baseline / case is shown.
+Machines are displayed separately; results from different hosts or software cohorts are not used to calculate a speedup. Times are in milliseconds. Device execution and host round-trip measurements have separate tables. Platform default clocks; 3 warmups, 15 samples and 1 GiB cache eviction. Only cache records with complete successful correctness and guard receipts are included. The most recent valid record per host / baseline / case is shown.
 
 [Download measurements and provenance](baseline-cache.json).
 
