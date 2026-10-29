@@ -54,6 +54,14 @@ expands the single `Benchmarks` nav entry to whichever pages the renderer produc
 
 ## Ascend 950 publication
 
+Current authorization (2026-10-29): publish the frozen three-machine baseline
+cache as progress in the existing benchmark family layout. Use
+`render_baseline_cache.py` and `data/baseline-cache/snapshot.json`; preserve host
+and timing cohorts, display missing TileOPs ratios as NaN, and do not infer
+TileOPs acceptance. Platform default clocks apply (user revoked clock locking
+on 2026-10-22). This overrides the older empty-section rule for this baseline
+cache view; the paired official-nightly pipeline below remains separate.
+
 Use the upstream `gen_bench_pages.py` layout. `render_official_ascend950.py` gates
 snapshots by remote publisher, formal protocol and successful clock/guard evidence.
 No eligible snapshot means an empty performance section. Correctness-only results,

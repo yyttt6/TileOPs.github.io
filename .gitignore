@@ -10,3 +10,4 @@ docs/benchmarks/*.md
 
 # Download copies are regenerated from the validated data/ snapshot.
 docs/benchmarks/data/
+docs/benchmarks/baseline-cache.json

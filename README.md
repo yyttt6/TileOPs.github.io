@@ -61,6 +61,23 @@ prepended by `hooks.py` — so the Chinese nav is never sparse.
 
 ## Official Ascend 950 publication
 
+### Baseline cache progress
+
+The benchmark family pages currently display the explicit, frozen baseline cache
+snapshot in `data/baseline-cache/snapshot.json`. This progress publication was
+authorized on 2026-10-29 and includes measured results from all three machines.
+It uses platform default clocks, full correctness receipts and exclusive guard
+receipts, with 3 warmups, 15 samples and 1 GiB cache eviction. Host cohorts and
+device versus host timing remain identifiable. Missing TileOPs timings stay null
+and ratios render as NaN. Cache coverage does not establish complete baseline
+coverage or acceptance of a TileOPs implementation.
+
+`scripts/render_baseline_cache.py` generates these pages after the official
+renderer. The raw sanitized snapshot is downloadable from the benchmark index.
+The historical official-nightly instructions below describe the separate paired
+comparison pipeline; its old clock-lock requirement was revoked by the user on
+2026-10-22 and is not applied to this cache publication.
+
 Benchmark pages use the upstream renderer and family layout, pinned at
 `tile-ai/TileOPs.github.io@9c575b45a428ee8c4fce706b83fc85af3231d3a9`.
 The small platform adaptation replaces the measurement-method text when the
