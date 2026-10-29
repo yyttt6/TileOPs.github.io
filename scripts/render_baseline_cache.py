@@ -39,12 +39,13 @@ def render():
     rows = data['rows']
     identities = set()
     for row in rows:
-        key = (row['host'], row['library'], row['op'], row['case'])
+        assert not {'host', 'cohort'} & row.keys(), 'Machine metadata must remain private'
+        key = (row['library'], row['op'], row['case'])
         assert key not in identities, 'Duplicate measurement'
         identities.add(key)
         assert row['samples'] == 15 and math.isfinite(row['latency_us']) and row['latency_us'] > 0
         assert row['ratio'] is None and row['tileops_latency_us'] is None
-        assert row['metric'] in ('device_latency_ms', 'end_to_end_mean_ms')
+        assert row['metric'] == 'device_latency_ms', 'Only profiler device timings may be published'
     out = ROOT / 'docs/benchmarks'
     out.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(source, out / 'baseline-cache.json')
@@ -58,29 +59,26 @@ def render():
              'Latencies are measured baseline results. TileOPs timings are not included in this '
              'cache snapshot, so **Ratio = NaN** and TileOPs latency is **—**. '
              'This does not rate unfinished operators or claim performance acceptance.\n\n'
-             'Machines are displayed separately; results from different hosts or software cohorts '
-             'are not used to calculate a speedup. Times are in milliseconds. '
-             'Device execution and host round-trip measurements have separate tables. '
+             'Times are profiler-measured device execution times in milliseconds. '
              'Platform default clocks; 3 warmups, 15 samples and 1 GiB cache eviction. '
              'Only cache records with complete successful correctness and guard receipts are included. '
-             'The most recent valid record per host / baseline / case is shown.\n\n'
+             'The most recent eligible device measurement per baseline / case is shown.\n\n'
              '[Download measurements and provenance](baseline-cache.json).\n\n')
     index = ['# Benchmarks\n\n', intro,
              f"**{len(ops)} operators · {len(cases)} / {data['manifest_cases']} workloads with a baseline · "
-             f"{len(rows)} baseline measurements across 3 machines.**\n\n",
+             f"{len(rows)} baseline measurements.**\n\n",
              'Coverage is partial: a measured workload can still have other baselines pending. '
              'These are recorded results, not a claim that an operator is fully covered.\n\n',
-             '## Baseline coverage\n\n| Baseline | Local | Server 1 | Server 2 | Total |\n| --- | ---: | ---: | ---: | ---: |\n']
+             '## Baseline coverage\n\n| Baseline | Measurements |\n| --- | ---: |\n']
     for lib in sorted({r['library'] for r in rows}):
-        counts = [sum(r['library'] == lib and r['host'] == host for r in rows)
-                  for host in ('local', 'server1', 'server2')]
-        index.append('| ' + cell(lib) + ' | ' + ' | '.join(map(str, counts + [sum(counts)])) + ' |\n')
+        count = sum(r['library'] == lib for r in rows)
+        index.append('| ' + cell(lib) + ' | ' + str(count) + ' |\n')
     index.append('\n## Data\n\n| Page | Operators | Workloads | Baseline measurements |\n| --- | ---: | ---: | ---: |\n')
     (out / 'method.md').write_text('# How these numbers are taken\n\n' + intro +
-        'Device execution time is the profiler measurement of device work. Host round-trip '
-        'time also includes dispatch and synchronization overhead. They are labelled in table '
-        'headings and kept separate; neither is substituted for the other. The downloadable '
-        'snapshot retains the exact metric and machine cohort for every measurement.\n\n'
+        'Device execution time is measured with torch_npu.profiler.profile using the shared '
+        'measurement core. End-to-end wall-clock measurements are excluded from these '
+        'performance tables. The downloadable snapshot retains the device metric and '
+        'measurement identifier for every result.\n\n'
         'Ratio, TileOPs device time, throughput, SOL and bound remain unavailable when '
         'the corresponding TileOPs measurement or roofline calibration is absent.\n')
     order = {}
@@ -98,13 +96,13 @@ def render():
         text = [f'# {title}\n\n',
                 f"{len({r['op'] for r in selected})} ops, "
                 f"{len({(r['op'], r['case']) for r in selected})} workloads.\n\n",
-                'One table per op and measurement cohort, one row per workload and dtype. '
+                'One table per op, one row per workload and dtype. '
                 'Times are in ms. Ratio is NaN until a matching TileOPs timing is available. '
                 '[How these numbers are taken](method.md).\n\n']
         grouped = defaultdict(list)
         for row in selected:
             grouped[row['op']].append(row)
-            assigned.add((row['host'], row['library'], row['op'], row['case']))
+            assigned.add((row['library'], row['op'], row['case']))
         for op, values in sorted(grouped.items(), key=lambda x: (order.get(x[0].removesuffix('Op'), 10000), x[0])):
             text.append(f'## {cell(op.removesuffix("Op"))}\n\n')
             specs = {}
@@ -118,28 +116,25 @@ def render():
                 text.append(f'<li><code class="wl-id">{_label_html(label)}</code>'
                             f'<span class="wl-delta">{cell(shapes)} · dtype={cell(", ".join(sorted(dtypes)))}</span></li>\n')
             text.append('</ul></div>\n\n')
-            cohorts = defaultdict(lambda: defaultdict(list))
+            workloads = defaultdict(list)
             for row in values:
-                cohorts[(row['host'], row['metric'])][row['case']].append(row)
-            for (host, metric), workloads in sorted(cohorts.items()):
-                kind = 'Device execution time' if metric == 'device_latency_ms' else 'Host round-trip time'
-                text.append(f'### {cell(host)} · {kind}\n\n')
-                text.append('\n'.join(DETAIL_HEADER) + '\n')
-                groups = defaultdict(list)
-                for case, measures in workloads.items():
-                    label, dtype = label_dtype(case)
-                    groups[label].append((dtype, measures))
-                for label, dtype_rows in sorted(groups.items()):
-                    for number, (dtype, measures) in enumerate(sorted(dtype_rows)):
-                        measures.sort(key=lambda r: (r['latency_us'], r['library']))
-                        names = _stack([f"<code>{cell(r['library'])}</code>" for r in measures])
-                        times = _stack([_sig_ms(r['latency_us'] / 1000) for r in measures])
-                        name = (f'<td class="wl-name" rowspan="{len(dtype_rows)}">'
-                                f'<code>{_label_html(label)}</code></td>') if number == 0 else ''
-                        text.append(f'<tr>{name}<td class="colsep">{cell(dtype)}</td>'
-                                    f'<td>NaN</td><td>—</td><td>{names}</td><td>{times}</td>'
-                                    '<td>·</td><td>·</td><td>·</td></tr>\n')
-                text.append('\n'.join(DETAIL_FOOTER) + '\n\n')
+                workloads[row['case']].append(row)
+            text.append('\n'.join(DETAIL_HEADER) + '\n')
+            groups = defaultdict(list)
+            for case, measures in workloads.items():
+                label, dtype = label_dtype(case)
+                groups[label].append((dtype, measures))
+            for label, dtype_rows in sorted(groups.items()):
+                for number, (dtype, measures) in enumerate(sorted(dtype_rows)):
+                    measures.sort(key=lambda r: (r['latency_us'], r['library']))
+                    names = _stack([f"<code>{cell(r['library'])}</code>" for r in measures])
+                    times = _stack([_sig_ms(r['latency_us'] / 1000) for r in measures])
+                    name = (f'<td class="wl-name" rowspan="{len(dtype_rows)}">'
+                            f'<code>{_label_html(label)}</code></td>') if number == 0 else ''
+                    text.append(f'<tr>{name}<td class="colsep">{cell(dtype)}</td>'
+                                f'<td>NaN</td><td>—</td><td>{names}</td><td>{times}</td>'
+                                '<td>·</td><td>·</td><td>·</td></tr>\n')
+            text.append('\n'.join(DETAIL_FOOTER) + '\n\n')
         (out / (slug + '.md')).write_text(''.join(text))
         index.append(f'| [{title}]({slug}.md) | {len(grouped)} | '
                      f"{len({(r['op'], r['case']) for r in selected})} | {len(selected)} |\n")

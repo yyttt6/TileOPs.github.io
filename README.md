@@ -67,8 +67,10 @@ The benchmark family pages currently display the explicit, frozen baseline cache
 snapshot in `data/baseline-cache/snapshot.json`. This progress publication was
 authorized on 2026-10-29 and includes measured results from all three machines.
 It uses platform default clocks, full correctness receipts and exclusive guard
-receipts, with 3 warmups, 15 samples and 1 GiB cache eviction. Host cohorts and
-device versus host timing remain identifiable. Missing TileOPs timings stay null
+receipts, with 3 warmups, 15 samples and 1 GiB cache eviction. Only profiler device
+timings are eligible. Machine labels and machine metadata are omitted from the
+public pages and download; detailed provenance remains in the internal receipts.
+Missing TileOPs timings stay null
 and ratios render as NaN. Cache coverage does not establish complete baseline
 coverage or acceptance of a TileOPs implementation.
 
