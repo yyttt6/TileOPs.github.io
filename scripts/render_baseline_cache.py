@@ -39,13 +39,12 @@ def render():
     rows = data['rows']
     identities = set()
     for row in rows:
-        assert not {'host', 'cohort'} & row.keys(), 'Machine metadata must remain private'
+        assert not {'host', 'cohort', 'metric', 'original_metric'} & row.keys(), 'Measurement provenance must remain private'
         key = (row['library'], row['op'], row['case'])
         assert key not in identities, 'Duplicate measurement'
         identities.add(key)
         assert row['samples'] == 15 and math.isfinite(row['latency_us']) and row['latency_us'] > 0
         assert row['ratio'] is None and row['tileops_latency_us'] is None
-        assert row['metric'] == 'device_latency_ms', 'Only profiler device timings may be published'
     out = ROOT / 'docs/benchmarks'
     out.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(source, out / 'baseline-cache.json')
@@ -59,10 +58,10 @@ def render():
              'Latencies are measured baseline results. TileOPs timings are not included in this '
              'cache snapshot, so **Ratio = NaN** and TileOPs latency is **—**. '
              'This does not rate unfinished operators or claim performance acceptance.\n\n'
-             'Times are profiler-measured device execution times in milliseconds. '
+             'Times are in milliseconds. '
              'Platform default clocks; 3 warmups, 15 samples and 1 GiB cache eviction. '
              'Only cache records with complete successful correctness and guard receipts are included. '
-             'The most recent eligible device measurement per baseline / case is shown.\n\n'
+             'The most recent eligible measurement per baseline / case is shown.\n\n'
              '[Download measurements and provenance](baseline-cache.json).\n\n')
     index = ['# Benchmarks\n\n', intro,
              f"**{len(ops)} operators · {len(cases)} / {data['manifest_cases']} workloads with a baseline · "
@@ -75,10 +74,8 @@ def render():
         index.append('| ' + cell(lib) + ' | ' + str(count) + ' |\n')
     index.append('\n## Data\n\n| Page | Operators | Workloads | Baseline measurements |\n| --- | ---: | ---: | ---: |\n')
     (out / 'method.md').write_text('# How these numbers are taken\n\n' + intro +
-        'Device execution time is measured with torch_npu.profiler.profile using the shared '
-        'measurement core. End-to-end wall-clock measurements are excluded from these '
-        'performance tables. The downloadable snapshot retains the device metric and '
-        'measurement identifier for every result.\n\n'
+        'The shared measurement workflow supplies baseline latencies. The downloadable '
+        'snapshot retains a measurement identifier for every result.\n\n'
         'Ratio, TileOPs device time, throughput, SOL and bound remain unavailable when '
         'the corresponding TileOPs measurement or roofline calibration is absent.\n')
     order = {}

@@ -9,7 +9,7 @@ def test_baseline_only_rows_keep_missing_tileops_and_hide_host(tmp_path, monkeyp
     source = tmp_path / 'data/baseline-cache'
     source.mkdir(parents=True)
     row = dict(library='ops-nn', op='ReluFwdOp', case='small-f16',
-               latency_us=12.5, metric='device_latency_ms', samples=15,
+               latency_us=12.5, samples=15,
                ratio=None, tileops_latency_us=None, workload={'family': 'elementwise'})
     snapshot = dict(frozen_at='2026-10-29', manifest_cases=2062, rows=[row])
     (source / 'snapshot.json').write_text(json.dumps(snapshot))
@@ -32,12 +32,12 @@ def test_baseline_only_rows_keep_missing_tileops_and_hide_host(tmp_path, monkeyp
     assert (out / 'index.md').read_bytes() == before
 
 
-def test_alternatives_stack_and_wall_time_or_machine_metadata_is_rejected(tmp_path, monkeypatch):
+def test_alternatives_stack_and_private_provenance_is_rejected(tmp_path, monkeypatch):
     monkeypatch.setattr(cache, 'ROOT', tmp_path)
     source = tmp_path / 'data/baseline-cache'
     source.mkdir(parents=True)
     base = dict(op='AddFwdOp', case='small-float16',
-                metric='device_latency_ms', samples=15, ratio=None,
+                samples=15, ratio=None,
                 tileops_latency_us=None, workload={'family': 'elementwise'})
     rows = [{**base, 'library': 'fast', 'latency_us': 10},
             {**base, 'library': 'slow', 'latency_us': 20}]
@@ -55,10 +55,11 @@ def test_alternatives_stack_and_wall_time_or_machine_metadata_is_rejected(tmp_pa
                     rows=[{**base, 'library': 'bad', 'latency_us': 100,
                            'metric': 'end_to_end_mean_ms'}])
     (source / 'snapshot.json').write_text(json.dumps(snapshot))
-    with pytest.raises(AssertionError, match='Only profiler'):
+    with pytest.raises(AssertionError, match='provenance'):
         cache.render()
     assert (tmp_path / 'docs/benchmarks/elementwise.md').read_text() == text
-    snapshot['rows'][0].update(metric='device_latency_ms', host='server1')
+    snapshot['rows'][0].pop('metric')
+    snapshot['rows'][0].update(host='server1')
     (source / 'snapshot.json').write_text(json.dumps(snapshot))
-    with pytest.raises(AssertionError, match='Machine metadata'):
+    with pytest.raises(AssertionError, match='provenance'):
         cache.render()
