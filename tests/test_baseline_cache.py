@@ -63,3 +63,23 @@ def test_alternatives_stack_and_private_provenance_is_rejected(tmp_path, monkeyp
     (source / 'snapshot.json').write_text(json.dumps(snapshot))
     with pytest.raises(AssertionError, match='provenance'):
         cache.render()
+
+
+@pytest.mark.parametrize(('family', 'slug'), [
+    ('gemm', 'gemm'), ('norm', 'normalization'),
+    ('rope', 'rope'), ('mamba', 'ssm'),
+])
+def test_manifest_family_aliases_reach_their_pages(tmp_path, monkeypatch, family, slug):
+    monkeypatch.setattr(cache, 'ROOT', tmp_path)
+    source = tmp_path / 'data/baseline-cache'
+    source.mkdir(parents=True)
+    row = dict(library='baseline', op='ExampleOp', case='small-float16',
+               latency_us=10, samples=15, ratio=None, tileops_latency_us=None,
+               workload={'family': family})
+    (source / 'snapshot.json').write_text(json.dumps(
+        dict(frozen_at='2026-10-29', manifest_cases=1, rows=[row])))
+    cache.render()
+    out = tmp_path / 'docs/benchmarks'
+    assert 'baseline' in (out / (slug + '.md')).read_text()
+    assert f']({slug}.md)' in (out / 'index.md').read_text()
+    assert not (out / 'other.md').exists()

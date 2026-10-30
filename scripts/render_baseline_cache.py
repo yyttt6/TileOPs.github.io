@@ -8,6 +8,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from gen_bench_pages import (
+    _MANIFEST_FAMILY,
     DATA_PAGES,
     DETAIL_FOOTER,
     DETAIL_HEADER,
@@ -82,11 +83,15 @@ def render():
     for api in sorted((ROOT / 'docs/api').glob('*.md')):
         for name in re.findall(r'^::: tileops\.(?:\w+\.)+(\w+)\s*$', api.read_text(), re.MULTILINE):
             order.setdefault(name.removesuffix('Op'), len(order))
+    def page_family(row):
+        family = row['workload'].get('family', 'other')
+        return _MANIFEST_FAMILY.get(family, family)
+
     assigned = set()
     for slug, title, families in DATA_PAGES:
-        selected = [r for r in rows if r['workload'].get('family', 'other') in families]
+        selected = [r for r in rows if page_family(r) in families]
         if slug == 'other':
-            selected += [r for r in rows if r['workload'].get('family', 'other') not in
+            selected += [r for r in rows if page_family(r) not in
                          {f for _, _, fs in DATA_PAGES for f in fs}]
         if not selected:
             continue

@@ -37,11 +37,15 @@ Coverage is partial: a measured workload can still have other baselines pending.
 | Page | Operators | Workloads | Baseline measurements |
 | --- | ---: | ---: | ---: |
 | [Elementwise](elementwise.md) | 66 | 465 | 1131 |
+| [RoPE](rope.md) | 5 | 23 | 55 |
 | [Reduction](reduction.md) | 19 | 169 | 387 |
+| [Normalization](normalization.md) | 11 | 108 | 408 |
 | [Conv & Pool](conv-pool.md) | 16 | 120 | 533 |
+| [GEMM](gemm.md) | 7 | 114 | 513 |
 | [Quantization & Dequantization](quantization.md) | 4 | 25 | 112 |
 | [Attention](attention.md) | 15 | 174 | 516 |
 | [MoE](moe.md) | 7 | 72 | 150 |
 | [Sampling](sampling.md) | 3 | 11 | 11 |
 | [Linear Attention](linear-attention.md) | 9 | 353 | 1016 |
-| [Other](other.md) | 31 | 273 | 1042 |
+| [SSM](ssm.md) | 5 | 22 | 49 |
+| [Other](other.md) | 3 | 6 | 17 |
