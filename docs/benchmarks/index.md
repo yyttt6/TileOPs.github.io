@@ -1,6 +1,6 @@
 # Benchmarks
 
-Baseline cache progress · Ascend 950DT · snapshot 2026-11-01T11:06:06.328648+00:00
+Baseline cache progress · Ascend 950DT · snapshot 2026-11-01T12:22:53.032329+00:00
 
 Latencies are measured results on Ascend 950DT with 32 AI Cores. Ratio is the fastest listed baseline time divided by TileOPs time. A verified matching TileOPs result is required; otherwise **Ratio = NaN** and TileOPs latency is **—**. A verified TileOPs timing without an eligible baseline is shown with **Ratio = NaN**. Gray ratios use torch-eager as their fastest listed alternative.
 
