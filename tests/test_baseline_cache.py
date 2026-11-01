@@ -83,3 +83,41 @@ def test_manifest_family_aliases_reach_their_pages(tmp_path, monkeypatch, family
     assert 'baseline' in (out / (slug + '.md')).read_text()
     assert f']({slug}.md)' in (out / 'index.md').read_text()
     assert not (out / 'other.md').exists()
+
+
+def test_verified_tileops_uses_fastest_baseline_and_rejects_inconsistent_ratio(tmp_path, monkeypatch):
+    monkeypatch.setattr(cache, 'ROOT', tmp_path)
+    source = tmp_path / 'data/baseline-cache'
+    source.mkdir(parents=True)
+    base = dict(op='AddFwdOp', case='small-float16', samples=15,
+                tileops_latency_us=5, tileops_samples=15, tileops_verified=True,
+                workload={'family': 'elementwise'})
+    rows = [{**base, 'library': 'slow', 'latency_us': 20, 'ratio': 4},
+            {**base, 'library': 'fast', 'latency_us': 10, 'ratio': 2}]
+    snapshot = dict(frozen_at='2026-11-01', manifest_cases=1, rows=rows)
+    (source / 'snapshot.json').write_text(json.dumps(snapshot))
+    cache.render()
+    text = (tmp_path / 'docs/benchmarks/elementwise.md').read_text()
+    assert '<td>2.00</td><td>0.005</td>' in text
+    assert text.index('<code>fast</code>') < text.index('<code>slow</code>')
+    rows[0]['ratio'] = 40
+    (source / 'snapshot.json').write_text(json.dumps(snapshot))
+    with pytest.raises(AssertionError):
+        cache.render()
+    assert (tmp_path / 'docs/benchmarks/elementwise.md').read_text() == text
+
+
+def test_verified_tileops_without_eligible_baseline_keeps_nan(tmp_path, monkeypatch):
+    monkeypatch.setattr(cache, 'ROOT', tmp_path)
+    source = tmp_path / 'data/baseline-cache'
+    source.mkdir(parents=True)
+    snapshot = dict(frozen_at='2026-11-01', manifest_cases=1, rows=[], tileops_rows=[
+        dict(op='SinusoidalFwdOp', case='small-float32', latency_us=5,
+             samples=15, verified=True, workload={'family': 'elementwise'})])
+    (source / 'snapshot.json').write_text(json.dumps(snapshot))
+    cache.render()
+    text = (tmp_path / 'docs/benchmarks/elementwise.md').read_text()
+    assert '<td>NaN</td><td>0.005</td><td>—</td><td>—</td>' in text
+    index = (tmp_path / 'docs/benchmarks/index.md').read_text()
+    assert '0 baseline measurements' in index
+    assert 'Verified TileOPs results: 1 operators · 1 workloads' in index
