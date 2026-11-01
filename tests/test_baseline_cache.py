@@ -98,7 +98,7 @@ def test_verified_tileops_uses_fastest_baseline_and_rejects_inconsistent_ratio(t
     (source / 'snapshot.json').write_text(json.dumps(snapshot))
     cache.render()
     text = (tmp_path / 'docs/benchmarks/elementwise.md').read_text()
-    assert '<td>2.00</td><td>0.005</td>' in text
+    assert '<td><span class="perf-ahead">2.00×</span></td><td>0.005</td>' in text
     assert text.index('<code>fast</code>') < text.index('<code>slow</code>')
     rows[0]['ratio'] = 40
     (source / 'snapshot.json').write_text(json.dumps(snapshot))
@@ -121,3 +121,42 @@ def test_verified_tileops_without_eligible_baseline_keeps_nan(tmp_path, monkeypa
     index = (tmp_path / 'docs/benchmarks/index.md').read_text()
     assert '0 baseline measurements' in index
     assert 'Verified TileOPs results: 1 operators · 1 workloads' in index
+
+
+def test_different_workload_contracts_are_rejected_before_writing(tmp_path, monkeypatch):
+    monkeypatch.setattr(cache, 'ROOT', tmp_path)
+    source = tmp_path / 'data/baseline-cache'
+    source.mkdir(parents=True)
+    row = dict(library='first', op='ExampleOp', case='same-id-float16',
+               latency_us=10, samples=15, ratio=None, tileops_latency_us=None,
+               workload={'family': 'elementwise', 'tensors': {'x': [[32], 'float16']}})
+    snapshot = dict(frozen_at='2026-11-01', manifest_cases=2208, rows=[row])
+    (source / 'snapshot.json').write_text(json.dumps(snapshot))
+    cache.render()
+    output = tmp_path / 'docs/benchmarks/elementwise.md'
+    original = output.read_bytes()
+    snapshot['rows'].append({**row, 'library': 'second',
+                             'workload': {'family': 'elementwise', 'tensors': {'x': [[64], 'float16']}}})
+    (source / 'snapshot.json').write_text(json.dumps(snapshot))
+    with pytest.raises(AssertionError, match='workload contract'):
+        cache.render()
+    assert output.read_bytes() == original
+
+
+@pytest.mark.parametrize(('library', 'baseline_us', 'css'), [
+    ('torch-eager', 10, 'perf-unrated'),
+    ('native-library', 3, 'perf-behind'),
+])
+def test_ratio_uses_existing_verdict_style(tmp_path, monkeypatch, library, baseline_us, css):
+    monkeypatch.setattr(cache, 'ROOT', tmp_path)
+    source = tmp_path / 'data/baseline-cache'
+    source.mkdir(parents=True)
+    row = dict(library=library, op='ExampleOp', case='small-float16',
+               latency_us=baseline_us, samples=15, ratio=baseline_us/5,
+               tileops_latency_us=5, tileops_samples=15, tileops_verified=True,
+               workload={'family': 'elementwise'})
+    (source / 'snapshot.json').write_text(json.dumps(
+        dict(frozen_at='2026-11-01', manifest_cases=1, rows=[row])))
+    cache.render()
+    text = (tmp_path / 'docs/benchmarks/elementwise.md').read_text()
+    assert f'<span class="{css}">{baseline_us/5:.2f}×</span>' in text

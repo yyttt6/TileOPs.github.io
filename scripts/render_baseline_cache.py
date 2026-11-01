@@ -13,6 +13,7 @@ from gen_bench_pages import (
     DETAIL_FOOTER,
     DETAIL_HEADER,
     _label_html,
+    _ratio_cell,
     _sig_ms,
     _stack,
 )
@@ -41,11 +42,13 @@ def render():
     baseline_count = len(rows)
     baseline_cases = {(r['op'], r['case']) for r in rows}
     identities = set()
+    contracts = defaultdict(set)
     for row in rows:
         assert not {'host', 'cohort', 'metric', 'original_metric'} & row.keys(), 'Measurement provenance must remain private'
         key = (row['library'], row['op'], row['case'])
         assert key not in identities, 'Duplicate measurement'
         identities.add(key)
+        contracts[(row['op'], row['case'])].add(json.dumps(row['workload'], sort_keys=True))
         assert row['samples'] == 15 and math.isfinite(row['latency_us']) and row['latency_us'] > 0
         tile = row['tileops_latency_us']
         if tile is None:
@@ -55,6 +58,7 @@ def render():
             assert row.get('tileops_samples') == 15
             assert row.get('tileops_verified') is True
             assert math.isfinite(row['ratio']) and math.isclose(row['ratio'], row['latency_us'] / tile, rel_tol=1e-9)
+    assert all(len(values) == 1 for values in contracts.values()), 'Inconsistent workload contract across baselines'
     timings = defaultdict(set)
     for row in rows:
         timings[(row['op'], row['case'])].add(row['tileops_latency_us'])
@@ -85,7 +89,8 @@ def render():
              'Ratio is the fastest listed baseline time divided by TileOPs time. '
              'A verified matching TileOPs result is required; otherwise **Ratio = NaN** '
              'and TileOPs latency is **—**. A verified TileOPs timing without an eligible '
-             'baseline is shown with **Ratio = NaN**.\n\n'
+             'baseline is shown with **Ratio = NaN**. '
+             'Gray ratios use torch-eager as their fastest listed alternative.\n\n'
              'Times are in milliseconds. '
              'Platform default clocks; 3 warmups, 15 samples and 1 GiB cache eviction. '
              'Only cache records with complete successful correctness and guard receipts are included. '
@@ -162,7 +167,9 @@ def render():
                     name = (f'<td class="wl-name" rowspan="{len(dtype_rows)}">'
                             f'<code>{_label_html(label)}</code></td>') if number == 0 else ''
                     tile = measures[0]['tileops_latency_us']
-                    ratio_text = 'NaN' if tile is None or measures[0]['latency_us'] is None else f"{measures[0]['latency_us'] / tile:.2f}"
+                    ratio_text = 'NaN' if tile is None or measures[0]['latency_us'] is None else _ratio_cell(
+                        measures[0]['latency_us'] / tile,
+                        rated=measures[0]['library'] != 'torch-eager')
                     tile_text = '—' if tile is None else _sig_ms(tile / 1000)
                     text.append(f'<tr>{name}<td class="colsep">{cell(dtype)}</td>'
                                 f'<td>{ratio_text}</td><td>{tile_text}</td><td>{names}</td><td>{times}</td>'
