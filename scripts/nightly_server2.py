@@ -40,12 +40,12 @@ def main():
     started = datetime.datetime.now(datetime.timezone.utc).isoformat()
     timings = []
 
-    def run(op, target):
+    def run(op, target, attempt=0):
         command = [
             "npu-guard",
             "run",
             "--owner",
-            f"nightly/{os.environ['GITHUB_RUN_ID']}/{op}",
+            f"nightly/{os.environ['GITHUB_RUN_ID']}/{op}/{attempt}",
             "--wait",
             "1800",
             "--timeout",
@@ -61,10 +61,15 @@ def main():
             op,
         ]
         t = time.monotonic()
-        with (out / f"{op}.log").open("x") as log:
+        with (out / f"{op}-attempt{attempt}.log").open("x") as log:
             r = subprocess.run(command, cwd=a.source, stdout=log, stderr=subprocess.STDOUT)
         timings.append(
-            dict(op=op, guard_exit_code=r.returncode, elapsed_seconds=time.monotonic() - t)
+            dict(
+                op=op,
+                attempt=attempt,
+                guard_exit_code=r.returncode,
+                elapsed_seconds=time.monotonic() - t,
+            )
         )
         write(
             out / "timing.json",
@@ -86,20 +91,26 @@ def main():
     failures = []
     frozen_sources = None
     for op in ops:
-        target = out / op
-        code = run(op, target)
-        result = (
-            json.loads((target / "result.json").read_text())
-            if (target / "result.json").exists()
-            else {}
-        )
-        receipts[op] = dict(
-            guard_exit_code=code,
-            result=result,
-            hardware=json.loads((target / "hardware.json").read_text())
-            if (target / "hardware.json").exists()
-            else {},
-        )
+        attempts = []
+        for attempt in range(2):
+            target = out / (op if attempt == 0 else f"{op}-retry{attempt}")
+            code = run(op, target, attempt)
+            result = (
+                json.loads((target / "result.json").read_text())
+                if (target / "result.json").exists()
+                else {}
+            )
+            receipt = dict(
+                guard_exit_code=code,
+                result=result,
+                hardware=json.loads((target / "hardware.json").read_text())
+                if (target / "hardware.json").exists()
+                else {},
+            )
+            attempts.append(dict(attempt=attempt, directory=target.name, **receipt))
+            if code not in (75, 76, 78) or result.get("failed", 0):
+                break
+        receipts[op] = dict(**receipt, attempts=attempts, selected_attempt=attempt)
         if code or result.get("status") != "passed":
             failures.append(op)
         else:

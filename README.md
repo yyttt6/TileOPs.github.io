@@ -146,7 +146,9 @@ measurement identities; new results identify the measured commit and date.
 
 A successful workflow means complete correctness and valid measurements for the
 selected registered operators, not that every performance ratio reaches 0.8.
-Any failed operator or invalid guard receipt blocks this publication and preserves
+Guard infrastructure exits 75, 76 and 78 allow one full retry under a new reservation,
+with both attempts retained; numerical failures are never retried automatically.
+Any failed operator or invalid final guard receipt blocks this publication and preserves
 the last successful snapshot. Raw evidence, per-operator elapsed time (including
 reservation wait), compact publication evidence, and the source revision are
 uploaded by the workflow. The final Actions duration additionally includes CPU
