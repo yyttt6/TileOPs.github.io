@@ -77,6 +77,9 @@ def validate_run(snapshot, name, verify_only):
 
 def validate(snapshot):
     snapshot = Path(snapshot).resolve()
+    if read_json(snapshot / "meta.json").get("schema_version") == 2:
+        from nightly_snapshot import validate as validate_nightly
+        return validate_nightly(snapshot)
     inventory = read_json(snapshot / "sha256.json")
     require(isinstance(inventory, dict) and bool(inventory), "Missing evidence inventory")
     actual = {str(p.relative_to(snapshot)) for p in snapshot.rglob("*")

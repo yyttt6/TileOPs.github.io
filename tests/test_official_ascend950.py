@@ -164,11 +164,11 @@ def test_populated_snapshot_renders_upstream_family_page(bundle, tmp_path):
     assert sorted(p.name for p in out.iterdir()) == ["elementwise.md", "index.md", "reading.md"]
 
 
-def test_nightly_only_remote_and_at_utc_midnight():
+def test_nightly_server2_at_shanghai_0300():
     root = Path(__file__).resolve().parents[1]
     workflow = yaml.safe_load((root / ".github/workflows/ascend950-nightly.yml").read_text())
     triggers = workflow.get("on", workflow.get(True))
-    assert triggers["schedule"] == [{"cron": "0 0 * * *"}]
+    assert triggers["schedule"] == [{"cron": "0 19 * * *"}]
     assert "ascend950-production" in workflow["jobs"]["benchmark"]["runs-on"]
     assert workflow["jobs"]["publish"]["needs"] == "benchmark"
     assert "needs.contracts.outputs.source_commit" in json.dumps(workflow)

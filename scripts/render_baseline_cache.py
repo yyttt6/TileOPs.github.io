@@ -2,6 +2,7 @@
 import html
 import json
 import math
+import os
 import re
 import shutil
 from collections import defaultdict
@@ -35,6 +36,11 @@ def label_dtype(case):
 
 def render():
     source = ROOT / 'data/baseline-cache/snapshot.json'
+    official = os.environ.get('ASCEND950_OFFICIAL_SNAPSHOT')
+    if official and (Path(official) / 'baseline-cache.json').exists():
+        from nightly_snapshot import validate
+        validate(Path(official))
+        source = Path(official) / 'baseline-cache.json'
     if not source.exists():
         return
     data = json.loads(source.read_text())

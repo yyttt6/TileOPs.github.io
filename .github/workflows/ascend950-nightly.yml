@@ -2,7 +2,7 @@ name: Official Ascend 950 nightly
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 19 * * *'  # 03:00 Asia/Shanghai (UTC+8)
   workflow_dispatch:
 
 permissions:
@@ -42,8 +42,8 @@ jobs:
   benchmark:
     needs: contracts
     if: github.repository == 'yyttt6/TileOPs.github.io' && github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, linux, ARM64, ascend950-production]
-    timeout-minutes: 240
+    runs-on: [self-hosted, linux, ARM64, ascend950-production, ascend950-server2]
+    timeout-minutes: 720
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,22 +54,19 @@ jobs:
           ref: ${{ needs.contracts.outputs.source_commit }}
           path: measured-tileops
           persist-credentials: false
-      - name: Verify host reservation and clock prerequisites
-        run: |
-          python3 scripts/remote_preflight.py \
-            --config /workspace/user_data/tileops-ci/site.json \
-            --output "$RUNNER_TEMP/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-preflight.json"
-      - name: Run exact checkout through the shared host reservation
+      - name: Prepare canonical isolated environment and measure
         shell: bash
         run: |
           set -eo pipefail
-          source /workspace/user_data/tileops-ci/env.sh
-          /opt/tileops-ci/bin/uv pip install --python "$VIRTUAL_ENV/bin/python" \
-            --constraint /workspace/user_data/tileops-ci/runtime-freeze.txt --editable measured-tileops
-          /opt/tileops-ci/bin/uv pip check --python "$VIRTUAL_ENV/bin/python"
-          python scripts/remote_nightly.py \
-            --tileops measured-tileops \
-            --config /workspace/user_data/tileops-ci/site.json \
+          source /opt/tileops-ci/server2-20261030/config/prepare-python.sh "$GITHUB_WORKSPACE/measured-tileops"
+          source /opt/tileops-ci/server2-20261030/config/toolchain-v1.env.sh
+          export TILELANG_CACHE_DIR="$RUNNER_TEMP/nightly-${GITHUB_RUN_ID}-tilelang"
+          export OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
+          TORCH_DEVICE_BACKEND_AUTOLOAD=0 python /opt/tileops-ci/server2-20261030/config/check-toolchain-v1.py \
+            --lock /opt/tileops-ci/server2-20261030/config/toolchain-v1.lock.json \
+            --output "$RUNNER_TEMP/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-preflight.json"
+          python scripts/nightly_server2.py \
+            --source measured-tileops \
             --output "$RUNNER_TEMP/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
       - name: Preserve raw evidence, including failed runs
         uses: actions/upload-artifact@v4

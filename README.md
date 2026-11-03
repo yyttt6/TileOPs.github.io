@@ -127,3 +127,32 @@ the tables.
 branch `archive/ascend910b1-20261021`. The withdrawn custom 950 pages and evidence
 remain in `data/archive/website-before-formal-ci-20261021/` and Git history. None
 of these archives is copied into the public performance pages.
+
+### Ascend 950 nightly on server2
+
+The website nightly starts from the daily `19:00 UTC` schedule (03:00 Asia/Shanghai;
+GitHub may delay scheduled jobs). It freezes `ascend950` at the contracts job,
+uses the canonical release SDK/runtime profile on physical 32 Cube / 64 Vector
+hardware, and takes one shared `npu-guard` reservation per registered operator.
+The website runner requires both `ascend950-production` and `ascend950-server2`.
+
+New TileOPs samples use platform-default clocks, three warmups, fifteen isolated
+NPU profiler windows, and 1 GiB cache eviction. Distinct task spans count mixed
+AIC/AIV roles once; named AICPU work is included. Saved traces are hashed and
+replayed before publication. Historical native baselines retain their admitted
+original v2 values; nightly does not remeasure them or relabel them as v3.
+Only exact workload contracts are joined. Previous unrelated results retain their
+measurement identities; new results identify the measured commit and date.
+
+A successful workflow means complete correctness and valid measurements for the
+selected registered operators, not that every performance ratio reaches 0.8.
+Any failed operator or invalid guard receipt blocks this publication and preserves
+the last successful snapshot. Raw evidence, per-operator elapsed time (including
+reservation wait), compact publication evidence, and the source revision are
+uploaded by the workflow. The final Actions duration additionally includes CPU
+contracts, environment preparation, artifact upload and site deployment.
+
+The container runner supervisor lives at
+`/opt/tileops-ci/nightly-server2-20261103/start-runner.sh`; it uses a process lock
+and may be restarted without starting a second listener. Device jobs always run
+in the foreground under the shared NPU reservation.
