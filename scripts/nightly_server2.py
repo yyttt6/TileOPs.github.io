@@ -2,8 +2,10 @@
 
 import argparse
 import datetime
+import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -16,7 +18,22 @@ HERE = Path(__file__).resolve().parent
 
 
 def write(path, value):
-    path.write_text(json.dumps(value, indent=2, default=str) + "\n")
+    temp = path.with_suffix(path.suffix + ".tmp")
+    temp.write_text(json.dumps(value, indent=2, default=str) + "\n")
+    temp.replace(path)
+
+
+def identity(commit):
+    files = [HERE / "nightly_device.py", *sorted((HERE / "nightly_support").rglob("*.py"))]
+    return dict(
+        commit=commit,
+        measurement_files={
+            str(f.relative_to(HERE)): hashlib.sha256(f.read_bytes()).hexdigest() for f in files
+        },
+        toolchain=hashlib.sha256(
+            Path("/opt/tileops-ci/server2-20261030/config/toolchain-v1.lock.json").read_bytes()
+        ).hexdigest(),
+    )
 
 
 def main():
@@ -24,6 +41,7 @@ def main():
     p.add_argument("--source", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--operators", default="all")
+    p.add_argument("--resume", type=Path)
     a = p.parse_args()
     a.source = a.source.resolve()
     out = a.output.resolve()
@@ -36,6 +54,15 @@ def main():
     assert not subprocess.check_output(
         ["git", "-C", str(a.source), "status", "--porcelain"], text=True
     ).strip()
+    current_identity = identity(commit)
+    write(out / "identity.json", current_identity)
+    prior = {}
+    if a.resume:
+        a.resume = a.resume.resolve()
+        assert json.loads((a.resume / "identity.json").read_text()) == current_identity, (
+            "Checkpoint environment mismatch"
+        )
+        prior = json.loads((a.resume / "receipts.json").read_text())
     start = time.monotonic()
     started = datetime.datetime.now(datetime.timezone.utc).isoformat()
     timings = []
@@ -91,26 +118,46 @@ def main():
     failures = []
     frozen_sources = None
     for op in ops:
-        attempts = []
-        for attempt in range(2):
-            target = out / (op if attempt == 0 else f"{op}-retry{attempt}")
-            code = run(op, target, attempt)
-            result = (
-                json.loads((target / "result.json").read_text())
-                if (target / "result.json").exists()
-                else {}
+        saved = prior.get(op, {})
+        if saved.get("guard_exit_code") == 0 and saved.get("result", {}).get("status") == "passed":
+            assert saved["hardware"] == selection["hardware"], "Checkpoint hardware mismatch"
+            assert not saved["result"]["failed"] and not saved["result"]["source_changed"]
+            directory = saved.get("attempts", [{}])[saved.get("selected_attempt", 0)].get(
+                "directory", op
             )
-            receipt = dict(
-                guard_exit_code=code,
-                result=result,
-                hardware=json.loads((target / "hardware.json").read_text())
-                if (target / "hardware.json").exists()
-                else {},
+            origin = (a.resume / directory).resolve()
+            assert origin.is_relative_to(a.resume)
+            target = out / op
+            shutil.copytree(origin, target)
+            code, result = 0, saved["result"]
+            receipts[op] = dict(
+                saved,
+                resumed_from=str(a.resume),
+                attempts=[dict(attempt=0, directory=op)],
+                selected_attempt=0,
             )
-            attempts.append(dict(attempt=attempt, directory=target.name, **receipt))
-            if code not in (75, 76, 78) or result.get("failed", 0):
-                break
-        receipts[op] = dict(**receipt, attempts=attempts, selected_attempt=attempt)
+            print("RESUME", op, "CPU replay of retained raw profiles", flush=True)
+        else:
+            attempts = []
+            for attempt in range(2):
+                target = out / (op if attempt == 0 else f"{op}-retry{attempt}")
+                code = run(op, target, attempt)
+                result = (
+                    json.loads((target / "result.json").read_text())
+                    if (target / "result.json").exists()
+                    else {}
+                )
+                receipt = dict(
+                    guard_exit_code=code,
+                    result=result,
+                    hardware=json.loads((target / "hardware.json").read_text())
+                    if (target / "hardware.json").exists()
+                    else {},
+                )
+                attempts.append(dict(attempt=attempt, directory=target.name, **receipt))
+                if code not in (75, 76, 78) or result.get("failed", 0):
+                    break
+            receipts[op] = dict(**receipt, attempts=attempts, selected_attempt=attempt)
         if code or result.get("status") != "passed":
             failures.append(op)
         else:

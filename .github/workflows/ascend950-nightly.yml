@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 19 * * *'  # 03:00 Asia/Shanghai (UTC+8)
   workflow_dispatch:
+    inputs:
+      resume_run_id:
+        description: "Explicit prior run ID to resume (same source and measurement environment)"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -56,6 +61,8 @@ jobs:
           persist-credentials: false
       - name: Prepare canonical isolated environment and measure
         shell: bash
+        env:
+          RESUME_RUN_ID: ${{ inputs.resume_run_id }}
         run: |
           set -eo pipefail
           mkdir -p /opt/tileops-ci/nightly-server2-20261103/evidence
@@ -66,7 +73,12 @@ jobs:
           TORCH_DEVICE_BACKEND_AUTOLOAD=0 python /opt/tileops-ci/server2-20261030/config/check-toolchain-v1.py \
             --lock /opt/tileops-ci/server2-20261030/config/toolchain-v1.lock.json \
             --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-preflight.json"
-          python scripts/nightly_server2.py \
+          resume_args=()
+          if [[ -n "$RESUME_RUN_ID" ]]; then
+            [[ "$RESUME_RUN_ID" =~ ^[0-9]+$ ]] || exit 1
+            resume_args=(--resume "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${RESUME_RUN_ID}-1")
+          fi
+          python scripts/nightly_server2.py "${resume_args[@]}" \
             --source measured-tileops \
             --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
       - name: Preserve raw evidence, including failed runs
