@@ -151,7 +151,9 @@ with both attempts retained; numerical failures are never retried automatically.
 Any failed operator or invalid final guard receipt blocks this publication and preserves
 the last successful snapshot. Raw evidence, per-operator elapsed time (including
 reservation wait), compact publication evidence, and the source revision are
-uploaded by the workflow. The final Actions duration additionally includes CPU
+uploaded by the workflow. Evidence also remains under
+`/opt/tileops-ci/nightly-server2-20261103/evidence/`, outside Actions temporary
+cleanup, so a runner connection loss cannot erase the completed measurements. The final Actions duration additionally includes CPU
 contracts, environment preparation, artifact upload and site deployment.
 
 The container runner supervisor lives at
