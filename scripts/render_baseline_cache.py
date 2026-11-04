@@ -102,6 +102,10 @@ def render():
              'Only cache records with complete successful correctness and guard receipts are included. '
              'The most recent eligible measurement per baseline / case is shown.\n\n'
              '[Download measurements](baseline-cache.json).\n\n')
+    if data.get('publication_notes'):
+        intro += '**Measurement update**\n\n' + ''.join(
+            '- ' + cell(note) + '\n' for note in data['publication_notes']
+        ) + '\n'
     index = ['# Benchmarks\n\n', intro,
              f"**{len(ops)} operators · {len(baseline_cases)} / {data['manifest_cases']} workloads with a baseline · "
              f"{baseline_count} baseline measurements.**\n\n",
