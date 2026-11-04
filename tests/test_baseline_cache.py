@@ -160,3 +160,26 @@ def test_ratio_uses_existing_verdict_style(tmp_path, monkeypatch, library, basel
     cache.render()
     text = (tmp_path / 'docs/benchmarks/elementwise.md').read_text()
     assert f'<span class="{css}">{baseline_us/5:.2f}×</span>' in text
+
+
+def test_published_torch_survives_older_nightly_and_keeps_tileops():
+    workload = {'params': {'n': 32}, 'family': 'elementwise'}
+    prior = dict(library='native', op='AddFwdOp', case='small', workload=workload,
+                 latency_us=20, tileops_latency_us=5, tileops_samples=15,
+                 tileops_verified=True, tileops_measurement_id='tile', tileops_protocol='v3')
+    new = dict(library='torch-eager', op='AddFwdOp', case='small', workload=workload,
+               latency_us=10, tileops_latency_us=None, ratio=None,
+               measurement_id='new', protocol='v3')
+    official = dict(rows=[prior], frozen_at='2026-11-02')
+    published = dict(rows=[new], frozen_at='2026-11-04', publication_notes=['new release'])
+    release = dict(count=1, measurements=[dict(op='AddFwdOp', case='small',
+                                             measurement_id='new', protocol='v3')])
+    merged = cache.merge_torch_release(official, published, release)
+    assert merged['rows'][0] == prior
+    row = merged['rows'][1]
+    assert row['latency_us'] == 10 and row['tileops_latency_us'] == 5
+    assert row['ratio'] == 2 and row['tileops_measurement_id'] == 'tile'
+    assert merged['publication_notes'] == ['new release']
+    prior['workload'] = {'params': {'n': 64}, 'family': 'elementwise'}
+    with pytest.raises(AssertionError, match='workload mismatch'):
+        cache.merge_torch_release(official, published, release)

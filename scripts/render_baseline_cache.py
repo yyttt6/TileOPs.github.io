@@ -1,10 +1,10 @@
 """Render an explicitly published cache snapshot in the existing family layout."""
+import hashlib
 import html
 import json
 import math
 import os
 import re
-import shutil
 from collections import defaultdict
 from pathlib import Path
 
@@ -34,8 +34,51 @@ def label_dtype(case):
     return '-'.join(parts), '/'.join(dtypes) or '·'
 
 
+def merge_torch_release(official, published, release):
+    """Overlay the explicit torch release, retaining validated nightly TileOPs values."""
+    def key(row):
+        return row['library'], row['op'], row['case']
+
+    published_rows = {key(row): row for row in published['rows']}
+    rows = {key(row): dict(row) for row in official['rows']}
+    cases = {(row['op'], row['case']): row for row in official['rows']}
+    tile_only = {(row['op'], row['case']): row for row in official.get('tileops_rows', [])}
+    promoted = set()
+    for item in release['measurements']:
+        identity = ('torch-eager', item['op'], item['case'])
+        row = dict(published_rows[identity])
+        assert row['measurement_id'] == item['measurement_id']
+        assert row['protocol'] == item['protocol']
+        case = (row['op'], row['case'])
+        assert case not in promoted, 'Duplicate torch release entry'
+        promoted.add(case)
+        prior = cases.get(case)
+        for field in list(row):
+            if field.startswith('tileops_'):
+                del row[field]
+        row.update(tileops_latency_us=None, ratio=None)
+        if prior is not None:
+            assert prior['workload'] == row['workload'], 'Nightly/release workload mismatch'
+            row.update({field: value for field, value in prior.items()
+                        if field.startswith('tileops_')})
+        elif case in tile_only:
+            tile = tile_only[case]
+            assert tile['workload'] == row['workload'], 'Nightly/release workload mismatch'
+            for field in ('latency_us', 'samples', 'verified', 'measurement_id', 'protocol'):
+                row['tileops_' + field] = tile[field]
+        if row['tileops_latency_us'] is not None:
+            row['ratio'] = row['latency_us'] / row['tileops_latency_us']
+        rows[identity] = row
+    assert len(promoted) == release['count']
+    return {**official, 'rows': list(rows.values()),
+            'tileops_rows': [row for case, row in tile_only.items() if case not in promoted],
+            'frozen_at': max(official['frozen_at'], published['frozen_at']),
+            'publication_notes': published.get('publication_notes', [])}
+
+
 def render():
     source = ROOT / 'data/baseline-cache/snapshot.json'
+    published_source = source
     official = os.environ.get('ASCEND950_OFFICIAL_SNAPSHOT')
     if official and (Path(official) / 'baseline-cache.json').exists():
         from nightly_snapshot import validate
@@ -44,6 +87,11 @@ def render():
     if not source.exists():
         return
     data = json.loads(source.read_text())
+    release_path = ROOT / 'data/baseline-cache/torch1135-release.json'
+    if source != published_source and release_path.exists():
+        release = json.loads(release_path.read_text())
+        assert hashlib.sha256(published_source.read_bytes()).hexdigest() == release['snapshot_sha256']
+        data = merge_torch_release(data, json.loads(published_source.read_text()), release)
     rows = list(data['rows'])
     baseline_count = len(rows)
     baseline_cases = {(r['op'], r['case']) for r in rows}
@@ -81,7 +129,7 @@ def render():
                          tileops_latency_us=tile['latency_us'], ratio=None))
     out = ROOT / 'docs/benchmarks'
     out.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(source, out / 'baseline-cache.json')
+    (out / 'baseline-cache.json').write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n')
     # This view reports cached baselines. The official matched-comparison renderer
     # retains its own admission rules; no synthetic TileOPs measurements are made.
     for path in out.glob('*.md'):
