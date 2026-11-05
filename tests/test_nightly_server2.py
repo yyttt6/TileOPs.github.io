@@ -118,3 +118,25 @@ def test_reject_bad_evidence(tmp_path, failure):
     seal(root)
     with pytest.raises(AssertionError):
         validate(root)
+
+
+@pytest.mark.parametrize("order", [float("inf"), float("-inf")])
+def test_vector_norm_infinity_cache_contract(tmp_path, order):
+    root = bundle(tmp_path)
+    base = json.loads((root / "baseline-before.json").read_text())
+    measured = json.loads((root / "measurements.json").read_text())
+    base["rows"][0]["op"] = measured[0]["op"] = "VectorNormFwdOp"
+    params = {"shape": [4], "dim": -1, "ord": order}
+    measured[0]["params"] = params
+    base["rows"][0]["workload"]["params"] = dict(
+        params, ord="Infinity" if order > 0 else "-Infinity"
+    )
+    before = json.dumps(base, sort_keys=True)
+    result = build_cache(base, measured, "b" * 40, "2026-11-05")
+    assert result["rows"][0]["ratio"] == 1.5
+    assert json.dumps(base, sort_keys=True) == before
+    assert result["rows"][0]["workload"] == base["rows"][0]["workload"]
+    for changed in [dict(params, ord=-order), dict(params, ord=2), dict(params, dim=0)]:
+        measured[0]["params"] = changed
+        with pytest.raises(AssertionError, match="Changed cached contract"):
+            build_cache(base, measured, "b" * 40, "2026-11-05")

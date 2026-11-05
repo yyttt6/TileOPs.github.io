@@ -15,6 +15,16 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def contract_params(op, params):
+    """Normalize the cache's JSON-safe infinity encoding for vector norm ord only."""
+    normalized = dict(params)
+    if op == "VectorNormFwdOp":
+        order = normalized.get("ord")
+        if isinstance(order, float) and math.isinf(order):
+            normalized["ord"] = "Infinity" if order > 0 else "-Infinity"
+    return normalized
+
+
 def build_cache(base, measured, commit, date):
     data = copy.deepcopy(base)
     fresh = {(r["op"], r["case_id"]): r for r in measured}
@@ -25,7 +35,9 @@ def build_cache(base, measured, commit, date):
         if key not in fresh:
             continue
         m = fresh[key]
-        assert row["workload"]["params"] == m["params"], f"Changed cached contract: {key}"
+        assert contract_params(row["op"], row["workload"]["params"]) == contract_params(
+            m["op"], m["params"]
+        ), f"Changed cached contract: {key}"
         latency = m["measurement"]["latency_ms"] * 1000
         row.update(
             tileops_latency_us=latency,
