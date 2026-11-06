@@ -183,3 +183,25 @@ def test_published_torch_survives_older_nightly_and_keeps_tileops():
     prior['workload'] = {'params': {'n': 64}, 'family': 'elementwise'}
     with pytest.raises(AssertionError, match='workload mismatch'):
         cache.merge_torch_release(official, published, release)
+
+
+def test_new_release_promotes_tile_only_infinity_without_measurement_id():
+    work = {'params': {'ord': 'Infinity', 'dim': -1}, 'family': 'reduction'}
+    tile = dict(op='VectorNormFwdOp', case='inf', workload={
+        'params': {'ord': float('inf'), 'dim': -1}, 'family': 'reduction'},
+        latency_us=5, samples=15, verified=True, protocol='v3', commit='source')
+    new = dict(library='torch-eager', op=tile['op'], case=tile['case'], workload=work,
+               latency_us=10, tileops_latency_us=None, ratio=None,
+               measurement_id='new', protocol='v3')
+    official = dict(rows=[], tileops_rows=[tile], frozen_at='2026-11-05')
+    published = dict(rows=[new], frozen_at='2026-11-06')
+    release = dict(count=1, measurements=[dict(op=tile['op'], case=tile['case'],
+                                             measurement_id='new', protocol='v3')])
+    result = cache.merge_torch_release(official, published, release)
+    assert result['tileops_rows'] == []
+    assert result['rows'][0]['ratio'] == 2
+    assert result['rows'][0]['tileops_commit'] == 'source'
+    assert result['rows'][0]['workload'] == work
+    tile['workload']['params']['dim'] = 0
+    with pytest.raises(AssertionError, match='workload mismatch'):
+        cache.merge_torch_release(official, published, release)

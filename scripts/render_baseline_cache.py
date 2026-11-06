@@ -34,6 +34,16 @@ def label_dtype(case):
     return '-'.join(parts), '/'.join(dtypes) or '·'
 
 
+def normalized_workload(value):
+    if isinstance(value, float) and not math.isfinite(value):
+        return 'NaN' if math.isnan(value) else ('Infinity' if value > 0 else '-Infinity')
+    if isinstance(value, dict):
+        return {key: normalized_workload(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [normalized_workload(item) for item in value]
+    return value
+
+
 def merge_torch_release(official, published, release):
     """Overlay the explicit torch release, retaining validated nightly TileOPs values."""
     def key(row):
@@ -58,14 +68,17 @@ def merge_torch_release(official, published, release):
                 del row[field]
         row.update(tileops_latency_us=None, ratio=None)
         if prior is not None:
-            assert prior['workload'] == row['workload'], 'Nightly/release workload mismatch'
+            assert normalized_workload(prior['workload']) == normalized_workload(row['workload']), 'Nightly/release workload mismatch'
             row.update({field: value for field, value in prior.items()
                         if field.startswith('tileops_')})
         elif case in tile_only:
             tile = tile_only[case]
-            assert tile['workload'] == row['workload'], 'Nightly/release workload mismatch'
-            for field in ('latency_us', 'samples', 'verified', 'measurement_id', 'protocol'):
+            assert normalized_workload(tile['workload']) == normalized_workload(row['workload']), 'Nightly/release workload mismatch'
+            for field in ('latency_us', 'samples', 'verified', 'protocol'):
                 row['tileops_' + field] = tile[field]
+            for field in ('measurement_id', 'commit', 'date'):
+                if field in tile:
+                    row['tileops_' + field] = tile[field]
         if row['tileops_latency_us'] is not None:
             row['ratio'] = row['latency_us'] / row['tileops_latency_us']
         rows[identity] = row
@@ -87,7 +100,9 @@ def render():
     if not source.exists():
         return
     data = json.loads(source.read_text())
-    release_path = ROOT / 'data/baseline-cache/torch1135-release.json'
+    release_path = ROOT / 'data/baseline-cache/torch2208-release.json'
+    if not release_path.exists():
+        release_path = ROOT / 'data/baseline-cache/torch1135-release.json'
     if source != published_source and release_path.exists():
         release = json.loads(release_path.read_text())
         assert hashlib.sha256(published_source.read_bytes()).hexdigest() == release['snapshot_sha256']

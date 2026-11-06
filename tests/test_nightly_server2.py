@@ -140,3 +140,17 @@ def test_vector_norm_infinity_cache_contract(tmp_path, order):
         measured[0]["params"] = changed
         with pytest.raises(AssertionError, match="Changed cached contract"):
             build_cache(base, measured, "b" * 40, "2026-11-05")
+
+
+def test_nightly_includes_named_ascend_variants():
+    from nightly_device import registered_ascend_ops
+
+    registered = {
+        "BatchNormFwdOp": {"ascend_train": object(), "ascend_infer": object()},
+        "InstanceNormFwdOp": {"ascend_train": object()},
+        "ReluFwdOp": {"ascend": object()},
+        "OtherOp": {"cuda": object(), "not_ascend": object()},
+    }
+    assert registered_ascend_ops(registered) == [
+        "BatchNormFwdOp", "InstanceNormFwdOp", "ReluFwdOp"
+    ]
