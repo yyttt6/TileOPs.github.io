@@ -100,13 +100,19 @@ def render():
     if not source.exists():
         return
     data = json.loads(source.read_text())
-    release_path = ROOT / 'data/baseline-cache/torch2208-release.json'
+    release_path = ROOT / 'data/baseline-cache/latest-release.json'
+    if not release_path.exists():
+        release_path = ROOT / 'data/baseline-cache/torch2208-release.json'
     if not release_path.exists():
         release_path = ROOT / 'data/baseline-cache/torch1135-release.json'
     if source != published_source and release_path.exists():
         release = json.loads(release_path.read_text())
         assert hashlib.sha256(published_source.read_bytes()).hexdigest() == release['snapshot_sha256']
-        data = merge_torch_release(data, json.loads(published_source.read_text()), release)
+        if release.get('schema') == 2:
+            from baseline_release import merge_latest_release
+            data = merge_latest_release(data, json.loads(published_source.read_text()), release)
+        else:
+            data = merge_torch_release(data, json.loads(published_source.read_text()), release)
     rows = list(data['rows'])
     baseline_count = len(rows)
     baseline_cases = {(r['op'], r['case']) for r in rows}

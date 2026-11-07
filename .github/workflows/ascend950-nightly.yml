@@ -5,6 +5,10 @@ on:
     - cron: '0 19 * * *'  # 03:00 Asia/Shanghai (UTC+8)
   workflow_dispatch:
     inputs:
+      validate_sources_only:
+        description: "Validate contracts and source delivery without initializing the NPU"
+        type: boolean
+        default: false
       resume_run_id:
         description: "Explicit prior run ID to resume (same source and measurement environment)"
         required: false
@@ -44,29 +48,58 @@ jobs:
           path: ${{ runner.temp }}/official-950-contracts
           if-no-files-found: error
 
+      - uses: actions/checkout@v4
+        with:
+          path: nightly-site-source
+          persist-credentials: false
+      - name: Package the exact sources for the device runner
+        run: |
+          mkdir -p "$RUNNER_TEMP/nightly-sources"
+          git archive --format=tar HEAD > "$RUNNER_TEMP/nightly-sources/tileops.tar"
+          tar -rf "$RUNNER_TEMP/nightly-sources/tileops.tar" .git
+          gzip "$RUNNER_TEMP/nightly-sources/tileops.tar"
+          git -C nightly-site-source archive --format=tar.gz HEAD > "$RUNNER_TEMP/nightly-sources/site.tar.gz"
+          cd "$RUNNER_TEMP/nightly-sources"
+          sha256sum tileops.tar.gz site.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-sources
+          path: ${{ runner.temp }}/nightly-sources
+          if-no-files-found: error
+          retention-days: 7
+
   benchmark:
     needs: contracts
     if: github.repository == 'yyttt6/TileOPs.github.io' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, linux, ARM64, ascend950-production, ascend950-server2]
     timeout-minutes: 720
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
-          persist-credentials: false
-      - uses: actions/checkout@v4
-        with:
-          repository: yyttt6/TileOPs
-          ref: ${{ needs.contracts.outputs.source_commit }}
-          path: measured-tileops
-          persist-credentials: false
+          name: nightly-sources
+          path: ${{ runner.temp }}/nightly-archives-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Unpack verified sources without GitHub git access on the device runner
+        env:
+          ARCHIVES: ${{ runner.temp }}/nightly-archives-${{ github.run_id }}-${{ github.run_attempt }}
+          DESTINATION: ${{ runner.temp }}/nightly-source-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          cd "$ARCHIVES"
+          sha256sum --check SHA256SUMS
+          mkdir -p "$DESTINATION/measured-tileops"
+          tar --no-same-owner -xzf site.tar.gz -C "$DESTINATION"
+          tar --no-same-owner -xzf tileops.tar.gz -C "$DESTINATION/measured-tileops"
+          test "$(git -C "$DESTINATION/measured-tileops" rev-parse HEAD)" = '${{ needs.contracts.outputs.source_commit }}'
+          test -z "$(git -C "$DESTINATION/measured-tileops" status --porcelain)"
       - name: Prepare canonical isolated environment and measure
+        if: inputs.validate_sources_only != true
+        working-directory: ${{ runner.temp }}/nightly-source-${{ github.run_id }}-${{ github.run_attempt }}
         shell: bash
         env:
           RESUME_RUN_ID: ${{ inputs.resume_run_id }}
         run: |
           set -eo pipefail
           mkdir -p /opt/tileops-ci/nightly-server2-20261103/evidence
-          source /opt/tileops-ci/server2-20261030/config/prepare-python.sh "$GITHUB_WORKSPACE/measured-tileops"
+          source /opt/tileops-ci/server2-20261030/config/prepare-python.sh "$PWD/measured-tileops"
           source /opt/tileops-ci/server2-20261030/config/toolchain-v1.env.sh
           export TILELANG_CACHE_DIR="$RUNNER_TEMP/nightly-${GITHUB_RUN_ID}-tilelang"
           export OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
@@ -83,7 +116,7 @@ jobs:
             --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
       - name: Preserve raw evidence, including failed runs
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && inputs.validate_sources_only != true
         with:
           name: ascend950-raw-evidence
           overwrite: true
@@ -93,6 +126,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
       - name: Publish validated snapshot artifact
+        if: inputs.validate_sources_only != true
         uses: actions/upload-artifact@v4
         with:
           name: ascend950-official-snapshot
@@ -102,6 +136,7 @@ jobs:
           if-no-files-found: error
 
   publish:
+    if: inputs.validate_sources_only != true
     needs: benchmark
     permissions:
       contents: write

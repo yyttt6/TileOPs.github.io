@@ -26,6 +26,8 @@ def contract_params(op, params):
 
 
 def build_cache(base, measured, commit, date):
+    if base.get("baseline_release"):
+        return build_versioned_cache(base, measured, commit, date)
     data = copy.deepcopy(base)
     fresh = {(r["op"], r["case_id"]): r for r in measured}
     assert len(fresh) == len(measured)
@@ -76,6 +78,49 @@ def build_cache(base, measured, commit, date):
         fresh_protocol=PROTOCOL,
         clock_policy="platform-default",
     )
+    return data
+
+
+def build_versioned_cache(base, measured, commit, date):
+    """Update each measured contract separately; changed definitions never share ratios."""
+    from baseline_release import contract
+    data = copy.deepcopy(base)
+    fresh = {(r['op'], r['case_id']): r for r in measured}
+    assert len(fresh) == len(measured)
+    visible = {(r['op'], r['case']) for r in data['rows']}
+    matched = set()
+    for row in data['rows'] + data.get('historical_rows', []):
+        key = row['op'], row['case']
+        m = fresh.get(key)
+        if m is None or contract(row) != contract({'workload': {'params': m['params']}}):
+            continue
+        latency = m['measurement']['latency_ms'] * 1000
+        row.update(tileops_latency_us=latency, ratio=row['latency_us'] / latency,
+                   tileops_verified=True, tileops_samples=15, tileops_protocol=PROTOCOL,
+                   tileops_commit=commit, tileops_date=date,
+                   tileops_measurement_id=hashlib.sha256(json.dumps(m, sort_keys=True).encode()).hexdigest())
+        matched.add((key, contract(row)))
+    extra = {(r['op'], r['case']): r for r in data.get('tileops_rows', [])}
+    historical = {(r['op'], r['case'], contract(r)): r
+                  for r in data.get('historical_tileops_rows', [])}
+    for key, m in fresh.items():
+        token = contract({'workload': {'params': m['params']}})
+        if (key, token) in matched:
+            continue
+        tile = dict(op=key[0], case=key[1], workload=m['workload'],
+                    latency_us=m['measurement']['latency_ms'] * 1000,
+                    samples=15, verified=True, commit=commit, date=date, protocol=PROTOCOL)
+        if key in visible:
+            historical[(*key, token)] = tile
+        else:
+            extra[key] = tile
+    data['tileops_rows'] = [r for key, r in extra.items() if key not in visible]
+    data['historical_tileops_rows'] = list(historical.values())
+    data['frozen_at'] = date
+    data['nightly'] = dict(commit=commit, date=date, fresh_cases=len(measured),
+                          baseline_release=base['baseline_release'],
+                          native_baselines='Published measurements retained with their recorded protocols',
+                          fresh_protocol=PROTOCOL, clock_policy='platform-default')
     return data
 
 
