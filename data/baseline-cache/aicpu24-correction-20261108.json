@@ -1,0 +1,1908 @@
+{
+  "release": "verified-aicpu24-20261108",
+  "replaced_rows": [
+    {
+      "library": "torch-eager",
+      "op": "AllFwdOp",
+      "case": "3d-multidim-complex64",
+      "latency_us": 2146.962360578586,
+      "samples": 15,
+      "measurement_id": "b1fad0fdfa748725232656a03b4bc8df2208201b9c15a426e09ab91cd969d2b4",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "AllFwdOp",
+        "case_id": "3d-multidim-complex64",
+        "tensors": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex64"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ]
+        },
+        "params": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex64"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ],
+          "dim": [
+            0,
+            2
+          ],
+          "keepdim": false
+        },
+        "family": "reduction"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "AllFwdOp",
+      "case": "3d-multidim-complex128",
+      "latency_us": 3205.079021219701,
+      "samples": 15,
+      "measurement_id": "4603f119921276bc2bbb9964b2e8391de11abe341bfeacf4eee66ac348e4539c",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "AllFwdOp",
+        "case_id": "3d-multidim-complex128",
+        "tensors": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex128"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ]
+        },
+        "params": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex128"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ],
+          "dim": [
+            0,
+            2
+          ],
+          "keepdim": false
+        },
+        "family": "reduction"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "llama-8b-q-proj-float16",
+      "latency_us": 102601.45317145088,
+      "samples": 15,
+      "measurement_id": "9799494ea6251cca59d205f40e373a314390159d17a2741ba72076408beaccaa",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "llama-8b-q-proj-float16",
+        "tensors": {
+          "w": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              4096,
+              2048
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              262144,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              4096,
+              2048
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              262144,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 64
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "qwen3-32b-o-proj-float16",
+      "latency_us": 264666.4906539713,
+      "samples": 15,
+      "measurement_id": "29da2d40eea14362338fbdb7b5f9b27144d7d5c6331a524fa462811f92e73bd3",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "qwen3-32b-o-proj-float16",
+        "tensors": {
+          "w": [
+            [
+              5120,
+              8192
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              5120,
+              4096
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              327680,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              5120,
+              8192
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              5120,
+              4096
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              327680,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 128
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "qwen2-7b-mlp-down-float16",
+      "latency_us": 416504.2731878253,
+      "samples": 15,
+      "measurement_id": "616d2cd287a125cf3762d8098868d99c590013a51071b9ed345d41cc39b5f9ea",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "qwen2-7b-mlp-down-float16",
+        "tensors": {
+          "w": [
+            [
+              3584,
+              18944
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              3584,
+              9472
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              530432,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              3584,
+              18944
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              3584,
+              9472
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              530432,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 128
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "opt-13b-mlp-up-float16",
+      "latency_us": 644693.3073367974,
+      "samples": 15,
+      "measurement_id": "a5b3863ca18581f730226322e80d55159c4804b610741a101850891232c1e3e3",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "opt-13b-mlp-up-float16",
+        "tensors": {
+          "w": [
+            [
+              20480,
+              5120
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              20480,
+              2560
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              1638400,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              20480,
+              5120
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              20480,
+              2560
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              1638400,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 64
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "AnyFwdOp",
+      "case": "3d-multidim-complex64",
+      "latency_us": 2302.059260781939,
+      "samples": 15,
+      "measurement_id": "a8e48e36876dad10b441ac2614812d80836184d6b503d22d2328ad33483ebdf1",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "AnyFwdOp",
+        "case_id": "3d-multidim-complex64",
+        "tensors": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex64"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ]
+        },
+        "params": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex64"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ],
+          "dim": [
+            0,
+            2
+          ],
+          "keepdim": false
+        },
+        "family": "reduction"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "CountNonzeroFwdOp",
+      "case": "3d-multidim-complex64",
+      "latency_us": 2878.660070389019,
+      "samples": 15,
+      "measurement_id": "6dee6cc6a6879d427907bb8d70489fd6236182549fda52a7cbc00883e673f134",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "CountNonzeroFwdOp",
+        "case_id": "3d-multidim-complex64",
+        "tensors": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex64"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "int64"
+          ]
+        },
+        "params": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex64"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "int64"
+          ],
+          "dim": [
+            0,
+            2
+          ]
+        },
+        "family": "reduction"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "AnyFwdOp",
+      "case": "3d-multidim-complex128",
+      "latency_us": 3098.2918751031702,
+      "samples": 15,
+      "measurement_id": "b60cd31cf580800d33df08c41132c3170e428c8161833c32d3a1611082a23cc4",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "AnyFwdOp",
+        "case_id": "3d-multidim-complex128",
+        "tensors": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex128"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ]
+        },
+        "params": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex128"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "bool"
+          ],
+          "dim": [
+            0,
+            2
+          ],
+          "keepdim": false
+        },
+        "family": "reduction"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "CountNonzeroFwdOp",
+      "case": "3d-multidim-complex128",
+      "latency_us": 3218.497366688205,
+      "samples": 15,
+      "measurement_id": "74e758195517788ea220774524f32533600b4e918c8c3fa5b6ad71bc16e1721e",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "CountNonzeroFwdOp",
+        "case_id": "3d-multidim-complex128",
+        "tensors": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex128"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "int64"
+          ]
+        },
+        "params": {
+          "x": [
+            [
+              4,
+              128,
+              4096
+            ],
+            "complex128"
+          ],
+          "output": [
+            [
+              128
+            ],
+            "int64"
+          ],
+          "dim": [
+            0,
+            2
+          ]
+        },
+        "family": "reduction"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "llama-8b-mlp-up-chan-float16",
+      "latency_us": 364793.35950120486,
+      "samples": 15,
+      "measurement_id": "1a216ab2bbafdeddbeae286d8a1c7c5724e165d5316d42d038bbfa7bcba0afaa",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "llama-8b-mlp-up-chan-float16",
+        "tensors": {
+          "w": [
+            [
+              14336,
+              4096
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              14336,
+              2048
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              14336,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              14336,
+              4096
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              14336,
+              2048
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              14336,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 4096
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "llama-8b-mlp-up-float16",
+      "latency_us": 367618.0217688111,
+      "samples": 15,
+      "measurement_id": "dcd822aa65462da34baa7e72c1831a2014f5c1b3db19b2dc9629087d5f88ccf3",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "llama-8b-mlp-up-float16",
+        "tensors": {
+          "w": [
+            [
+              14336,
+              4096
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              14336,
+              2048
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              458752,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              14336,
+              4096
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              14336,
+              2048
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              458752,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 128
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "qwen2-7b-mlp-up-float16",
+      "latency_us": 415463.5726716827,
+      "samples": 15,
+      "measurement_id": "ef1a364c0464cfcb98bec35369ce7f0b94898a12dbd1def1b681d751379caf86",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "qwen2-7b-mlp-up-float16",
+        "tensors": {
+          "w": [
+            [
+              18944,
+              3584
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              18944,
+              1792
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              530432,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              18944,
+              3584
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              18944,
+              1792
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              530432,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 128
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "torch-eager",
+      "op": "INT4QuantPerGroupFwdOp",
+      "case": "llama-70b-mlp-down-float16",
+      "latency_us": 1474026.4259109541,
+      "samples": 15,
+      "measurement_id": "382a2bb4abc8566f12f8cde636598033b38776b46242b770b46999fec4c3f925",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "INT4QuantPerGroupFwdOp",
+        "case_id": "llama-70b-mlp-down-float16",
+        "tensors": {
+          "w": [
+            [
+              8192,
+              28672
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              8192,
+              14336
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              1835008,
+              2
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "w": [
+            [
+              8192,
+              28672
+            ],
+            "float16"
+          ],
+          "packed_weight": [
+            [
+              8192,
+              14336
+            ],
+            "int8"
+          ],
+          "params": [
+            [
+              1835008,
+              2
+            ],
+            "float32"
+          ],
+          "group_size": 128
+        },
+        "family": "quantization"
+      },
+      "ratio": null,
+      "tileops_latency_us": null
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "MaskedFillScalarFwdOp",
+      "case": "16M-bfloat16",
+      "latency_us": 53319.90208509178,
+      "samples": 15,
+      "measurement_id": "3444ee92fb1846f2d361c6a63f189fdcd5c29e21b493bc48b23d1d0c498c745e",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "MaskedFillScalarFwdOp",
+        "case_id": "16M-bfloat16",
+        "family": "elementwise",
+        "tensors": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ]
+        },
+        "params": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "value": 0.0
+        }
+      },
+      "tileops_latency_us": 17.184066666666663,
+      "ratio": 3102.8686701105944,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "ff82a480435a0c697b176c5be8ddc80258b48b4c57f8dbfe29c9e36249737d4b",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "MaskedFillTensorFwdOp",
+      "case": "16M-float32",
+      "latency_us": 53436.450472970224,
+      "samples": 15,
+      "measurement_id": "110b7dda1e5430ab45040a278614d33d1579b590b70fb191fd3f155bd715895b",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "MaskedFillTensorFwdOp",
+        "case_id": "16M-float32",
+        "family": "elementwise",
+        "tensors": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "value": [
+            [],
+            "float32"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "value": [
+            [],
+            "float32"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ]
+        }
+      },
+      "tileops_latency_us": 31.77766666666667,
+      "ratio": 1681.5725028994227,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "b64d5a53a57b6f0a08e67f37659c850dbe31add4d5d5a635b0e3eb0fcf922c6e",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "MaskedFillScalarFwdOp",
+      "case": "16M-float16",
+      "latency_us": 54121.32161975513,
+      "samples": 15,
+      "measurement_id": "70152abb38a6d181af6cfdfe6b5e895369b39d80fa91de9a3dc33c433d24a050",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "MaskedFillScalarFwdOp",
+        "case_id": "16M-float16",
+        "family": "elementwise",
+        "tensors": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ]
+        },
+        "params": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "value": 0.0
+        }
+      },
+      "tileops_latency_us": 17.086933333333334,
+      "ratio": 3167.409889413848,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "2ada16c8b6c8c444587ada3bcddacd43ec27443a2d826b11237ac4d416be2aeb",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "WhereFwdOp",
+      "case": "16M-bfloat16",
+      "latency_us": 54383.15564611625,
+      "samples": 15,
+      "measurement_id": "92a849eb093b22197a2c365513df9b0a693aa49e92eb8df5132d5a7459b5af12",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "WhereFwdOp",
+        "case_id": "16M-bfloat16",
+        "family": "elementwise",
+        "tensors": {
+          "condition": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "other": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ]
+        },
+        "params": {
+          "condition": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "other": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ]
+        }
+      },
+      "tileops_latency_us": 27.981466666666666,
+      "ratio": 1943.541998493631,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "58df7a22120bb72a386154a1a135e116e71989bcb2db8bd46f08b239f67fe346",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "MaskedFillTensorFwdOp",
+      "case": "16M-float16",
+      "latency_us": 54324.802433708915,
+      "samples": 15,
+      "measurement_id": "eeec10f89bfd036ecb8fae27e081066cd7580c16da1d12e1a3f5112518c36bed",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "MaskedFillTensorFwdOp",
+        "case_id": "16M-float16",
+        "family": "elementwise",
+        "tensors": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "value": [
+            [],
+            "float16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ]
+        },
+        "params": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "value": [
+            [],
+            "float16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ]
+        }
+      },
+      "tileops_latency_us": 17.197266666666664,
+      "ratio": 3158.920745179016,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "a0244ddc5ac1adec2136c00b52e036d7d3589d2e22c9dfe5072fc0a39c6b8dc2",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "WhereFwdOp",
+      "case": "16M-float16",
+      "latency_us": 54345.81422342829,
+      "samples": 15,
+      "measurement_id": "5c7e249fb7dc8030865f00c22c8b2071eb742a212386abf4df754629536d62f4",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "WhereFwdOp",
+        "case_id": "16M-float16",
+        "family": "elementwise",
+        "tensors": {
+          "condition": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "other": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ]
+        },
+        "params": {
+          "condition": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "other": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float16"
+          ]
+        }
+      },
+      "tileops_latency_us": 26.506866666666664,
+      "ratio": 2050.254181561569,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "a73c4cca7001ccad325eada9f1caf36e9ac2f25746837ae8c3a2e26e48056d23",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "MaskedFillTensorFwdOp",
+      "case": "16M-bfloat16",
+      "latency_us": 54323.98368887458,
+      "samples": 15,
+      "measurement_id": "8b97515011f18fc9d27d1867755182dc9bc2adfb8e880354b0248000971967e1",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "MaskedFillTensorFwdOp",
+        "case_id": "16M-bfloat16",
+        "family": "elementwise",
+        "tensors": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "value": [
+            [],
+            "bfloat16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ]
+        },
+        "params": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "value": [
+            [],
+            "bfloat16"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bfloat16"
+          ]
+        }
+      },
+      "tileops_latency_us": 17.334200000000003,
+      "ratio": 3133.9192860861517,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "c13f983396729c4d98e7c526e94486e9d9f1873845d703a9651b8772eafed8a4",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "MaskedFillScalarFwdOp",
+      "case": "16M-float32",
+      "latency_us": 54348.36875317481,
+      "samples": 15,
+      "measurement_id": "8d897e0d9635c1b25ef3e16f1f4d86d9b12d0bc504f3813955c1ce8f176e3da7",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "MaskedFillScalarFwdOp",
+        "case_id": "16M-float32",
+        "family": "elementwise",
+        "tensors": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "mask": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "value": 0.0
+        }
+      },
+      "tileops_latency_us": 31.6848,
+      "ratio": 1715.282051746415,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "35a1a4acd309fe8be163f4321629df2021456b0aa2f07ba82dba353d38f5741b",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "WhereFwdOp",
+      "case": "16M-float32",
+      "latency_us": 54048.043311976704,
+      "samples": 15,
+      "measurement_id": "6623da481756a30f655d29b7b4cf97e614daa3e84832345d6b0f2e306d16c0bf",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "WhereFwdOp",
+        "case_id": "16M-float32",
+        "family": "elementwise",
+        "tensors": {
+          "condition": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "other": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ]
+        },
+        "params": {
+          "condition": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "other": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "float32"
+          ]
+        }
+      },
+      "tileops_latency_us": 57.242533333333334,
+      "ratio": 944.1937692946859,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "079253805285260adb9eb259a6e0a7b659a4a80c2864c93bafecde6f3e60e0f7",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    },
+    {
+      "library": "tilelang-ascend",
+      "op": "LogicalNotFwdOp",
+      "case": "16M-bool",
+      "latency_us": 3515.077874231391,
+      "samples": 15,
+      "measurement_id": "edfe7ba05d7dae9676134dfec324839cb2f51d8e11f066b70621742913a7d21b",
+      "protocol": "ascend950-isolated-ffts-v3",
+      "parser_revision": "v3-task-coverage-full32-20261103",
+      "workload": {
+        "op": "LogicalNotFwdOp",
+        "case_id": "16M-bool",
+        "family": "elementwise",
+        "tensors": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ]
+        },
+        "params": {
+          "input": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ],
+          "output": [
+            [
+              4096,
+              4096
+            ],
+            "bool"
+          ]
+        }
+      },
+      "tileops_latency_us": 8.043066666666666,
+      "ratio": 437.0320451027872,
+      "tileops_samples": 15,
+      "tileops_verified": true,
+      "tileops_measurement_id": "a6c0fb425dae1bb5f431ede282312e2aef430f240d3d3b2ada8cc5cb73592127",
+      "tileops_protocol": "ascend950-isolated-ffts-v3"
+    }
+  ],
+  "replacements": [
+    {
+      "key": [
+        "torch-eager",
+        "AllFwdOp",
+        "3d-multidim-complex64"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "b1fad0fdfa748725232656a03b4bc8df2208201b9c15a426e09ab91cd969d2b4",
+      "new_measurement_id": "2f75afb990d805e97f5a5b39fcfa262c94c4da88059506f1cf0c2c9aa829bbd2",
+      "latency_us": 42.0586,
+      "old_web_ratio": 294.0211940791081,
+      "ratio_with_existing_tileops": 5.759821420419789,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "AllFwdOp",
+        "3d-multidim-complex128"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "4603f119921276bc2bbb9964b2e8391de11abe341bfeacf4eee66ac348e4539c",
+      "new_measurement_id": "075a3f7853eb6a849e2ac0e7f0a9438253fe860f1ba7e3231bee257fc3e6772b",
+      "latency_us": 49.461533333333335,
+      "old_web_ratio": 272.98952540057644,
+      "ratio_with_existing_tileops": 4.212838566804838,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "llama-8b-q-proj-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "9799494ea6251cca59d205f40e373a314390159d17a2741ba72076408beaccaa",
+      "new_measurement_id": "507f866d97b780b900f79cf9d35a5f52bd7e760c0962812f928d839e7ca6929d",
+      "latency_us": 430.64866666666666,
+      "old_web_ratio": 545.4228358367012,
+      "ratio_with_existing_tileops": 2.289301074811532,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "qwen3-32b-o-proj-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "29da2d40eea14362338fbdb7b5f9b27144d7d5c6331a524fa462811f92e73bd3",
+      "new_measurement_id": "b6d65098b00fdcede3425ae7b4b999cbb6c030adf81b57ef1bbd1f49f11b48dd",
+      "latency_us": 1334.7030666666667,
+      "old_web_ratio": 843.7403266934049,
+      "ratio_with_existing_tileops": 4.25495044244327,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "qwen2-7b-mlp-down-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "616d2cd287a125cf3762d8098868d99c590013a51071b9ed345d41cc39b5f9ea",
+      "new_measurement_id": "5f6ece1a6130fbaf367e87268491ba8a7d58a176da87b5f5147552ab738f448a",
+      "latency_us": 2175.9213333333337,
+      "old_web_ratio": 820.2514490064037,
+      "ratio_with_existing_tileops": 4.285196434913273,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "opt-13b-mlp-up-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "a5b3863ca18581f730226322e80d55159c4804b610741a101850891232c1e3e3",
+      "new_measurement_id": "9672fc70a7427241a9c0ff4b4ecc882bb46b030552490190fbcbe2f92725d33e",
+      "latency_us": 3413.151533333333,
+      "old_web_ratio": 552.9869789843874,
+      "ratio_with_existing_tileops": 2.9276375817065974,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "AnyFwdOp",
+        "3d-multidim-complex64"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "a8e48e36876dad10b441ac2614812d80836184d6b503d22d2328ad33483ebdf1",
+      "new_measurement_id": "e38e9ce3695ad422e39da7d0b4355ed3c334a300c7c2022434d032141e20945e",
+      "latency_us": 42.243133333333326,
+      "old_web_ratio": 324.11805094641426,
+      "ratio_with_existing_tileops": 5.947614935515965,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "CountNonzeroFwdOp",
+        "3d-multidim-complex64"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "6dee6cc6a6879d427907bb8d70489fd6236182549fda52a7cbc00883e673f134",
+      "new_measurement_id": "d875cdf35d444da81fe81451dc0412ac7d18e663ee2acf8169f09a4836fb3d0a",
+      "latency_us": 64.30046666666667,
+      "old_web_ratio": 281.0020633058835,
+      "ratio_with_existing_tileops": 6.276727144939609,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "AnyFwdOp",
+        "3d-multidim-complex128"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "b60cd31cf580800d33df08c41132c3170e428c8161833c32d3a1611082a23cc4",
+      "new_measurement_id": "c4bcef805dcf30eaf5b2c2722ae0bbd2e29e3093fb0eb21d5b83c5b1c88f2cc0",
+      "latency_us": 50.62386666666667,
+      "old_web_ratio": 260.75947037512583,
+      "ratio_with_existing_tileops": 4.260622689042626,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "CountNonzeroFwdOp",
+        "3d-multidim-complex128"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "74e758195517788ea220774524f32533600b4e918c8c3fa5b6ad71bc16e1721e",
+      "new_measurement_id": "cf04584443debe7627c0f10a2fd25e594a203afc8a6555d99ed5163ce6ab6000",
+      "latency_us": 72.21573333333333,
+      "old_web_ratio": 199.2491054380495,
+      "ratio_with_existing_tileops": 4.470695056067553,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "llama-8b-mlp-up-chan-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "1a216ab2bbafdeddbeae286d8a1c7c5724e165d5316d42d038bbfa7bcba0afaa",
+      "new_measurement_id": "438f9640a8a414d84ecf8126390c53eb337b85e46227c1814c2d836633c2bc6a",
+      "latency_us": 1866.6082,
+      "old_web_ratio": 1699.7681391170215,
+      "ratio_with_existing_tileops": 8.69752988627002,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "llama-8b-mlp-up-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "dcd822aa65462da34baa7e72c1831a2014f5c1b3db19b2dc9629087d5f88ccf3",
+      "new_measurement_id": "c58e2ae29bd5026740fe8e97481c318ed3e7dc14f3c455b033def9dd8c862fd5",
+      "latency_us": 1894.6070666666665,
+      "old_web_ratio": 837.4127986868369,
+      "ratio_with_existing_tileops": 4.315806386409855,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "qwen2-7b-mlp-up-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "ef1a364c0464cfcb98bec35369ce7f0b94898a12dbd1def1b681d751379caf86",
+      "new_measurement_id": "ce3cd565f1a70d1b173fa4755e584f16ab690dac70bf74525a2a3c14142fb7f1",
+      "latency_us": 2168.1444,
+      "old_web_ratio": 817.3339017564732,
+      "ratio_with_existing_tileops": 4.265350896175526,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "torch-eager",
+        "INT4QuantPerGroupFwdOp",
+        "llama-70b-mlp-down-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "382a2bb4abc8566f12f8cde636598033b38776b46242b770b46999fec4c3f925",
+      "new_measurement_id": "74e15d946f3ab64d56428257a81f7f8087080ac014a12963ca5fe8ebc65b509d",
+      "latency_us": 7709.401466666667,
+      "old_web_ratio": 840.1768158091581,
+      "ratio_with_existing_tileops": 4.394263401387449,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "MaskedFillScalarFwdOp",
+        "16M-bfloat16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "3444ee92fb1846f2d361c6a63f189fdcd5c29e21b493bc48b23d1d0c498c745e",
+      "new_measurement_id": "e6264944474c1865dcb670ee50ae615c6662f5bff74240b7830828ddb8f898da",
+      "latency_us": 1688.8620666666668,
+      "old_web_ratio": 2870.014896532783,
+      "ratio_with_existing_tileops": 90.905254885637,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "MaskedFillTensorFwdOp",
+        "16M-float32"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "110b7dda1e5430ab45040a278614d33d1579b590b70fb191fd3f155bd715895b",
+      "new_measurement_id": "a6e6fd4b33c4044c746401b2331cc52470ab8c5b2d4a84703f596aef1a7059f4",
+      "latency_us": 1652.0355333333334,
+      "old_web_ratio": 1427.931956900087,
+      "ratio_with_existing_tileops": 44.145790206899996,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "MaskedFillScalarFwdOp",
+        "16M-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "70152abb38a6d181af6cfdfe6b5e895369b39d80fa91de9a3dc33c433d24a050",
+      "new_measurement_id": "61e65a4811cb18dc1fe8ae2fbb44718b058b6c23194047b4c9e96de5bf9055fa",
+      "latency_us": 1688.2804,
+      "old_web_ratio": 2821.1502015426877,
+      "ratio_with_existing_tileops": 88.00399635810149,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "WhereFwdOp",
+        "16M-bfloat16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "92a849eb093b22197a2c365513df9b0a693aa49e92eb8df5132d5a7459b5af12",
+      "new_measurement_id": "7fd42d7ff12c1c3c12a520775f2ccd29fe974321edd0e0d2d6f8d133491a42b7",
+      "latency_us": 1677.4031333333332,
+      "old_web_ratio": 1842.0689379571174,
+      "ratio_with_existing_tileops": 56.817081900357465,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "MaskedFillTensorFwdOp",
+        "16M-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "eeec10f89bfd036ecb8fae27e081066cd7580c16da1d12e1a3f5112518c36bed",
+      "new_measurement_id": "c99a9e58625c7e8652119ce80f322114179d6d7dfb761b37914b0cbd30b3f185",
+      "latency_us": 1685.7867333333334,
+      "old_web_ratio": 2864.0136809080304,
+      "ratio_with_existing_tileops": 88.87498989529772,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "WhereFwdOp",
+        "16M-float16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "5c7e249fb7dc8030865f00c22c8b2071eb742a212386abf4df754629536d62f4",
+      "new_measurement_id": "0175faf044111444069d87c46b467f5e80be5759e699722def3137ebf3b30aa5",
+      "latency_us": 1677.2623999999998,
+      "old_web_ratio": 2127.3430325328477,
+      "ratio_with_existing_tileops": 65.65570010047104,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "MaskedFillTensorFwdOp",
+        "16M-bfloat16"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "8b97515011f18fc9d27d1867755182dc9bc2adfb8e880354b0248000971967e1",
+      "new_measurement_id": "4ab2bafed42a56c776d3adf854eee7ac52ef1cdf863bdf93909e0015248fcde3",
+      "latency_us": 1685.0925333333334,
+      "old_web_ratio": 2922.760404784535,
+      "ratio_with_existing_tileops": 90.66201335734117,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "MaskedFillScalarFwdOp",
+        "16M-float32"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "8d897e0d9635c1b25ef3e16f1f4d86d9b12d0bc504f3813955c1ce8f176e3da7",
+      "new_measurement_id": "65f81bb325fce01a2738c68bd60f31c39401a8871757aec3e62902dae162565c",
+      "latency_us": 1654.6224666666665,
+      "old_web_ratio": 1435.3547713621572,
+      "ratio_with_existing_tileops": 43.69901630569704,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "WhereFwdOp",
+        "16M-float32"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "6623da481756a30f655d29b7b4cf97e614daa3e84832345d6b0f2e306d16c0bf",
+      "new_measurement_id": "3495518627a548548c03a3d8c0d0f687e8150505ff0a28345713d0e1037866b6",
+      "latency_us": 1642.5332666666666,
+      "old_web_ratio": 959.0388913424316,
+      "ratio_with_existing_tileops": 29.145426670941042,
+      "aicpu_tasks_per_window": 0
+    },
+    {
+      "key": [
+        "tilelang-ascend",
+        "LogicalNotFwdOp",
+        "16M-bool"
+      ],
+      "status": "verified_candidate_not_published",
+      "previous_measurement_id": "edfe7ba05d7dae9676134dfec324839cb2f51d8e11f066b70621742913a7d21b",
+      "new_measurement_id": "a0179fde2806c89ab60a3e0ecfe03cdd480c1367e5f59f5fcbb381c5a38f3b2f",
+      "latency_us": 1532.3222666666668,
+      "old_web_ratio": 407.81004179309366,
+      "ratio_with_existing_tileops": 177.77597821967504,
+      "aicpu_tasks_per_window": 0
+    }
+  ],
+  "evidence_archive_sha256": {
+    "native-evidence.tar.gz": "466c59be40c1d5c1efef5b17ae9a5efc113470d0bd8e406cdbf01c9b2987da02",
+    "torch14-evidence.tar.gz": "6a492d2a4a8442ecbc7a10ff13a3e827021987d686ddd64e61f5fc8c39737d8e",
+    "diagnostics-evidence.tar.gz": "e4044bd7c2437bf924978614ea49b0aab29df5df5236d7d8a99842459fca744c"
+  },
+  "note": "Superseded measurements retained for audit; not current comparison candidates."
+}
