@@ -9,6 +9,10 @@ on:
         description: "Validate contracts and source delivery without initializing the NPU"
         type: boolean
         default: false
+      publish_snapshot_run_id:
+        description: "Publish an existing validated snapshot without rerunning NPU measurements"
+        required: false
+        type: string
       resume_run_id:
         description: "Explicit prior run ID to resume (same source and measurement environment)"
         required: false
@@ -73,6 +77,13 @@ jobs:
     if: github.repository == 'yyttt6/TileOPs.github.io' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, linux, ARM64, ascend950-production, ascend950-server2]
     timeout-minutes: 720
+    env:
+      http_proxy: http://127.0.0.1:15014
+      https_proxy: http://127.0.0.1:15014
+      HTTP_PROXY: http://127.0.0.1:15014
+      HTTPS_PROXY: http://127.0.0.1:15014
+      no_proxy: localhost,127.0.0.1,::1
+      NO_PROXY: localhost,127.0.0.1,::1
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -91,7 +102,7 @@ jobs:
           test "$(git -C "$DESTINATION/measured-tileops" rev-parse HEAD)" = '${{ needs.contracts.outputs.source_commit }}'
           test -z "$(git -C "$DESTINATION/measured-tileops" status --porcelain)"
       - name: Prepare canonical isolated environment and measure
-        if: inputs.validate_sources_only != true
+        if: inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
         working-directory: ${{ runner.temp }}/nightly-source-${{ github.run_id }}-${{ github.run_attempt }}
         shell: bash
         env:
@@ -114,17 +125,14 @@ jobs:
           python scripts/nightly_server2.py "${resume_args[@]}" \
             --source measured-tileops \
             --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-      - name: Preserve raw evidence, including failed runs
-        uses: actions/upload-artifact@v4
-        if: always() && inputs.validate_sources_only != true
-        with:
-          name: ascend950-raw-evidence
-          overwrite: true
-          path: |
-            /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}
-            /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}-preflight.json
-          retention-days: 90
-          if-no-files-found: error
+      - name: Recover an existing validated snapshot without device access
+        if: inputs.publish_snapshot_run_id != ''
+        working-directory: ${{ runner.temp }}/nightly-source-${{ github.run_id }}-${{ github.run_attempt }}
+        env:
+          SAVED_RUN: ${{ inputs.publish_snapshot_run_id }}
+        run: |
+          python scripts/recover_snapshot.py --run-id "$SAVED_RUN" \
+            --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/snapshot"
       - name: Publish validated snapshot artifact
         if: inputs.validate_sources_only != true
         uses: actions/upload-artifact@v4
@@ -132,6 +140,19 @@ jobs:
           name: ascend950-official-snapshot
           overwrite: true
           path: /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}/snapshot
+          retention-days: 90
+          if-no-files-found: error
+      - name: Preserve raw evidence, including failed runs
+        uses: actions/upload-artifact@v4
+        if: always() && inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
+        continue-on-error: true
+        timeout-minutes: 20
+        with:
+          name: ascend950-raw-evidence
+          overwrite: true
+          path: |
+            /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}
+            /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}-preflight.json
           retention-days: 90
           if-no-files-found: error
 

@@ -49,14 +49,21 @@ def fetch(output, run_id=None):
     explicit = run_id is not None
     if run_id is None:
         try:
-            runs = request(f"{API}/actions/workflows/ascend950-nightly.yml/runs?branch=main&status=success&per_page=1")
+            runs = request(f"{API}/actions/workflows/ascend950-nightly.yml/runs?branch=main&status=success&per_page=30")
         except urllib.error.HTTPError as exc:
             if exc.code == 404:
                 return False
             raise
         if not runs["workflow_runs"]:
             return False
-        run_id = str(runs["workflow_runs"][0]["id"])
+        for candidate in runs["workflow_runs"]:
+            artifacts = request(f"{API}/actions/runs/{candidate['id']}/artifacts")
+            if any(a["name"] == "ascend950-official-snapshot" and not a["expired"]
+                   for a in artifacts["artifacts"]):
+                run_id = str(candidate["id"])
+                break
+        if run_id is None:
+            raise ValueError("Successful runs have no validated snapshots; preserve current site")
     if not str(run_id).isdigit():
         raise ValueError("Invalid run ID")
     run = request(f"{API}/actions/runs/{run_id}")
@@ -87,9 +94,30 @@ def fetch(output, run_id=None):
                 raise ValueError("Unsafe artifact member")
         zipped.extractall(output)
     meta, _ = validate(output)
-    if str(meta["run_id"]) != str(run_id) or str(meta["run_attempt"]) != str(run["run_attempt"]):
-        raise ValueError("Artifact run identity mismatch")
+    if str(meta["run_id"]) != str(run_id):
+        verify_recovery_origin(meta)
+    elif str(meta["run_attempt"]) != str(run["run_attempt"]):
+        raise ValueError("Artifact run attempt mismatch")
     return True
+
+
+def verify_recovery_origin(meta):
+    """A recovered artifact must come from a trusted run with successful measurement."""
+    original = str(meta["run_id"])
+    attempt = str(meta["run_attempt"])
+    if not original.isdigit() or not attempt.isdigit():
+        raise ValueError("Invalid recovered identity")
+    run = request(f"{API}/actions/runs/{original}")
+    if (run["path"] != WORKFLOW or run["head_branch"] != "main"
+            or run["head_repository"]["full_name"] != REPO
+            or run["event"] not in ("schedule", "workflow_dispatch")):
+        raise ValueError("Untrusted recovery origin")
+    jobs = request(f"{API}/actions/runs/{original}/attempts/{attempt}/jobs")
+    if not any(j["name"] == "benchmark" and "ascend950-production" in j.get("labels", [])
+               and any(s["name"] == "Prepare canonical isolated environment and measure"
+                       and s["conclusion"] == "success" for s in j.get("steps", []))
+               for j in jobs["jobs"]):
+        raise ValueError("Recovered run did not complete device measurement")
 
 
 def main():
