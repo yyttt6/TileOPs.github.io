@@ -17,7 +17,7 @@ jobs:
         with:
           repository: yyttt6/TileOPs
           # The renderer instantiates parametric workloads through this API.
-          ref: 7bce435e3af35f62f77b0a87de82c7cbc2b0ce91
+          ref: 9f3f655bc6d58259485b007468d4021221b7dbb0
           path: TileOPs
           sparse-checkout: src/tileops
       - uses: actions/setup-python@v5

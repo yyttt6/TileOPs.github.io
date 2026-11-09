@@ -24,7 +24,7 @@ def write(path, value):
 
 
 def identity(commit):
-    files = [HERE / "nightly_device.py", *sorted((HERE / "nightly_support").rglob("*.py"))]
+    files = [HERE / "nightly_device.py", HERE / "measured_correctness.py", *sorted((HERE / "nightly_support").rglob("*.py"))]
     return dict(
         commit=commit,
         measurement_files={
@@ -86,6 +86,7 @@ def main():
             str(target),
             "--op",
             op,
+            "--verify-measured-output",
         ]
         t = time.monotonic()
         with (out / f"{op}-attempt{attempt}.log").open("x") as log:
@@ -242,6 +243,9 @@ def main():
         run_id=os.environ["GITHUB_RUN_ID"],
         run_attempt=os.environ["GITHUB_RUN_ATTEMPT"],
         elapsed_seconds=time.monotonic() - start,
+        source_branch="ascend950-v0.1.0",
+        selection_scope=a.operators,
+        registered_operators=len(selection["operators"]),
     )
     for name, value in [
         ("meta", meta),

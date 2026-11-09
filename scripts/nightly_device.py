@@ -12,9 +12,10 @@ sys.path.insert(0, str(HERE / "nightly_support"))
 
 
 def registered_ascend_ops(registered):
-    """Include named train/infer Ascend implementations in nightly coverage."""
+    """Include all named Ascend implementations, including train/infer variants."""
     return sorted(
-        op for op, types in registered.items()
+        op
+        for op, types in registered.items()
         if any(name == "ascend" or name.startswith("ascend_") for name in types)
     )
 
@@ -24,6 +25,7 @@ def main():
     p.add_argument("--source", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--op", required=True)
+    p.add_argument("--verify-measured-output", action="store_true")
     a = p.parse_args()
     sys.path[:0] = [str(a.source / "src"), str(a.source)]
     from benchmarks.ascend.guard import require_reservation
@@ -33,9 +35,10 @@ def main():
     import torch_npu
     from benchmarks._cases import entry
     from benchmarks.api import cases
+    from benchmarks.ascend.coverage import registered_coverage
     from benchmarks.ascend.runner import benchmark_case, source_fingerprint
     from complete_profile import make_timer
-    from tileops.backend import registry
+    from tileops.backend import _registry as registry
     from tileops.manifest import load_manifest
     from workloads.device import set_run_device
     from workloads.numerics import Request, check_inputs_preserved
@@ -52,12 +55,13 @@ def main():
     assert "Ascend950" in hardware["device"] and (hardware["cube"], hardware["vector"]) == (32, 64)
     registry.ensure_loaded()
     assert not registry.LOAD_FAILURES, registry.LOAD_FAILURES
-    selected = registered_ascend_ops(registry.REGISTERED_KERNEL_TYPES)
+    coverage = registered_coverage()
+    selected = coverage["operators"]
     if a.op == "__list__":
         a.output.write_text(
             json.dumps(
                 {
-                    "operators": selected,
+                    **coverage,
                     "hardware": hardware,
                     "cases": {op: [c.id for c in cases(op)] for op in selected},
                 }
@@ -88,20 +92,36 @@ def main():
                 torch.manual_seed(seed)
                 op = op_class(**case.arguments)
                 impl = entry(a.op).binder(op, case)
-                checks = benchmark_case(
-                    case, {"tileops": impl}, None, name=case.id, verify_only=True
-                )
                 args = case.inputs if impl.args is None else impl.args
                 timer = make_timer(a.output / "profiles" / f"{index:04d}")
-                measurement = timer(torch, torch_npu, impl.run, args, 3, 15, reset=impl.reset)
+                if a.verify_measured_output:
+                    from measured_correctness import measure_and_verify
+
+                    correctness, measurement = measure_and_verify(
+                        case,
+                        impl,
+                        lambda run, timer=timer, args=args, reset=impl.reset: timer(
+                            torch, torch_npu, run, args, 3, 15, reset=reset
+                        ),
+                        expected_calls=1 + 3 + 15,
+                    )
+                else:
+                    checks = benchmark_case(
+                        case, {"tileops": impl}, None, name=case.id, verify_only=True
+                    )
+                    measurement = timer(torch, torch_npu, impl.run, args, 3, 15, reset=impl.reset)
+                    check_inputs_preserved(
+                        Request(impl.run, args, impl.reset, preserve_inputs=True), case.inputs
+                    )
+                    correctness = checks["tileops"]["correctness"]
                 measurement.update(warmup=3, repeats=15, flush_bytes=1 << 30)
-                check_inputs_preserved(
-                    Request(impl.run, args, impl.reset, preserve_inputs=True), case.inputs
-                )
                 row.update(
                     status="passed",
                     seed=seed,
-                    correctness=checks["tileops"]["correctness"],
+                    correctness=correctness,
+                    correctness_source=(
+                        "final-profile-repeat" if a.verify_measured_output else "separate-run"
+                    ),
                     measurement=measurement,
                     input_preserved=True,
                 )
@@ -114,6 +134,8 @@ def main():
             stream.flush()
             print(a.op, case.id, row["status"], flush=True)
             case._release()
+            if failed and a.verify_measured_output:
+                break
     torch.npu.synchronize()
     changed = before != source_fingerprint()
     result = dict(

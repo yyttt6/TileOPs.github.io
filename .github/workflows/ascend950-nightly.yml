@@ -5,6 +5,10 @@ on:
   # GitHub scheduled events were repeatedly delayed by several hours.
   workflow_dispatch:
     inputs:
+      operators:
+        description: "Comma-separated operators for a bounded migration validation; all for nightly"
+        default: all
+        type: string
       validate_sources_only:
         description: "Validate contracts and source delivery without initializing the NPU"
         type: boolean
@@ -35,14 +39,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: yyttt6/TileOPs
-          ref: ascend950
+          ref: ascend950-v0.1.0
           persist-credentials: false
       - id: source
         run: echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -e '.[dev]' -c constraints.txt
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e . --group dev -c constraints.txt
       - run: python scripts/ci/ascend950.py --phase cpu --output "$RUNNER_TEMP/official-950-contracts"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -89,7 +94,7 @@ jobs:
       - name: Unpack verified sources without GitHub git access on the device runner
         env:
           ARCHIVES: ${{ runner.temp }}/nightly-archives-${{ github.run_id }}-${{ github.run_attempt }}
-          DESTINATION: ${{ runner.temp }}/nightly-source-${{ github.run_id }}-${{ github.run_attempt }}
+          DESTINATION: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           cd "$ARCHIVES"
           sha256sum --check SHA256SUMS
@@ -100,10 +105,11 @@ jobs:
           test -z "$(git -C "$DESTINATION/measured-tileops" status --porcelain)"
       - name: Prepare canonical isolated environment and measure
         if: inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
-        working-directory: ${{ runner.temp }}/nightly-source-${{ github.run_id }}-${{ github.run_attempt }}
+        working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
         shell: bash
         env:
           RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+          NIGHTLY_OPERATORS: ${{ inputs.operators || 'all' }}
         run: |
           set -eo pipefail
           mkdir -p /opt/tileops-ci/nightly-server2-20261103/evidence
@@ -120,11 +126,11 @@ jobs:
             resume_args=(--resume "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${RESUME_RUN_ID}-1")
           fi
           python scripts/nightly_server2.py "${resume_args[@]}" \
-            --source measured-tileops \
+            --source measured-tileops --operators "$NIGHTLY_OPERATORS" \
             --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
       - name: Recover an existing validated snapshot without device access
         if: inputs.publish_snapshot_run_id != ''
-        working-directory: ${{ runner.temp }}/nightly-source-${{ github.run_id }}-${{ github.run_attempt }}
+        working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
         env:
           SAVED_RUN: ${{ inputs.publish_snapshot_run_id }}
         run: |

@@ -393,8 +393,12 @@ class Parametric:
                 src = os.path.join(self.tileops, "src")
                 if src not in sys.path:
                     sys.path.insert(0, src)
-                from tileops.manifest import workload
-                from tileops.manifest.plan import entry_plan
+                try:
+                    from tileops.manifest import _workload as workload
+                    from tileops.manifest import entry_plan
+                except ImportError:  # Legacy documentation checkout
+                    from tileops.manifest import workload
+                    from tileops.manifest.plan import entry_plan
                 self._tools = (entry_plan, workload)
             except Exception as exc:  # noqa: BLE001 — degrade to ids alone
                 print(f"warning: parametric workloads keep their ids alone "
