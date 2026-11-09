@@ -1,8 +1,8 @@
 name: Official Ascend 950 nightly
 
 on:
-  schedule:
-    - cron: '0 19 * * *'  # 03:00 Asia/Shanghai (UTC+8)
+  # Dispatched by tileops-nightly-dispatch.timer at 02:00 Asia/Shanghai.
+  # GitHub scheduled events were repeatedly delayed by several hours.
   workflow_dispatch:
     inputs:
       validate_sources_only:
