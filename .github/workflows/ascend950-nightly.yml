@@ -81,6 +81,9 @@ jobs:
     needs: contracts
     if: github.repository == 'yyttt6/TileOPs.github.io' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, linux, ARM64, ascend950-production, ascend950-server2]
+    permissions:
+      contents: read
+      actions: read
     timeout-minutes: 720
     env:
       http_proxy: http://127.0.0.1:15014
@@ -103,6 +106,12 @@ jobs:
           tar --no-same-owner -xzf tileops.tar.gz -C "$DESTINATION/measured-tileops"
           test "$(git -C "$DESTINATION/measured-tileops" rev-parse HEAD)" = '${{ needs.contracts.outputs.source_commit }}'
           test -z "$(git -C "$DESTINATION/measured-tileops" status --porcelain)"
+      - name: Preserve the previous validated snapshot as historical evidence
+        if: inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
+        working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/fetch_official_snapshot.py --output previous-snapshot
       - name: Prepare canonical isolated environment and measure
         if: inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
         working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
@@ -126,7 +135,7 @@ jobs:
             resume_args=(--resume "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${RESUME_RUN_ID}-1")
           fi
           python scripts/nightly_server2.py "${resume_args[@]}" \
-            --source measured-tileops --operators "$NIGHTLY_OPERATORS" \
+            --source measured-tileops --previous-snapshot previous-snapshot --operators "$NIGHTLY_OPERATORS" \
             --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
       - name: Recover an existing validated snapshot without device access
         if: inputs.publish_snapshot_run_id != ''

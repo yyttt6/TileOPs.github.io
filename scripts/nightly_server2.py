@@ -42,6 +42,7 @@ def main():
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--operators", default="all")
     p.add_argument("--resume", type=Path)
+    p.add_argument("--previous-snapshot", type=Path)
     a = p.parse_args()
     a.source = a.source.resolve()
     out = a.output.resolve()
@@ -225,6 +226,15 @@ def main():
     snapshot = out / "snapshot"
     snapshot.mkdir()
     base = json.loads((HERE.parent / "data/baseline-cache/snapshot.json").read_text())
+    inherited = None
+    if a.previous_snapshot and (a.previous_snapshot / "meta.json").exists():
+        from ascend950_snapshot import validate as validate_prior
+        from baseline_release import merge_latest_release
+
+        inherited, _ = validate_prior(a.previous_snapshot)
+        previous = json.loads((a.previous_snapshot / "baseline-cache.json").read_text())
+        release = json.loads((HERE.parent / "data/baseline-cache/latest-release.json").read_text())
+        base = merge_latest_release(previous, base, release)
     # Bind unpaired workloads to their family from the frozen source manifest.
     for row in measured:
         row["workload"]["family"] = row["family"]
@@ -246,6 +256,9 @@ def main():
         source_branch="ascend950-v0.1.0",
         selection_scope=a.operators,
         registered_operators=len(selection["operators"]),
+        inherited_snapshot=None if inherited is None else {
+            k: inherited[k] for k in ("run_id", "commit", "date", "fresh_cases")
+        },
     )
     for name, value in [
         ("meta", meta),

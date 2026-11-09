@@ -48,3 +48,25 @@ def test_older_nightly_cannot_roll_back_torch_or_native_release():
     result = merge_latest_release(matching, published, release)
     assert [r['ratio'] for r in result['rows']] == [2, 1.6]
     assert result['frozen_at'] == '2026-11-07'
+
+
+def test_bounded_refresh_preserves_previous_measurements_and_new_baselines():
+    first, second = row(64), row(32)
+    second['case'] = 'other'
+    published = dict(baseline_release='v2', rows=[first, second], frozen_at='2026-11-09')
+    release = dict(count=2, measurements=[{k: r[k] for k in
+                   ('library', 'op', 'case', 'measurement_id', 'protocol')}
+                   for r in published['rows']])
+    previous = copy.deepcopy(published)
+    previous['rows'][1].update(tileops_latency_us=5, tileops_date='2026-11-08',
+                               tileops_commit='b' * 40)
+    previous['rows'][1]['latency_us'] = 100  # Superseded baseline must not return.
+    inherited = merge_latest_release(previous, published, release)
+    measured = dict(op='ExampleOp', case_id='same', params={'n': 64},
+                    workload=first['workload'], measurement={'latency_ms': .004})
+    result = build_cache(inherited, [measured], 'a' * 40, '2026-11-09')
+    assert result['rows'][0]['tileops_latency_us'] == 4
+    assert result['rows'][1]['tileops_latency_us'] == 5
+    assert result['rows'][1]['latency_us'] == 10
+    assert result['rows'][1]['tileops_commit'] == 'b' * 40
+    assert result['nightly']['fresh_cases'] == 1
