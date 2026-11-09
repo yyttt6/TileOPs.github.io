@@ -17,7 +17,8 @@ def contract(row):
 
 
 def identity(row):
-    return row['op'], row['case'], contract(row)
+    from baseline_contracts import comparison_identity
+    return comparison_identity(row['op'], row['case'], row['workload']['params'])
 
 
 def merge_latest_release(official, published, release):

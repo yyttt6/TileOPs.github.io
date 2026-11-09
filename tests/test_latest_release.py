@@ -70,3 +70,19 @@ def test_bounded_refresh_preserves_previous_measurements_and_new_baselines():
     assert result['rows'][1]['latency_us'] == 10
     assert result['rows'][1]['tileops_commit'] == 'b' * 40
     assert result['nightly']['fresh_cases'] == 1
+
+
+def test_new_gemm_measurement_updates_old_name_without_rewriting_baseline():
+    saved = row(64)
+    saved['op'] = 'GemmFwdOp'
+    base = dict(baseline_release='v2', rows=[saved], frozen_at='old')
+    measured = dict(op='GEMMFwdOp', case_id='same', params={'n': 64},
+                    workload=saved['workload'], measurement={'latency_ms': .005})
+    legacy = build_cache(base, [measured], 'a' * 40, 'new')
+    assert legacy['rows'][0]['ratio'] is None
+    result = build_cache(base, [measured], 'a' * 40, 'new', use_v010_aliases=True)
+    assert result['rows'][0]['ratio'] == 2
+    assert result['rows'][0]['op'] == 'GemmFwdOp'
+    assert result['rows'][0]['measurement_id'] == saved['measurement_id']
+    assert result['tileops_rows'] == []
+    assert base['rows'][0]['ratio'] is None

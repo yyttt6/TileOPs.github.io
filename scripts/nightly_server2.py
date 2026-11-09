@@ -36,6 +36,19 @@ def identity(commit):
     )
 
 
+def select_operators(selection, requested):
+    stale = selection.get("unmapped_registrations", [])
+    if stale:
+        raise ValueError(f"Ascend registrations absent from the current manifest: {stale}")
+    ops = selection["operators"] if requested == "all" else requested.split(",")
+    missing = sorted(set(ops) - set(selection["operators"]))
+    if missing:
+        raise ValueError(f"Requested operators have no discovered Ascend implementation: {missing}")
+    if not ops or len(ops) != len(set(ops)):
+        raise ValueError("Operator selection must be nonempty and contain no duplicates")
+    return ops
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--source", type=Path, required=True)
@@ -108,8 +121,7 @@ def main():
 
     assert run("__list__", out / "selection.json") == 0
     selection = json.loads((out / "selection.json").read_text())
-    ops = selection["operators"] if a.operators == "all" else a.operators.split(",")
-    assert set(ops) <= set(selection["operators"]) and len(ops) == len(set(ops))
+    ops = select_operators(selection, a.operators)
     write(out / "plan.json", dict(commit=commit, operators=ops, started_at=started))
     sys.path.insert(0, str(HERE / "nightly_support"))
     from complete_profile import complete_digest, decode, pure_aicpu_base
@@ -254,6 +266,7 @@ def main():
         run_attempt=os.environ["GITHUB_RUN_ATTEMPT"],
         elapsed_seconds=time.monotonic() - start,
         source_branch="ascend950-v0.1.0",
+        contract_identity_version="v010-reviewed-aliases-v1",
         selection_scope=a.operators,
         registered_operators=len(selection["operators"]),
         inherited_snapshot=None if inherited is None else {
@@ -266,7 +279,7 @@ def main():
         ("measurements", measured),
         ("receipts", receipts),
         ("baseline-before", base),
-        ("baseline-cache", build_cache(base, measured, commit, date)),
+        ("baseline-cache", build_cache(base, measured, commit, date, use_v010_aliases=True)),
     ]:
         write(snapshot / f"{name}.json", value)
     seal(snapshot)

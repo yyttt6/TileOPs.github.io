@@ -25,9 +25,9 @@ def contract_params(op, params):
     return normalized
 
 
-def build_cache(base, measured, commit, date):
+def build_cache(base, measured, commit, date, *, use_v010_aliases=False):
     if base.get("baseline_release"):
-        return build_versioned_cache(base, measured, commit, date)
+        return build_versioned_cache(base, measured, commit, date, use_v010_aliases=use_v010_aliases)
     data = copy.deepcopy(base)
     fresh = {(r["op"], r["case_id"]): r for r in measured}
     assert len(fresh) == len(measured)
@@ -81,29 +81,35 @@ def build_cache(base, measured, commit, date):
     return data
 
 
-def build_versioned_cache(base, measured, commit, date):
+def build_versioned_cache(base, measured, commit, date, *, use_v010_aliases=False):
     """Update each measured contract separately; changed definitions never share ratios."""
-    from baseline_release import contract
+    from baseline_contracts import comparison_identity
+    from baseline_release import contract, identity
     data = copy.deepcopy(base)
-    fresh = {(r['op'], r['case_id']): r for r in measured}
+    assert len({(r['op'], r['case_id']) for r in measured}) == len(measured)
+    fresh = {(comparison_identity(r['op'], r['case_id'], r['params']) if use_v010_aliases
+              else (r['op'], r['case_id'], contract({'workload': {'params': r['params']}}))): r
+             for r in measured}
     assert len(fresh) == len(measured)
     visible = {(r['op'], r['case']) for r in data['rows']}
     matched = set()
     for row in data['rows'] + data.get('historical_rows', []):
         key = row['op'], row['case']
-        m = fresh.get(key)
-        if m is None or contract(row) != contract({'workload': {'params': m['params']}}):
+        lookup = identity(row) if use_v010_aliases else (row['op'], row['case'], contract(row))
+        m = fresh.get(lookup)
+        if m is None:
             continue
         latency = m['measurement']['latency_ms'] * 1000
         row.update(tileops_latency_us=latency, ratio=row['latency_us'] / latency,
                    tileops_verified=True, tileops_samples=15, tileops_protocol=PROTOCOL,
                    tileops_commit=commit, tileops_date=date,
                    tileops_measurement_id=hashlib.sha256(json.dumps(m, sort_keys=True).encode()).hexdigest())
-        matched.add((key, contract(row)))
+        matched.add(((m['op'], m['case_id']), contract({'workload': {'params': m['params']}})))
     extra = {(r['op'], r['case']): r for r in data.get('tileops_rows', [])}
     historical = {(r['op'], r['case'], contract(r)): r
                   for r in data.get('historical_tileops_rows', [])}
-    for key, m in fresh.items():
+    for m in fresh.values():
+        key = m['op'], m['case_id']
         token = contract({'workload': {'params': m['params']}})
         if (key, token) in matched:
             continue
@@ -179,6 +185,9 @@ def validate(path):
             for c, s in zip(coverage[-15:], samples, strict=True)
         )
     base = json.loads((path / "baseline-before.json").read_text())
-    expected = build_cache(base, measured, meta["commit"], meta["date"])
+    version = meta.get("contract_identity_version")
+    assert version in (None, "v010-reviewed-aliases-v1")
+    expected = build_cache(base, measured, meta["commit"], meta["date"],
+                           use_v010_aliases=version == "v010-reviewed-aliases-v1")
     assert expected == json.loads((path / "baseline-cache.json").read_text())
     return meta, []
