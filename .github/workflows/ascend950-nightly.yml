@@ -124,11 +124,13 @@ jobs:
           mkdir -p /opt/tileops-ci/nightly-server2-20261103/evidence
           source /opt/tileops-ci/server2-20261030/config/prepare-python.sh "$PWD/measured-tileops"
           source /opt/tileops-ci/server2-20261030/config/toolchain-v1.env.sh
-          export TILELANG_CACHE_DIR="$RUNNER_TEMP/nightly-${GITHUB_RUN_ID}-tilelang"
           export OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
           TORCH_DEVICE_BACKEND_AUTOLOAD=0 python /opt/tileops-ci/server2-20261030/config/check-toolchain-v1.py \
             --lock /opt/tileops-ci/server2-20261030/config/toolchain-v1.lock.json \
             --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-preflight.json"
+          TILELANG_CACHE_KEY="$(python measured-tileops/scripts/ci/tilelang_cache_key.py --source "$PWD/measured-tileops" --lock /opt/tileops-ci/server2-20261030/config/toolchain-v1.lock.json --verified-toolchain "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-preflight.json" --output "/opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-cache.json")"
+          export TILELANG_CACHE_DIR="/opt/tileops-ci/server2-20261030/cache/tilelang-v1-${TILELANG_CACHE_KEY}"
+          mkdir -p "$TILELANG_CACHE_DIR"
           resume_args=()
           if [[ -n "$RESUME_RUN_ID" ]]; then
             [[ "$RESUME_RUN_ID" =~ ^[0-9]+$ ]] || exit 1
@@ -165,6 +167,7 @@ jobs:
           path: |
             /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}
             /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}-preflight.json
+            /opt/tileops-ci/nightly-server2-20261103/evidence/official-950-${{ github.run_id }}-${{ github.run_attempt }}-cache.json
           retention-days: 90
           if-no-files-found: error
 
