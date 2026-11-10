@@ -44,3 +44,14 @@ def test_no_fuzzy_alias_or_conflicting_parameters():
     assert identity('UnreviewedOp', 'case', {'n': 4}) != identity('UNREVIEWEDOp', 'case', {'n': 4})
     with pytest.raises(ValueError, match='Ambiguous'):
         identity('GroupedGemmFwdOp', 'case', {'output': 1, 'd': 1})
+
+
+def test_relu_spelling_alias_keeps_exact_case_and_mutation_contract():
+    from baseline_contracts import comparison_identity
+
+    params = {"input": [[1, 4096], "bfloat16"], "output": [[1, 4096], "bfloat16"], "inplace": False}
+    old = comparison_identity("ReluFwdOp", "decode", params)
+    assert old == comparison_identity("ReLUFwdOp", "decode", params)
+    assert old != comparison_identity("ReLUFwdOp", "decode", {**params, "inplace": True})
+    assert old != comparison_identity("ReLUFwdOp", "prefill", params)
+    assert old != comparison_identity("ReLUFwdOp", "decode", {**params, "input": [[2, 4096], "bfloat16"]})
