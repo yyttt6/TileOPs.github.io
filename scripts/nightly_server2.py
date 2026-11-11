@@ -24,7 +24,7 @@ def write(path, value):
 
 
 def identity(commit):
-    files = [HERE / "precompile.py", HERE / "nightly_device.py", HERE / "measured_correctness.py", *sorted((HERE / "nightly_support").rglob("*.py"))]
+    files = [HERE / "precompile.py", HERE / "nightly_device.py", HERE / "measured_correctness.py", HERE / "golden_cache.py", HERE / "golden_cache_policy.json", *sorted((HERE / "nightly_support").rglob("*.py"))]
     return dict(
         commit=commit,
         measurement_files={
