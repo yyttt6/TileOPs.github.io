@@ -259,6 +259,8 @@ def render():
                      f"{len({(r['op'], r['case']) for r in selected})} | {sum(r['library'] is not None for r in selected)} |\n")
     assert len(assigned) == len(rows), 'Every published measurement must appear in a family table'
     (out / 'index.md').write_text(''.join(index))
+    from render_partial_nightly import render_progress
+    render_progress(data, out)
     print(f'Baseline snapshot: {len(rows)} measurements, {len(cases)} workloads, {len(ops)} operators')
 
 
