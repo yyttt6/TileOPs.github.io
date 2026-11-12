@@ -38,11 +38,12 @@ def main(argv=None):
     require_reservation()
     import torch
     import torch_npu
+    from complete_profile import make_timer
+
     from benchmarks._cases import entry
     from benchmarks.api import cases
     from benchmarks.ascend.coverage import registered_coverage
     from benchmarks.ascend.runner import benchmark_case, source_fingerprint
-    from complete_profile import make_timer
     from tileops.backend import _registry as registry
     from tileops.manifest import load_manifest
     from workloads.device import set_run_device
@@ -123,7 +124,7 @@ def main(argv=None):
                 op = op_class(**case.arguments)
                 impl = entry(a.op).binder(op, case)
                 args = case.inputs if impl.args is None else impl.args
-                from reference_placement import prepare_reference
+                from reference_plan import prepare_reference
 
                 reference_plan = prepare_reference(a.op, case)
                 if reference_plan.cache_identity:
