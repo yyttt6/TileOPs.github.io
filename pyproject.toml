@@ -14,3 +14,8 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.ruff.lint.per-file-ignores]
+# Keep this producer byte-identical to the qualified TileOPs CI mirror: its
+# content hash is part of affected Golden keys; the two repos group imports differently.
+"scripts/nightly_support/complete_reference.py" = ["I001"]
