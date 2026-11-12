@@ -192,7 +192,12 @@ def validate(path):
             guard = receipt["guard_metadata"]
             assert guard["exit_code"] == 0 and guard["performance_valid"] is True
             assert guard["workload_completed"] is True
-            assert guard["owner"] == f"nightly/{meta['run_id']}/{receipt['batch']}"
+            measurement_run = receipt.get("measurement_run_id", meta["run_id"])
+            if str(measurement_run) != str(meta["run_id"]):
+                assert receipt.get("resumed_from"), (
+                    "Prior guard needs explicit checkpoint provenance"
+                )
+            assert guard["owner"] == f"nightly/{measurement_run}/{receipt['batch']}"
             assert len(receipt["guard_sha256"]) == 64
         result = receipt["result"]
         assert (

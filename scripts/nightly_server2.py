@@ -220,6 +220,7 @@ def main():
                         hardware=json.loads((target / "hardware.json").read_text())
                         if (target / "hardware.json").exists()
                         else {},
+                        measurement_run_id=os.environ["GITHUB_RUN_ID"],
                         batch=label,
                         guard_metadata=report["guard"],
                         guard_receipt=report["guard_receipt"],

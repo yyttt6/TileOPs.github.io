@@ -154,7 +154,7 @@ def test_nightly_includes_named_ascend_variants():
     assert registered_ascend_ops(registered) == ["BatchNormFwdOp", "InstanceNormFwdOp", "ReluFwdOp"]
 
 
-def test_v4_snapshot_keeps_row_protocol_and_validates_marker_windows(tmp_path):
+def v4_bundle(tmp_path):
     from nightly_snapshot import ADAPTIVE_PROTOCOL, SESSION_COVERAGE, SESSION_PROTOCOL
 
     root = bundle(tmp_path)
@@ -182,3 +182,32 @@ def test_v4_snapshot_keeps_row_protocol_and_validates_marker_windows(tmp_path):
     seal(root)
     validate(root)
     assert cache["rows"][0]["tileops_protocol"] == SESSION_PROTOCOL
+
+    return root
+
+
+def test_v4_snapshot_keeps_row_protocol_and_validates_marker_windows(tmp_path):
+    v4_bundle(tmp_path)
+
+
+@pytest.mark.parametrize("fault", ["resume", "missing-resume", "contaminated", "owner"])
+def test_v4_guard_provenance_preserves_original_measurement_run(tmp_path, fault):
+    root = v4_bundle(tmp_path)
+    receipts = json.loads((root / "receipts.json").read_text())
+    receipt = receipts["ReluFwdOp"]
+    if fault in ("resume", "missing-resume"):
+        receipt["measurement_run_id"] = "0"
+        receipt["guard_metadata"]["owner"] = "nightly/0/batch-0"
+        if fault == "resume":
+            receipt["resumed_from"] = "prior-evidence"
+    if fault == "contaminated":
+        receipt["guard_metadata"]["performance_valid"] = False
+    if fault == "owner":
+        receipt["guard_metadata"]["owner"] = "other-owner"
+    (root / "receipts.json").write_text(json.dumps(receipts))
+    seal(root)
+    if fault == "resume":
+        validate(root)
+    else:
+        with pytest.raises(AssertionError):
+            validate(root)
