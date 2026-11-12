@@ -12,7 +12,7 @@ import time
 from pathlib import Path
 
 from ascend950_snapshot import seal
-from nightly_snapshot import PROTOCOL, build_cache, validate
+from nightly_snapshot import build_cache, validate
 
 HERE = Path(__file__).resolve().parent
 
@@ -24,7 +24,16 @@ def write(path, value):
 
 
 def identity(commit):
-    files = [HERE / "precompile.py", HERE / "nightly_device.py", HERE / "measured_correctness.py", HERE / "golden_cache.py", HERE / "golden_cache_policy.json", *sorted((HERE / "nightly_support").rglob("*.py"))]
+    files = [
+        HERE / "device_batch.py",
+        HERE / "nightly_support/session_profile.py",
+        HERE / "precompile.py",
+        HERE / "nightly_device.py",
+        HERE / "measured_correctness.py",
+        HERE / "golden_cache.py",
+        HERE / "golden_cache_policy.json",
+        *sorted((HERE / "nightly_support").rglob("*.py")),
+    ]
     return dict(
         commit=commit,
         measurement_files={
@@ -56,6 +65,7 @@ def main():
     p.add_argument("--operators", default="all")
     p.add_argument("--resume", type=Path)
     p.add_argument("--previous-snapshot", type=Path)
+    p.add_argument("--batch-size", type=int, default=8)
     a = p.parse_args()
     a.source = a.source.resolve()
     out = a.output.resolve()
@@ -68,7 +78,15 @@ def main():
     assert not subprocess.check_output(
         ["git", "-C", str(a.source), "status", "--porcelain"], text=True
     ).strip()
-    current_identity = identity(commit)
+    from device_batch import groups
+    from device_batch import run as run_batch
+
+    groups([], a.batch_size)
+    current_identity = dict(
+        identity(commit),
+        batch_size=a.batch_size,
+        timer=os.environ.get("ASCEND950_TIMER_MODE", "auto"),
+    )
     write(out / "identity.json", current_identity)
     prior = {}
     if a.resume:
@@ -124,14 +142,14 @@ def main():
     ops = select_operators(selection, a.operators)
     write(out / "plan.json", dict(commit=commit, operators=ops, started_at=started))
     sys.path.insert(0, str(HERE / "nightly_support"))
-    from complete_profile import complete_digest, decode, pure_aicpu_base
-    from tools.measure_baselines import _parse_ffts_profile
 
     receipts = {}
     measured = []
     failures = []
     frozen_sources = None
-    for op in ops:
+    live = {}
+    batch_number = 0
+    for op_index, op in enumerate(ops):
         saved = prior.get(op, {})
         if saved.get("guard_exit_code") == 0 and saved.get("result", {}).get("status") == "passed":
             assert saved["hardware"] == selection["hardware"], "Checkpoint hardware mismatch"
@@ -152,26 +170,74 @@ def main():
             )
             print("RESUME", op, "CPU replay of retained raw profiles", flush=True)
         else:
-            attempts = []
-            for attempt in range(2):
-                target = out / (op if attempt == 0 else f"{op}-retry{attempt}")
-                code = run(op, target, attempt)
-                result = (
-                    json.loads((target / "result.json").read_text())
-                    if (target / "result.json").exists()
-                    else {}
+            if op not in live:
+                available = [
+                    name
+                    for name in ops[op_index:]
+                    if name not in live
+                    and not (
+                        prior.get(name, {}).get("guard_exit_code") == 0
+                        and prior.get(name, {}).get("result", {}).get("status") == "passed"
+                    )
+                ]
+                batch = groups(available, a.batch_size)[0]
+                label = f"batch-{batch_number:04d}"
+                batch_number += 1
+                report = run_batch(
+                    a.source,
+                    [dict(op=name, output=str(out / name)) for name in batch],
+                    out,
+                    label,
+                    f"nightly/{os.environ['GITHUB_RUN_ID']}/{label}",
+                    timer=current_identity["timer"],
                 )
-                receipt = dict(
-                    guard_exit_code=code,
-                    result=result,
-                    hardware=json.loads((target / "hardware.json").read_text())
-                    if (target / "hardware.json").exists()
-                    else {},
+                timings.append(
+                    dict(
+                        batch=batch,
+                        guard_exit_code=report["code"],
+                        elapsed_seconds=report["seconds"],
+                    )
                 )
-                attempts.append(dict(attempt=attempt, directory=target.name, **receipt))
-                if code not in (75, 76, 78) or result.get("failed", 0):
-                    break
-            receipts[op] = dict(**receipt, attempts=attempts, selected_attempt=attempt)
+                write(
+                    out / "timing.json",
+                    dict(
+                        started_at=started, elapsed_seconds=time.monotonic() - start, stages=timings
+                    ),
+                )
+                completed = {item["op"] for item in report["worker"].get("records", [])}
+                for name in batch:
+                    target = out / name
+                    if name not in completed and report["code"] == 0:
+                        continue  # An earlier operator failed; start untouched work in a fresh process.
+                    result = (
+                        json.loads((target / "result.json").read_text())
+                        if (target / "result.json").exists()
+                        else {}
+                    )
+                    receipt = dict(
+                        guard_exit_code=report["code"],
+                        result=result,
+                        hardware=json.loads((target / "hardware.json").read_text())
+                        if (target / "hardware.json").exists()
+                        else {},
+                        measurement_run_id=os.environ["GITHUB_RUN_ID"],
+                        batch=label,
+                        guard_metadata=report["guard"],
+                        guard_receipt=report["guard_receipt"],
+                        guard_sha256=report["guard_sha256"],
+                        attempts=[dict(attempt=0, directory=name)],
+                        selected_attempt=0,
+                    )
+                    live[name] = receipt
+                    receipts[name] = receipt
+                write(
+                    out / "receipts.json", receipts
+                )  # Only completed guards produce reusable checkpoints.
+            target = out / op
+            receipt = live[op]
+            code, result = receipt["guard_exit_code"], receipt["result"]
+            receipts[op] = receipt
+
         if code or result.get("status") != "passed":
             failures.append(op)
         else:
@@ -186,25 +252,10 @@ def main():
             assert len(case_rows) == len(selection["cases"][op])
             for line in (target / "results.jsonl").read_text().splitlines():
                 row = json.loads(line)
-                coverage = json.loads(
-                    Path(row["measurement"]["profile_coverage_evidence"]).read_text()
-                )
-                for c in coverage[-15:]:
-                    assert complete_digest(c["path"]) == c["complete_sha256"]
-                    extra = decode(c["path"])
-                    try:
-                        replay = _parse_ffts_profile(Path(c["path"]), 1)
-                    except ValueError as exc:
-                        if str(exc) != "No valid FFTS activity":
-                            raise
-                        replay = pure_aicpu_base(extra)
-                    import math
+                from complete_profile import replay_coverage
 
-                    assert math.isclose(
-                        replay["latency_ms"] + extra["added_us"] / 1000,
-                        c["result"]["latency_ms"],
-                        rel_tol=1e-10,
-                    )
+                assert result.get("selection_scope", "all-cases") == "all-cases"
+                coverage = replay_coverage(row["measurement"])
                 row["raw_replayed"] = True
                 row["measurement"] = {
                     k: v
@@ -256,7 +307,7 @@ def main():
         publisher="server2-physical32",
         publisher_repository="https://github.com/yyttt6/TileOPs.github.io",
         status="passed",
-        measurement_protocol=PROTOCOL,
+        measurement_protocol="ascend950-adaptive-ffts-v4",
         commit=commit,
         date=date,
         operators=ops,
@@ -269,9 +320,9 @@ def main():
         contract_identity_version="v010-reviewed-aliases-v1",
         selection_scope=a.operators,
         registered_operators=len(selection["operators"]),
-        inherited_snapshot=None if inherited is None else {
-            k: inherited[k] for k in ("run_id", "commit", "date", "fresh_cases")
-        },
+        inherited_snapshot=None
+        if inherited is None
+        else {k: inherited[k] for k in ("run_id", "commit", "date", "fresh_cases")},
     )
     for name, value in [
         ("meta", meta),
