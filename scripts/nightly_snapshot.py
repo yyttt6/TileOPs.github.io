@@ -96,13 +96,21 @@ def build_versioned_cache(
 ):
     """Update each measured contract separately; changed definitions never share ratios."""
     from baseline_contracts import comparison_identity
-    from baseline_release import contract, identity
+    from baseline_release import contract
 
     data = copy.deepcopy(base)
     assert len({(r["op"], r["case_id"]) for r in measured}) == len(measured)
+
+    def reviewed_identity(op, case, params):
+        # v3 publications predate the reviewed All x/input alias. Replay their
+        # original joins exactly; only adaptive publications use the new join.
+        if op == "AllFwdOp" and fresh_protocol == PROTOCOL:
+            return op, case, contract({"workload": {"params": params}})
+        return comparison_identity(op, case, params)
+
     fresh = {
         (
-            comparison_identity(r["op"], r["case_id"], r["params"])
+            reviewed_identity(r["op"], r["case_id"], r["params"])
             if use_v010_aliases
             else (r["op"], r["case_id"], contract({"workload": {"params": r["params"]}}))
         ): r
@@ -113,7 +121,11 @@ def build_versioned_cache(
     matched = set()
     for row in data["rows"] + data.get("historical_rows", []):
         key = row["op"], row["case"]
-        lookup = identity(row) if use_v010_aliases else (row["op"], row["case"], contract(row))
+        lookup = (
+            reviewed_identity(row["op"], row["case"], row["workload"]["params"])
+            if use_v010_aliases
+            else (row["op"], row["case"], contract(row))
+        )
         m = fresh.get(lookup)
         if m is None:
             continue

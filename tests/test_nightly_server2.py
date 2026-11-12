@@ -225,3 +225,38 @@ def test_legacy_snapshot_protocol_is_not_rewritten_as_adaptive(tmp_path):
     seal(root)
     with pytest.raises(AssertionError):
         validate(root)
+
+
+def test_legacy_all_join_replays_original_alias_scope():
+    from nightly_snapshot import ADAPTIVE_PROTOCOL
+
+    base = dict(
+        baseline_release="frozen",
+        rows=[
+            dict(
+                op="AllFwdOp",
+                case="bool",
+                library="torch",
+                workload=dict(params={"x": [4]}),
+                latency_us=3,
+            )
+        ],
+        tileops_rows=[],
+    )
+    rows = [
+        dict(
+            op="AllFwdOp",
+            case_id="bool",
+            params={"input": [4]},
+            workload=dict(params={"input": [4]}),
+            measurement=dict(latency_ms=0.001),
+        )
+    ]
+    old = build_cache(base, rows, "a" * 40, "date", use_v010_aliases=True, fresh_protocol=PROTOCOL)
+    assert "tileops_latency_us" not in old["rows"][0]
+    assert len(old["historical_tileops_rows"]) == 1
+    new = build_cache(
+        base, rows, "a" * 40, "date", use_v010_aliases=True, fresh_protocol=ADAPTIVE_PROTOCOL
+    )
+    assert new["rows"][0]["tileops_latency_us"] == 1
+    assert not new["historical_tileops_rows"]
