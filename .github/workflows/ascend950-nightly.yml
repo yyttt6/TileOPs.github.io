@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       source_commit: ${{ steps.source.outputs.commit }}
+      archive_digest: ${{ steps.package.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,6 +63,7 @@ jobs:
           path: nightly-site-source
           persist-credentials: false
       - name: Package the exact sources for the device runner
+        id: package
         run: |
           mkdir -p "$RUNNER_TEMP/nightly-sources"
           git archive --format=tar HEAD > "$RUNNER_TEMP/nightly-sources/tileops.tar"
@@ -70,6 +72,7 @@ jobs:
           git -C nightly-site-source archive --format=tar.gz HEAD > "$RUNNER_TEMP/nightly-sources/site.tar.gz"
           cd "$RUNNER_TEMP/nightly-sources"
           sha256sum tileops.tar.gz site.tar.gz > SHA256SUMS
+          echo "digest=$(sha256sum SHA256SUMS | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-sources
@@ -90,7 +93,34 @@ jobs:
       https_proxy: http://127.0.0.1:15014
       no_proxy: localhost,127.0.0.1,::1
     steps:
+      - name: Restore checksum-verified nightly source archives
+        id: archive-cache
+        env:
+          DIGEST: ${{ needs.contracts.outputs.archive_digest }}
+          ARCHIVES: ${{ runner.temp }}/nightly-archives-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, os, pathlib, re
+          hit = False
+          try:
+              digest = os.environ['DIGEST']
+              if not re.fullmatch(r'[0-9a-f]{64}', digest): raise ValueError('Invalid digest')
+              root = pathlib.Path('/opt/tileops-ci/server2-20261030/cache/nightly-archives-v1') / digest
+              manifest = (root/'SHA256SUMS').read_bytes()
+              if hashlib.sha256(manifest).hexdigest() != digest: raise ValueError('Manifest mismatch')
+              entries = [x.split() for x in manifest.decode().splitlines()]
+              if len(entries) != 2 or any(len(x) != 2 for x in entries) or {x[1] for x in entries} != {'site.tar.gz', 'tileops.tar.gz'}: raise ValueError('Unexpected members')
+              payload = {name:(root/name).read_bytes() for _,name in entries}
+              if any(hashlib.sha256(payload[name]).hexdigest() != sha for sha,name in entries): raise ValueError('Payload mismatch')
+              destination = pathlib.Path(os.environ['ARCHIVES']); destination.mkdir(parents=True,exist_ok=True)
+              for name,data in {**payload,'SHA256SUMS':manifest}.items(): (destination/name).write_bytes(data)
+              hit = True
+          except (OSError,ValueError,UnicodeError) as exc:
+              print(f'Nightly archive cache miss: {exc}')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as stream: stream.write(f'hit={str(hit).lower()}\n')
+          PY
       - uses: actions/download-artifact@v4
+        if: steps.archive-cache.outputs.hit != 'true'
         with:
           name: nightly-sources
           path: ${{ runner.temp }}/nightly-archives-${{ github.run_id }}-${{ github.run_attempt }}
@@ -100,12 +130,18 @@ jobs:
           DESTINATION: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           cd "$ARCHIVES"
+          echo '${{ needs.contracts.outputs.archive_digest }}  SHA256SUMS' | sha256sum --check
           sha256sum --check SHA256SUMS
           mkdir -p "$DESTINATION/measured-tileops"
           tar --no-same-owner -xzf site.tar.gz -C "$DESTINATION"
           tar --no-same-owner -xzf tileops.tar.gz -C "$DESTINATION/measured-tileops"
           test "$(git -C "$DESTINATION/measured-tileops" rev-parse HEAD)" = '${{ needs.contracts.outputs.source_commit }}'
           test -z "$(git -C "$DESTINATION/measured-tileops" status --porcelain)"
+      - name: Cache verified nightly archives for retries
+        continue-on-error: true
+        working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          python3 scripts/nightly_source_cache.py --archives "$RUNNER_TEMP/nightly-archives-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" --cache-root /opt/tileops-ci/server2-20261030/cache/nightly-archives-v1 --digest '${{ needs.contracts.outputs.archive_digest }}'
       - name: Preserve the previous validated snapshot as historical evidence
         if: inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
         working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}

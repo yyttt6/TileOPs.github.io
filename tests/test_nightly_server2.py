@@ -151,6 +151,34 @@ def test_nightly_includes_named_ascend_variants():
         "ReluFwdOp": {"ascend": object()},
         "OtherOp": {"cuda": object(), "not_ascend": object()},
     }
-    assert registered_ascend_ops(registered) == [
-        "BatchNormFwdOp", "InstanceNormFwdOp", "ReluFwdOp"
-    ]
+    assert registered_ascend_ops(registered) == ["BatchNormFwdOp", "InstanceNormFwdOp", "ReluFwdOp"]
+
+
+def test_v4_snapshot_keeps_row_protocol_and_validates_marker_windows(tmp_path):
+    from nightly_snapshot import ADAPTIVE_PROTOCOL, SESSION_COVERAGE, SESSION_PROTOCOL
+
+    root = bundle(tmp_path)
+    meta = json.loads((root / "meta.json").read_text())
+    meta["measurement_protocol"] = ADAPTIVE_PROTOCOL
+    meta["run_id"] = "1"
+    receipts = json.loads((root / "receipts.json").read_text())
+    receipts["ReluFwdOp"].update(
+        batch="batch-0",
+        guard_sha256="a" * 64,
+        guard_metadata=dict(
+            owner="nightly/1/batch-0", exit_code=0, performance_valid=True, workload_completed=True
+        ),
+    )
+    (root / "receipts.json").write_text(json.dumps(receipts))
+    rows = json.loads((root / "measurements.json").read_text())
+    rows[0]["measurement"].update(
+        measurement_protocol=SESSION_PROTOCOL, profile_coverage_protocol=SESSION_COVERAGE
+    )
+    for name, value in [("meta", meta), ("measurements", rows)]:
+        (root / f"{name}.json").write_text(json.dumps(value))
+    base = json.loads((root / "baseline-before.json").read_text())
+    cache = build_cache(base, rows, meta["commit"], meta["date"])
+    (root / "baseline-cache.json").write_text(json.dumps(cache))
+    seal(root)
+    validate(root)
+    assert cache["rows"][0]["tileops_protocol"] == SESSION_PROTOCOL
