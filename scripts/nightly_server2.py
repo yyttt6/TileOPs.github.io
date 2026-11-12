@@ -330,7 +330,17 @@ def main():
         ("measurements", measured),
         ("receipts", receipts),
         ("baseline-before", base),
-        ("baseline-cache", build_cache(base, measured, commit, date, use_v010_aliases=True)),
+        (
+            "baseline-cache",
+            build_cache(
+                base,
+                measured,
+                commit,
+                date,
+                use_v010_aliases=True,
+                fresh_protocol=meta["measurement_protocol"],
+            ),
+        ),
     ]:
         write(snapshot / f"{name}.json", value)
     seal(snapshot)

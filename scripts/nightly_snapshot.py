@@ -28,10 +28,15 @@ def contract_params(op, params):
     return normalized
 
 
-def build_cache(base, measured, commit, date, *, use_v010_aliases=False):
+def build_cache(base, measured, commit, date, *, use_v010_aliases=False, fresh_protocol=PROTOCOL):
     if base.get("baseline_release"):
         return build_versioned_cache(
-            base, measured, commit, date, use_v010_aliases=use_v010_aliases
+            base,
+            measured,
+            commit,
+            date,
+            use_v010_aliases=use_v010_aliases,
+            fresh_protocol=fresh_protocol,
         )
     data = copy.deepcopy(base)
     fresh = {(r["op"], r["case_id"]): r for r in measured}
@@ -80,13 +85,15 @@ def build_cache(base, measured, commit, date, *, use_v010_aliases=False):
         date=date,
         fresh_cases=len(measured),
         native_baselines="Preserved original saved v2; not remeasured",
-        fresh_protocol=ADAPTIVE_PROTOCOL,
+        fresh_protocol=fresh_protocol,
         clock_policy="platform-default",
     )
     return data
 
 
-def build_versioned_cache(base, measured, commit, date, *, use_v010_aliases=False):
+def build_versioned_cache(
+    base, measured, commit, date, *, use_v010_aliases=False, fresh_protocol=PROTOCOL
+):
     """Update each measured contract separately; changed definitions never share ratios."""
     from baseline_contracts import comparison_identity
     from baseline_release import contract, identity
@@ -157,7 +164,7 @@ def build_versioned_cache(base, measured, commit, date, *, use_v010_aliases=Fals
         fresh_cases=len(measured),
         baseline_release=base["baseline_release"],
         native_baselines="Published measurements retained with their recorded protocols",
-        fresh_protocol=ADAPTIVE_PROTOCOL,
+        fresh_protocol=fresh_protocol,
         clock_policy="platform-default",
     )
     return data
@@ -245,6 +252,7 @@ def validate(path):
         meta["commit"],
         meta["date"],
         use_v010_aliases=version == "v010-reviewed-aliases-v1",
+        fresh_protocol=meta["measurement_protocol"],
     )
     assert expected == json.loads((path / "baseline-cache.json").read_text())
     return meta, []

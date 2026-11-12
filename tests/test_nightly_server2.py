@@ -177,7 +177,9 @@ def v4_bundle(tmp_path):
     for name, value in [("meta", meta), ("measurements", rows)]:
         (root / f"{name}.json").write_text(json.dumps(value))
     base = json.loads((root / "baseline-before.json").read_text())
-    cache = build_cache(base, rows, meta["commit"], meta["date"])
+    cache = build_cache(
+        base, rows, meta["commit"], meta["date"], fresh_protocol=meta["measurement_protocol"]
+    )
     (root / "baseline-cache.json").write_text(json.dumps(cache))
     seal(root)
     validate(root)
@@ -211,3 +213,15 @@ def test_v4_guard_provenance_preserves_original_measurement_run(tmp_path, fault)
     else:
         with pytest.raises(AssertionError):
             validate(root)
+
+
+def test_legacy_snapshot_protocol_is_not_rewritten_as_adaptive(tmp_path):
+    root = bundle(tmp_path)
+    data = json.loads((root / "baseline-cache.json").read_text())
+    assert data["nightly"]["fresh_protocol"] == PROTOCOL
+    validate(root)
+    data["nightly"]["fresh_protocol"] = "ascend950-adaptive-ffts-v4"
+    (root / "baseline-cache.json").write_text(json.dumps(data))
+    seal(root)
+    with pytest.raises(AssertionError):
+        validate(root)
