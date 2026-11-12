@@ -177,7 +177,9 @@ def v4_bundle(tmp_path):
     for name, value in [("meta", meta), ("measurements", rows)]:
         (root / f"{name}.json").write_text(json.dumps(value))
     base = json.loads((root / "baseline-before.json").read_text())
-    cache = build_cache(base, rows, meta["commit"], meta["date"])
+    cache = build_cache(
+        base, rows, meta["commit"], meta["date"], fresh_protocol=meta["measurement_protocol"]
+    )
     (root / "baseline-cache.json").write_text(json.dumps(cache))
     seal(root)
     validate(root)
@@ -211,3 +213,50 @@ def test_v4_guard_provenance_preserves_original_measurement_run(tmp_path, fault)
     else:
         with pytest.raises(AssertionError):
             validate(root)
+
+
+def test_legacy_snapshot_protocol_is_not_rewritten_as_adaptive(tmp_path):
+    root = bundle(tmp_path)
+    data = json.loads((root / "baseline-cache.json").read_text())
+    assert data["nightly"]["fresh_protocol"] == PROTOCOL
+    validate(root)
+    data["nightly"]["fresh_protocol"] = "ascend950-adaptive-ffts-v4"
+    (root / "baseline-cache.json").write_text(json.dumps(data))
+    seal(root)
+    with pytest.raises(AssertionError):
+        validate(root)
+
+
+def test_legacy_all_join_replays_original_alias_scope():
+    from nightly_snapshot import ADAPTIVE_PROTOCOL
+
+    base = dict(
+        baseline_release="frozen",
+        rows=[
+            dict(
+                op="AllFwdOp",
+                case="bool",
+                library="torch",
+                workload=dict(params={"x": [4]}),
+                latency_us=3,
+            )
+        ],
+        tileops_rows=[],
+    )
+    rows = [
+        dict(
+            op="AllFwdOp",
+            case_id="bool",
+            params={"input": [4]},
+            workload=dict(params={"input": [4]}),
+            measurement=dict(latency_ms=0.001),
+        )
+    ]
+    old = build_cache(base, rows, "a" * 40, "date", use_v010_aliases=True, fresh_protocol=PROTOCOL)
+    assert "tileops_latency_us" not in old["rows"][0]
+    assert len(old["historical_tileops_rows"]) == 1
+    new = build_cache(
+        base, rows, "a" * 40, "date", use_v010_aliases=True, fresh_protocol=ADAPTIVE_PROTOCOL
+    )
+    assert new["rows"][0]["tileops_latency_us"] == 1
+    assert not new["historical_tileops_rows"]

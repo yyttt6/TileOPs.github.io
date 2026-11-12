@@ -28,10 +28,15 @@ def contract_params(op, params):
     return normalized
 
 
-def build_cache(base, measured, commit, date, *, use_v010_aliases=False):
+def build_cache(base, measured, commit, date, *, use_v010_aliases=False, fresh_protocol=PROTOCOL):
     if base.get("baseline_release"):
         return build_versioned_cache(
-            base, measured, commit, date, use_v010_aliases=use_v010_aliases
+            base,
+            measured,
+            commit,
+            date,
+            use_v010_aliases=use_v010_aliases,
+            fresh_protocol=fresh_protocol,
         )
     data = copy.deepcopy(base)
     fresh = {(r["op"], r["case_id"]): r for r in measured}
@@ -80,22 +85,32 @@ def build_cache(base, measured, commit, date, *, use_v010_aliases=False):
         date=date,
         fresh_cases=len(measured),
         native_baselines="Preserved original saved v2; not remeasured",
-        fresh_protocol=ADAPTIVE_PROTOCOL,
+        fresh_protocol=fresh_protocol,
         clock_policy="platform-default",
     )
     return data
 
 
-def build_versioned_cache(base, measured, commit, date, *, use_v010_aliases=False):
+def build_versioned_cache(
+    base, measured, commit, date, *, use_v010_aliases=False, fresh_protocol=PROTOCOL
+):
     """Update each measured contract separately; changed definitions never share ratios."""
     from baseline_contracts import comparison_identity
-    from baseline_release import contract, identity
+    from baseline_release import contract
 
     data = copy.deepcopy(base)
     assert len({(r["op"], r["case_id"]) for r in measured}) == len(measured)
+
+    def reviewed_identity(op, case, params):
+        # v3 publications predate the reviewed All x/input alias. Replay their
+        # original joins exactly; only adaptive publications use the new join.
+        if op == "AllFwdOp" and fresh_protocol == PROTOCOL:
+            return op, case, contract({"workload": {"params": params}})
+        return comparison_identity(op, case, params)
+
     fresh = {
         (
-            comparison_identity(r["op"], r["case_id"], r["params"])
+            reviewed_identity(r["op"], r["case_id"], r["params"])
             if use_v010_aliases
             else (r["op"], r["case_id"], contract({"workload": {"params": r["params"]}}))
         ): r
@@ -106,7 +121,11 @@ def build_versioned_cache(base, measured, commit, date, *, use_v010_aliases=Fals
     matched = set()
     for row in data["rows"] + data.get("historical_rows", []):
         key = row["op"], row["case"]
-        lookup = identity(row) if use_v010_aliases else (row["op"], row["case"], contract(row))
+        lookup = (
+            reviewed_identity(row["op"], row["case"], row["workload"]["params"])
+            if use_v010_aliases
+            else (row["op"], row["case"], contract(row))
+        )
         m = fresh.get(lookup)
         if m is None:
             continue
@@ -157,7 +176,7 @@ def build_versioned_cache(base, measured, commit, date, *, use_v010_aliases=Fals
         fresh_cases=len(measured),
         baseline_release=base["baseline_release"],
         native_baselines="Published measurements retained with their recorded protocols",
-        fresh_protocol=ADAPTIVE_PROTOCOL,
+        fresh_protocol=fresh_protocol,
         clock_policy="platform-default",
     )
     return data
@@ -245,6 +264,7 @@ def validate(path):
         meta["commit"],
         meta["date"],
         use_v010_aliases=version == "v010-reviewed-aliases-v1",
+        fresh_protocol=meta["measurement_protocol"],
     )
     assert expected == json.loads((path / "baseline-cache.json").read_text())
     return meta, []
