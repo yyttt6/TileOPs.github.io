@@ -31,6 +31,7 @@ def identity(commit):
         HERE / "nightly_device.py",
         HERE / "measured_correctness.py",
         HERE / "golden_cache.py",
+        HERE / "reference_cache_compat.py",
         HERE / "golden_cache_policy.json",
         *sorted((HERE / "nightly_support").rglob("*.py")),
     ]
