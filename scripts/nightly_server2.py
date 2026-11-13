@@ -31,6 +31,7 @@ def identity(commit):
         HERE / "nightly_device.py",
         HERE / "measured_correctness.py",
         HERE / "golden_cache.py",
+        HERE / "reference_cache_compat.py",
         HERE / "golden_cache_policy.json",
         *sorted((HERE / "nightly_support").rglob("*.py")),
     ]
@@ -317,7 +318,7 @@ def main():
         run_attempt=os.environ["GITHUB_RUN_ATTEMPT"],
         elapsed_seconds=time.monotonic() - start,
         source_branch="ascend950-v0.1.0",
-        contract_identity_version="v010-reviewed-aliases-v3",
+        contract_identity_version="v010-reviewed-aliases-v4",
         selection_scope=a.operators,
         registered_operators=len(selection["operators"]),
         inherited_snapshot=None
