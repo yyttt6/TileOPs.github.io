@@ -66,9 +66,35 @@ def test_representative_saved_contract_for_every_affected_operator():
     import json
     from pathlib import Path
 
-    examples = json.loads((Path(__file__).parent / 'fixtures/v010_metadata_alias_cases.json').read_text())
+    examples = json.loads(
+        (Path(__file__).parent / "fixtures/v010_metadata_alias_cases.json").read_text()
+    )
     assert len(examples) == 44
     for sample in examples:
-        old = identity(sample['old_op'], sample['case'], sample['old_params'])
-        assert old == identity(sample['op'], sample['case'], sample['new_params'])
-        assert old != identity(sample['op'], sample['case'] + '-different', sample['new_params'])
+        old = identity(sample["old_op"], sample["case"], sample["old_params"])
+        assert old == identity(sample["op"], sample["case"], sample["new_params"])
+        assert old != identity(sample["op"], sample["case"] + "-different", sample["new_params"])
+
+
+@pytest.mark.parametrize(
+    "queries,length,top_k", [(1, 16384, 2048), (32768, 65536, 1024), (32768, 65536, 2048)]
+)
+def test_topk_select_saved_names_keep_tensor_roles(queries, length, top_k):
+    old = {
+        "index_score": [[1, queries, length, 1], "float32"],
+        "starts": [[1, queries], "int32"],
+        "ends": [[1, queries], "int32"],
+        "indexes": [[1, queries, 1, top_k], "int32"],
+        "topk": top_k,
+    }
+    new = {**old, "logits": old["index_score"], "indices": old["indexes"], "top_k": old["topk"]}
+    for name in ["index_score", "indexes", "topk"]:
+        del new[name]
+    k = identity("TopKSelectFwdOp", "case", old)
+    assert k == identity("TopKSelectFwdOp", "case", new)
+    assert k != identity("TopKSelectFwdOp", "case", {**new, "top_k": top_k - 1})
+    assert k != identity(
+        "TopKSelectFwdOp", "case", {**new, "indices": [[1, queries, top_k, 1], "int32"]}
+    )
+    with pytest.raises(ValueError, match="Ambiguous"):
+        identity("TopKSelectFwdOp", "case", {**new, "index_score": new["logits"]})
