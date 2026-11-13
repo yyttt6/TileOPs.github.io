@@ -1,0 +1,3312 @@
+[
+  {
+    "op": "AmaxFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "AmaxFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "AminFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "AminFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "AnyFwdOp",
+    "case": "mask-validation-4k-bool",
+    "old_op": "AnyFwdOp",
+    "old_params": {
+      "x": [
+        [
+          32,
+          4096
+        ],
+        "bool"
+      ],
+      "output": [
+        [
+          32
+        ],
+        "bool"
+      ],
+      "dim": -1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          32,
+          4096
+        ],
+        "bool"
+      ],
+      "output": [
+        [
+          32
+        ],
+        "bool"
+      ],
+      "dim": -1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "ArgmaxFwdOp",
+    "case": "lm-head-float16",
+    "old_op": "ArgmaxFwdOp",
+    "old_params": {
+      "x": [
+        [
+          4,
+          102400
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          4
+        ],
+        "int64"
+      ],
+      "dim": -1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          4,
+          102400
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          4
+        ],
+        "int64"
+      ],
+      "dim": -1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "ArgminFwdOp",
+    "case": "lm-head-float16",
+    "old_op": "ArgminFwdOp",
+    "old_params": {
+      "x": [
+        [
+          4,
+          102400
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          4
+        ],
+        "int64"
+      ],
+      "dim": -1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          4,
+          102400
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          4
+        ],
+        "int64"
+      ],
+      "dim": -1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "CountNonzeroFwdOp",
+    "case": "sparsity-hidden-float16",
+    "old_op": "CountNonzeroFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "int64"
+      ],
+      "dim": -1
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "int64"
+      ],
+      "dim": -1
+    }
+  },
+  {
+    "op": "DeltaNetChunkFwdOp",
+    "case": "train-2k-float16",
+    "old_op": "DeltaNetChunkFwdOp",
+    "old_params": {
+      "q": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "beta": [
+        [
+          2,
+          4,
+          2048
+        ],
+        "float16"
+      ],
+      "o": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "S": [
+        [
+          2,
+          4,
+          33,
+          64,
+          64
+        ],
+        "float32"
+      ],
+      "Aw": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "Au": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "w": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "u": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "chunk_size": 64
+    },
+    "new_params": {
+      "q": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "beta": [
+        [
+          2,
+          4,
+          2048
+        ],
+        "float16"
+      ],
+      "o": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "h": [
+        [
+          2,
+          4,
+          33,
+          64,
+          64
+        ],
+        "float32"
+      ],
+      "Aw": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "Au": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "w": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "u": [
+        [
+          2,
+          4,
+          2048,
+          64
+        ],
+        "float16"
+      ],
+      "chunk_size": 64
+    }
+  },
+  {
+    "op": "DeltaNetFwdOp",
+    "case": "prefill-2k-bfloat16",
+    "old_op": "DeltaNetFwdOp",
+    "old_params": {
+      "q": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "beta": [
+        [
+          2,
+          2048,
+          4
+        ],
+        "bfloat16"
+      ],
+      "o": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "final_state": [
+        [
+          2,
+          4,
+          64,
+          64
+        ],
+        "float32"
+      ],
+      "scale": null,
+      "use_qk_l2norm_in_kernel": false
+    },
+    "new_params": {
+      "q": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "beta": [
+        [
+          2,
+          2048,
+          4
+        ],
+        "bfloat16"
+      ],
+      "o": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "final_state": [
+        [
+          2,
+          4,
+          64,
+          64
+        ],
+        "float32"
+      ],
+      "scale": null,
+      "use_qk_l2norm_in_kernel": false,
+      "validate_inputs": false
+    }
+  },
+  {
+    "op": "ELUFwdOp",
+    "case": "mlp-hidden-float16",
+    "old_op": "EluFwdOp",
+    "old_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "alpha": 1.0,
+      "inplace": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "alpha": 1.0,
+      "inplace": false
+    }
+  },
+  {
+    "op": "EngramDecodeFwdOp",
+    "case": "serving-b1-float16",
+    "old_op": "EngramDecodeFwdOp",
+    "old_params": {
+      "e_t": [
+        [
+          1,
+          512
+        ],
+        "float16"
+      ],
+      "h_t": [
+        [
+          1,
+          256
+        ],
+        "float16"
+      ],
+      "conv_state": [
+        [
+          1,
+          12,
+          256
+        ],
+        "float16"
+      ],
+      "W_K": [
+        [
+          512,
+          256
+        ],
+        "float16"
+      ],
+      "W_V": [
+        [
+          512,
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_h": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_v": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "conv_w": [
+        [
+          4,
+          256
+        ],
+        "float16"
+      ],
+      "y_t": [
+        [
+          1,
+          256
+        ],
+        "float16"
+      ],
+      "new_conv_state": [
+        [
+          1,
+          12,
+          256
+        ],
+        "float16"
+      ],
+      "batch": 1,
+      "d_mem": 512,
+      "d": 256,
+      "max_conv_len": 12,
+      "conv_kernel_size": 4,
+      "dilation": 3,
+      "eps": 1e-06
+    },
+    "new_params": {
+      "e_t": [
+        [
+          1,
+          512
+        ],
+        "float16"
+      ],
+      "h_t": [
+        [
+          1,
+          256
+        ],
+        "float16"
+      ],
+      "conv_state": [
+        [
+          1,
+          12,
+          256
+        ],
+        "float16"
+      ],
+      "W_K": [
+        [
+          512,
+          256
+        ],
+        "float16"
+      ],
+      "W_V": [
+        [
+          512,
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_h": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_v": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "conv_w": [
+        [
+          4,
+          256
+        ],
+        "float16"
+      ],
+      "y_t": [
+        [
+          1,
+          256
+        ],
+        "float16"
+      ],
+      "new_conv_state": [
+        [
+          1,
+          12,
+          256
+        ],
+        "float16"
+      ],
+      "max_conv_len": 12,
+      "conv_kernel_size": 4,
+      "dilation": 3,
+      "eps": 1e-06
+    }
+  },
+  {
+    "op": "EngramGateConvFwdOp",
+    "case": "train-s32-float16",
+    "old_op": "EngramGateConvFwdOp",
+    "old_params": {
+      "H": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_h": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_v": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "conv_w": [
+        [
+          4,
+          256
+        ],
+        "float16"
+      ],
+      "Y": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "vhat": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "alpha": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "rrms_h": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "rrms_k": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "rrms_v": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "M": 1,
+      "seq_len": 32,
+      "d": 256,
+      "eps": 1e-06
+    },
+    "new_params": {
+      "H": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_h": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "rms_w_v": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "conv_w": [
+        [
+          4,
+          256
+        ],
+        "float16"
+      ],
+      "Y": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "vhat": [
+        [
+          1,
+          32,
+          256
+        ],
+        "float16"
+      ],
+      "alpha": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "rrms_h": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "rrms_k": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "rrms_v": [
+        [
+          1,
+          32
+        ],
+        "float32"
+      ],
+      "eps": 1e-06
+    }
+  },
+  {
+    "op": "FusedAddRMSNormFwdOp",
+    "case": "llama-8b-prefill-float16",
+    "old_op": "FusedAddRMSNormFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "residual": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "residual_out": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "eps": 1e-06
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "residual": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "residual_out": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "eps": 1e-06
+    }
+  },
+  {
+    "op": "FusedAddRMSNormPerTokenQuantFwdOp",
+    "case": "llama-8b-prefill-bfloat16-float8_e4m3fn",
+    "old_op": "FusedAddRMSNormPerTokenQuantFwdOp",
+    "old_params": {
+      "x": [
+        [
+          4096,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "residual": [
+        [
+          4096,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "weight": [
+        [
+          4096
+        ],
+        "bfloat16"
+      ],
+      "q": [
+        [
+          4096,
+          4096
+        ],
+        "float8_e4m3fn"
+      ],
+      "scale": [
+        [
+          4096,
+          1
+        ],
+        "float32"
+      ],
+      "residual_out": [
+        [
+          4096,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "quant_dtype": "float8_e4m3fn",
+      "eps": 1e-06,
+      "scale_ub": null
+    },
+    "new_params": {
+      "input": [
+        [
+          4096,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "residual": [
+        [
+          4096,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "weight": [
+        [
+          4096
+        ],
+        "bfloat16"
+      ],
+      "q": [
+        [
+          4096,
+          4096
+        ],
+        "float8_e4m3fn"
+      ],
+      "scale": [
+        [
+          4096,
+          1
+        ],
+        "float32"
+      ],
+      "residual_out": [
+        [
+          4096,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "quant_dtype": "float8_e4m3fn",
+      "eps": 1e-06,
+      "scale_ub": null
+    }
+  },
+  {
+    "op": "GDNFwdOp",
+    "case": "prefill-4k-float16",
+    "old_op": "GDNFwdOp",
+    "old_params": {
+      "q": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "g": [
+        [
+          1,
+          4096,
+          16
+        ],
+        "float16"
+      ],
+      "beta": [
+        [
+          1,
+          4096,
+          16
+        ],
+        "float16"
+      ],
+      "o": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "final_state": [
+        [
+          1,
+          16,
+          128,
+          128
+        ],
+        "float32"
+      ],
+      "scale": null,
+      "use_qk_l2norm_in_kernel": false,
+      "use_beta_sigmoid_in_kernel": false,
+      "allow_neg_eigval": false,
+      "state_v_first": false,
+      "use_gate_in_kernel": false
+    },
+    "new_params": {
+      "q": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "g": [
+        [
+          1,
+          4096,
+          16
+        ],
+        "float16"
+      ],
+      "beta": [
+        [
+          1,
+          4096,
+          16
+        ],
+        "float16"
+      ],
+      "o": [
+        [
+          1,
+          4096,
+          16,
+          128
+        ],
+        "float16"
+      ],
+      "final_state": [
+        [
+          1,
+          16,
+          128,
+          128
+        ],
+        "float32"
+      ],
+      "scale": null,
+      "use_qk_l2norm_in_kernel": false,
+      "use_beta_sigmoid_in_kernel": false,
+      "allow_neg_eigval": false,
+      "state_v_first": false,
+      "use_gate_in_kernel": false,
+      "validate_inputs": false
+    }
+  },
+  {
+    "op": "GELUFwdOp",
+    "case": "llama-8b-ffn-prefill-float16",
+    "old_op": "GeluFwdOp",
+    "old_params": {
+      "input": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "approximate": "none"
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "approximate": "none"
+    }
+  },
+  {
+    "op": "GLAFwdOp",
+    "case": "prefill-2k-bfloat16",
+    "old_op": "GLAFwdOp",
+    "old_params": {
+      "q": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "g": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "o": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "final_state": [
+        [
+          2,
+          4,
+          64,
+          64
+        ],
+        "float32"
+      ],
+      "scale": null
+    },
+    "new_params": {
+      "q": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "g": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "o": [
+        [
+          2,
+          2048,
+          4,
+          64
+        ],
+        "bfloat16"
+      ],
+      "final_state": [
+        [
+          2,
+          4,
+          64,
+          64
+        ],
+        "float32"
+      ],
+      "scale": null,
+      "validate_inputs": false
+    }
+  },
+  {
+    "op": "GLARecurrentFwdOp",
+    "case": "serving-b1-h8-bfloat16",
+    "old_op": "GLARecurrentFwdOp",
+    "old_params": {
+      "q": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "gk": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "state": [
+        [
+          1,
+          8,
+          128,
+          128
+        ],
+        "bfloat16"
+      ],
+      "o": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "new_state": [
+        [
+          1,
+          8,
+          128,
+          128
+        ],
+        "bfloat16"
+      ],
+      "scale": 0.08838834764831845
+    },
+    "new_params": {
+      "q": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "g": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "state": [
+        [
+          1,
+          8,
+          128,
+          128
+        ],
+        "bfloat16"
+      ],
+      "o": [
+        [
+          1,
+          8,
+          128
+        ],
+        "bfloat16"
+      ],
+      "new_state": [
+        [
+          1,
+          8,
+          128,
+          128
+        ],
+        "bfloat16"
+      ],
+      "scale": 0.08838834764831845
+    }
+  },
+  {
+    "op": "GroupNormFwdOp",
+    "case": "image-float16",
+    "old_op": "GroupNormFwdOp",
+    "old_params": {
+      "x": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "num_groups": 32,
+      "eps": 1e-05
+    },
+    "new_params": {
+      "input": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "num_groups": 32,
+      "eps": 1e-05
+    }
+  },
+  {
+    "op": "INT8QuantPerTokenGroupFwdOp",
+    "case": "ds-v3-prefill-float16",
+    "old_op": "INT8QuantPerBlockFwdOp",
+    "old_params": {
+      "x": [
+        [
+          4096,
+          7168
+        ],
+        "float16"
+      ],
+      "q": [
+        [
+          4096,
+          7168
+        ],
+        "int8"
+      ],
+      "scale": [
+        [
+          4096,
+          56
+        ],
+        "float32"
+      ]
+    },
+    "new_params": {
+      "x": [
+        [
+          4096,
+          7168
+        ],
+        "float16"
+      ],
+      "q": [
+        [
+          4096,
+          7168
+        ],
+        "int8"
+      ],
+      "scale": [
+        [
+          4096,
+          56
+        ],
+        "float32"
+      ]
+    }
+  },
+  {
+    "op": "InstanceNormFwdOp",
+    "case": "image-affine-float16",
+    "old_op": "InstanceNormFwdOp",
+    "old_params": {
+      "x": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          128
+        ],
+        "float16"
+      ],
+      "bias": [
+        [
+          128
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "use_input_stats": true,
+      "momentum": 0.1,
+      "eps": 1e-05
+    },
+    "new_params": {
+      "input": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          128
+        ],
+        "float16"
+      ],
+      "bias": [
+        [
+          128
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          8,
+          128,
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "use_input_stats": true,
+      "momentum": 0.1,
+      "eps": 1e-05
+    }
+  },
+  {
+    "op": "KDAFwdOp",
+    "case": "kda-tp1-4x1024-bfloat16",
+    "old_op": "KDAFwdOp",
+    "old_params": {
+      "q": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "g": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "beta": [
+        [
+          1,
+          4096,
+          32
+        ],
+        "bfloat16"
+      ],
+      "cu_seqlens": [
+        [
+          5
+        ],
+        "int64"
+      ],
+      "cu_seqlens_cpu": [
+        [
+          5
+        ],
+        "int64"
+      ],
+      "o": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "final_state": [
+        [
+          4,
+          32,
+          128,
+          128
+        ],
+        "float32"
+      ],
+      "scale": null,
+      "use_qk_l2norm_in_kernel": true,
+      "use_beta_sigmoid_in_kernel": false,
+      "allow_neg_eigval": false,
+      "state_v_first": false,
+      "use_gate_in_kernel": false,
+      "lower_bound": null
+    },
+    "new_params": {
+      "q": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "v": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "g": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "beta": [
+        [
+          1,
+          4096,
+          32
+        ],
+        "bfloat16"
+      ],
+      "cu_seqlens": [
+        [
+          5
+        ],
+        "int64"
+      ],
+      "cu_seqlens_cpu": [
+        [
+          5
+        ],
+        "int64"
+      ],
+      "o": [
+        [
+          1,
+          4096,
+          32,
+          128
+        ],
+        "bfloat16"
+      ],
+      "final_state": [
+        [
+          4,
+          32,
+          128,
+          128
+        ],
+        "float32"
+      ],
+      "scale": null,
+      "use_qk_l2norm_in_kernel": true,
+      "use_beta_sigmoid_in_kernel": false,
+      "allow_neg_eigval": false,
+      "state_v_first": false,
+      "use_gate_in_kernel": false,
+      "lower_bound": null,
+      "validate_inputs": false
+    }
+  },
+  {
+    "op": "LayerNormFwdOp",
+    "case": "llama-8b-prefill-float16",
+    "old_op": "LayerNormFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          4096
+        ],
+        "float16"
+      ],
+      "bias": [
+        [
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "normalized_shape": [
+        4096
+      ],
+      "eps": 1e-05
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          4096
+        ],
+        "float16"
+      ],
+      "bias": [
+        [
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "normalized_shape": [
+        4096
+      ],
+      "eps": 1e-05
+    }
+  },
+  {
+    "op": "LeakyReLUFwdOp",
+    "case": "gan-feat-float16",
+    "old_op": "LeakyReluFwdOp",
+    "old_params": {
+      "input": [
+        [
+          16,
+          256,
+          64,
+          64
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          16,
+          256,
+          64,
+          64
+        ],
+        "float16"
+      ],
+      "negative_slope": 0.01,
+      "inplace": false
+    },
+    "new_params": {
+      "input": [
+        [
+          16,
+          256,
+          64,
+          64
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          16,
+          256,
+          64,
+          64
+        ],
+        "float16"
+      ],
+      "negative_slope": 0.01,
+      "inplace": false
+    }
+  },
+  {
+    "op": "LogSoftmaxFwdOp",
+    "case": "attn-weights-4k-float16",
+    "old_op": "LogSoftmaxFwdOp",
+    "old_params": {
+      "x": [
+        [
+          32,
+          32,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          32,
+          32,
+          4096
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "dtype": null
+    },
+    "new_params": {
+      "input": [
+        [
+          32,
+          32,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          32,
+          32,
+          4096
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "dtype": null
+    }
+  },
+  {
+    "op": "LogSumExpFwdOp",
+    "case": "attn-weights-4k-float16",
+    "old_op": "LogSumExpFwdOp",
+    "old_params": {
+      "x": [
+        [
+          32,
+          32,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          32,
+          32,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          32,
+          32
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "MeanFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "MeanFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false,
+      "dtype": null
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false,
+      "dtype": null
+    }
+  },
+  {
+    "op": "MeanPoolingFwdOp",
+    "case": "ragged-even-float16-float32",
+    "old_op": "MeanPoolingFwdOp",
+    "old_params": {
+      "x": [
+        [
+          1,
+          8192,
+          64,
+          128
+        ],
+        "float16"
+      ],
+      "offsets": [
+        [
+          5
+        ],
+        "int32"
+      ],
+      "indices": [
+        [
+          128,
+          2
+        ],
+        "int32"
+      ],
+      "output": [
+        [
+          1,
+          128,
+          64,
+          128
+        ],
+        "float16"
+      ],
+      "chunk_size": 64,
+      "accum_dtype": "float32",
+      "validate_inputs": false
+    },
+    "new_params": {
+      "x": [
+        [
+          1,
+          8192,
+          64,
+          128
+        ],
+        "float16"
+      ],
+      "cu_seqlens": [
+        [
+          5
+        ],
+        "int32"
+      ],
+      "chunk_indices": [
+        [
+          128,
+          2
+        ],
+        "int32"
+      ],
+      "output": [
+        [
+          1,
+          128,
+          64,
+          128
+        ],
+        "float16"
+      ],
+      "chunk_size": 64,
+      "accum_dtype": "float32",
+      "validate_inputs": false
+    }
+  },
+  {
+    "op": "NSATopKVarlenFwdOp",
+    "case": "prefill-8x1k-float16",
+    "old_op": "NSATopKVarlenFwdOp",
+    "old_params": {
+      "q": [
+        [
+          8192,
+          32,
+          128
+        ],
+        "float16"
+      ],
+      "k_cmp": [
+        [
+          256,
+          2,
+          128
+        ],
+        "float16"
+      ],
+      "offsets": [
+        [
+          9
+        ],
+        "int32"
+      ],
+      "chunk_offsets": [
+        [
+          9
+        ],
+        "int32"
+      ],
+      "token_indices": [
+        [
+          8192,
+          2
+        ],
+        "int32"
+      ],
+      "block_indices": [
+        [
+          8192,
+          2,
+          16
+        ],
+        "int32"
+      ],
+      "scale": 1.0,
+      "selected_block_num": 16,
+      "bs": 32
+    },
+    "new_params": {
+      "q": [
+        [
+          8192,
+          32,
+          128
+        ],
+        "float16"
+      ],
+      "k_cmp": [
+        [
+          256,
+          2,
+          128
+        ],
+        "float16"
+      ],
+      "cu_seqlens": [
+        [
+          9
+        ],
+        "int32"
+      ],
+      "chunk_offsets": [
+        [
+          9
+        ],
+        "int32"
+      ],
+      "token_indices": [
+        [
+          8192,
+          2
+        ],
+        "int32"
+      ],
+      "block_indices": [
+        [
+          8192,
+          2,
+          16
+        ],
+        "int32"
+      ],
+      "selected_block_num": 16,
+      "block_size": 32,
+      "sm_scale": 1.0,
+      "validate_inputs": false
+    }
+  },
+  {
+    "op": "NSAVarlenFwdOp",
+    "case": "prefill-4x2k-float16",
+    "old_op": "NSAVarlenFwdOp",
+    "old_params": {
+      "q": [
+        [
+          8192,
+          16,
+          64
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          8192,
+          1,
+          64
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          8192,
+          1,
+          64
+        ],
+        "float16"
+      ],
+      "block_indices": [
+        [
+          8192,
+          1,
+          1
+        ],
+        "int32"
+      ],
+      "block_counts": [
+        [
+          8192,
+          1
+        ],
+        "int32"
+      ],
+      "offsets": [
+        [
+          5
+        ],
+        "int32"
+      ],
+      "token_indices": [
+        [
+          8192,
+          2
+        ],
+        "int32"
+      ],
+      "o_slc": [
+        [
+          8192,
+          16,
+          64
+        ],
+        "float16"
+      ],
+      "is_causal": true,
+      "scale": 0.1,
+      "block_size": 32
+    },
+    "new_params": {
+      "q": [
+        [
+          8192,
+          16,
+          64
+        ],
+        "float16"
+      ],
+      "k": [
+        [
+          8192,
+          1,
+          64
+        ],
+        "float16"
+      ],
+      "v": [
+        [
+          8192,
+          1,
+          64
+        ],
+        "float16"
+      ],
+      "block_indices": [
+        [
+          8192,
+          1,
+          1
+        ],
+        "int32"
+      ],
+      "block_counts": [
+        [
+          8192,
+          1
+        ],
+        "int32"
+      ],
+      "cu_seqlens": [
+        [
+          5
+        ],
+        "int32"
+      ],
+      "token_indices": [
+        [
+          8192,
+          2
+        ],
+        "int32"
+      ],
+      "o": [
+        [
+          8192,
+          16,
+          64
+        ],
+        "float16"
+      ],
+      "block_size": 32,
+      "sm_scale": 0.1,
+      "is_causal": true,
+      "validate_inputs": false
+    }
+  },
+  {
+    "op": "PReLUFwdOp",
+    "case": "cnn-feat-float16",
+    "old_op": "PreluFwdOp",
+    "old_params": {
+      "input": [
+        [
+          16,
+          256,
+          56,
+          56
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          16,
+          256,
+          56,
+          56
+        ],
+        "float16"
+      ]
+    },
+    "new_params": {
+      "input": [
+        [
+          16,
+          256,
+          56,
+          56
+        ],
+        "float16"
+      ],
+      "weight": [
+        [
+          256
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          16,
+          256,
+          56,
+          56
+        ],
+        "float16"
+      ]
+    }
+  },
+  {
+    "op": "ProdFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "ProdFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false,
+      "dtype": null
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false,
+      "dtype": null
+    }
+  },
+  {
+    "op": "SELUFwdOp",
+    "case": "snn-fc-float16",
+    "old_op": "SeluFwdOp",
+    "old_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "inplace": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "inplace": false
+    }
+  },
+  {
+    "op": "SSDChunkCouplingFwdOp",
+    "case": "mamba2-780m-float16",
+    "old_op": "SSDChunkCouplingFwdOp",
+    "old_params": {
+      "C_mat": [
+        [
+          1,
+          4096,
+          1,
+          128
+        ],
+        "float16"
+      ],
+      "B_mat": [
+        [
+          1,
+          4096,
+          1,
+          128
+        ],
+        "float16"
+      ],
+      "cb": [
+        [
+          1,
+          16,
+          1,
+          256,
+          256
+        ],
+        "float16"
+      ],
+      "chunk_len": 256
+    },
+    "new_params": {
+      "C": [
+        [
+          1,
+          4096,
+          1,
+          128
+        ],
+        "float16"
+      ],
+      "B": [
+        [
+          1,
+          4096,
+          1,
+          128
+        ],
+        "float16"
+      ],
+      "cb": [
+        [
+          1,
+          16,
+          1,
+          256,
+          256
+        ],
+        "float16"
+      ],
+      "chunk_size": 256
+    }
+  },
+  {
+    "op": "SSDChunkCumsumFwdOp",
+    "case": "mamba2-780m-float16",
+    "old_op": "SSDChunkCumsumFwdOp",
+    "old_params": {
+      "dt": [
+        [
+          1,
+          4096,
+          48
+        ],
+        "float32"
+      ],
+      "A": [
+        [
+          48
+        ],
+        "float32"
+      ],
+      "dt_out": [
+        [
+          1,
+          48,
+          16,
+          256
+        ],
+        "float16"
+      ],
+      "dA_cumsum": [
+        [
+          1,
+          48,
+          16,
+          256
+        ],
+        "float32"
+      ],
+      "chunk_len": 256,
+      "out_dtype": "float16",
+      "dt_softplus": true,
+      "dt_min": 0.0,
+      "dt_max": "Infinity"
+    },
+    "new_params": {
+      "dt": [
+        [
+          1,
+          4096,
+          48
+        ],
+        "float32"
+      ],
+      "A": [
+        [
+          48
+        ],
+        "float32"
+      ],
+      "dt_out": [
+        [
+          1,
+          48,
+          16,
+          256
+        ],
+        "float16"
+      ],
+      "dA_cumsum": [
+        [
+          1,
+          48,
+          16,
+          256
+        ],
+        "float32"
+      ],
+      "chunk_size": 256,
+      "out_dtype": "float16",
+      "dt_softplus": true,
+      "dt_min": 0.0,
+      "dt_max": "Infinity"
+    }
+  },
+  {
+    "op": "SelectiveScanFwdOp",
+    "case": "mamba-2.8b-prefill-bfloat16",
+    "old_op": "SelectiveScanFwdOp",
+    "old_params": {
+      "u": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "delta": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "A": [
+        [
+          5120,
+          16
+        ],
+        "float32"
+      ],
+      "B_in": [
+        [
+          1,
+          1,
+          16,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "C_in": [
+        [
+          1,
+          1,
+          16,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "D_in": [
+        [
+          5120
+        ],
+        "float32"
+      ],
+      "z": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "delta_bias": [
+        [
+          5120
+        ],
+        "float32"
+      ],
+      "y": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "final_states": [
+        [
+          1,
+          5120,
+          16
+        ],
+        "float32"
+      ],
+      "delta_softplus": true
+    },
+    "new_params": {
+      "u": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "delta": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "A": [
+        [
+          5120,
+          16
+        ],
+        "float32"
+      ],
+      "B": [
+        [
+          1,
+          1,
+          16,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "C": [
+        [
+          1,
+          1,
+          16,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "D": [
+        [
+          5120
+        ],
+        "float32"
+      ],
+      "z": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "delta_bias": [
+        [
+          5120
+        ],
+        "float32"
+      ],
+      "y": [
+        [
+          1,
+          5120,
+          4096
+        ],
+        "bfloat16"
+      ],
+      "final_states": [
+        [
+          1,
+          5120,
+          16
+        ],
+        "float32"
+      ],
+      "delta_softplus": true
+    }
+  },
+  {
+    "op": "SiLUAndMulFwdOp",
+    "case": "llama-8b-ffn-prefill-float16",
+    "old_op": "SiluAndMulFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          28672
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ]
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          28672
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ]
+    }
+  },
+  {
+    "op": "SiLUFwdOp",
+    "case": "llama-8b-ffn-prefill-float16",
+    "old_op": "SiluFwdOp",
+    "old_params": {
+      "input": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "inplace": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048,
+          14336
+        ],
+        "float16"
+      ],
+      "inplace": false
+    }
+  },
+  {
+    "op": "StdFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "StdFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "correction": 1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "correction": 1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "SumFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "SumFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false,
+      "dtype": null
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "keepdim": false,
+      "dtype": null
+    }
+  },
+  {
+    "op": "TopKMaskFwdOp",
+    "case": "llama-8b-b1-bfloat16",
+    "old_op": "TopKMaskFwdOp",
+    "old_params": {
+      "logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          1
+        ],
+        "int32"
+      ],
+      "masked_logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ]
+    },
+    "new_params": {
+      "logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ],
+      "top_k": [
+        [
+          1
+        ],
+        "int32"
+      ],
+      "masked_logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ]
+    }
+  },
+  {
+    "op": "TopKTopPMaskFwdOp",
+    "case": "llama-8b-b1-bfloat16",
+    "old_op": "TopKTopPMaskFwdOp",
+    "old_params": {
+      "logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ],
+      "k": [
+        [
+          1
+        ],
+        "int32"
+      ],
+      "p": [
+        [
+          1
+        ],
+        "float32"
+      ],
+      "masked_logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ]
+    },
+    "new_params": {
+      "logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ],
+      "top_k": [
+        [
+          1
+        ],
+        "int32"
+      ],
+      "top_p": [
+        [
+          1
+        ],
+        "float32"
+      ],
+      "masked_logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ]
+    }
+  },
+  {
+    "op": "TopPMaskFwdOp",
+    "case": "llama-8b-b1-bfloat16",
+    "old_op": "TopPMaskFwdOp",
+    "old_params": {
+      "logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ],
+      "p": [
+        [
+          1
+        ],
+        "float32"
+      ],
+      "masked_logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ]
+    },
+    "new_params": {
+      "logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ],
+      "top_p": [
+        [
+          1
+        ],
+        "float32"
+      ],
+      "masked_logits": [
+        [
+          1,
+          128256
+        ],
+        "bfloat16"
+      ]
+    }
+  },
+  {
+    "op": "VarFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "VarFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "correction": 1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "output": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "correction": 1,
+      "keepdim": false
+    }
+  },
+  {
+    "op": "VarMeanFwdOp",
+    "case": "hidden-state-float16",
+    "old_op": "VarMeanFwdOp",
+    "old_params": {
+      "x": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "var": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "mean": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "correction": 1,
+      "keepdim": false
+    },
+    "new_params": {
+      "input": [
+        [
+          2048,
+          4096
+        ],
+        "float16"
+      ],
+      "var": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "mean": [
+        [
+          2048
+        ],
+        "float16"
+      ],
+      "dim": -1,
+      "correction": 1,
+      "keepdim": false
+    }
+  }
+]

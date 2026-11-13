@@ -36,3 +36,26 @@ def test_partial_run_retains_history_and_exposes_failed_and_unfinished_ops(tmp_p
     report['passed_operators'] = 2
     with pytest.raises(AssertionError):
         render_progress(snapshot, out)
+
+
+def test_newer_full_run_supersedes_old_failure_but_keeps_historical_page(tmp_path):
+    report = dict(status='partial', termination='workflow_timeout', run_id='123',
+                  commit='a' * 40, started_at='2026-11-10T18:06:00+00:00',
+                  completed_operators=1, total_operators=1, passed_operators=0,
+                  failed_operators=1, remaining_operators=0, fresh_cases=0,
+                  operators=[dict(op='GDNFwdOp', status='failed', cases=2)])
+    data = dict(partial_nightly=report, full_nightly=dict(run_id='456',
+                date='2026-11-12T19:16:00+00:00', registered_operators=1, fresh_cases=2))
+    (tmp_path / 'index.md').write_text('# Benchmarks\n\n')
+    detail = tmp_path / 'linear-attention.md'
+    original = '# Linear Attention\n\n## GDNFwd\n\nCurrent timing.\n'
+    detail.write_text(original)
+    render_progress(data, tmp_path)
+    assert detail.read_text() == original
+    assert 'Latest full nightly' in (tmp_path / 'index.md').read_text()
+    assert '| GDNFwdOp | Failed |' in (tmp_path / 'partial-nightly.md').read_text()
+    # A partial run newer than the full run must still expose its failure.
+    report['started_at'] = '2026-11-13T18:06:00+00:00'
+    (tmp_path / 'index.md').write_text('# Benchmarks\n\n')
+    render_progress(data, tmp_path)
+    assert 'Failed in the partial nightly' in detail.read_text()

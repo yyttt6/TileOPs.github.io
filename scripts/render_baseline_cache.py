@@ -113,6 +113,13 @@ def render():
             data = merge_latest_release(data, json.loads(published_source.read_text()), release)
         else:
             data = merge_torch_release(data, json.loads(published_source.read_text()), release)
+    # Only validated full-snapshot metadata may supersede an older partial run.
+    # A newer partial measurement or timestamp alone is not proof of completion.
+    if official and (Path(official) / 'meta.json').exists():
+        meta = json.loads((Path(official) / 'meta.json').read_text())
+        if meta.get('status') == 'passed' and meta.get('selection_scope') == 'all':
+            data['full_nightly'] = {key: meta[key] for key in
+                                   ('run_id', 'date', 'fresh_cases', 'registered_operators')}
     rows = list(data['rows'])
     baseline_count = len(rows)
     baseline_cases = {(r['op'], r['case']) for r in rows}
