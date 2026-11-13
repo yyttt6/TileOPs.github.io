@@ -86,3 +86,35 @@ def test_new_gemm_measurement_updates_old_name_without_rewriting_baseline():
     assert result['rows'][0]['measurement_id'] == saved['measurement_id']
     assert result['tileops_rows'] == []
     assert base['rows'][0]['ratio'] is None
+
+
+def test_equivalent_historical_alias_cannot_override_newer_timing():
+    saved = row(64)
+    saved['op'] = 'GLARecurrentFwdOp'
+    saved['workload']['params'] = {'gk': [[1, 4, 64], 'float16']}
+    published = dict(rows=[saved], frozen_at='2026-11-10')
+    release = dict(count=1, measurements=[{k: saved[k] for k in
+                   ('library', 'op', 'case', 'measurement_id', 'protocol')}])
+    fresh = copy.deepcopy(saved)
+    fresh.update(tileops_latency_us=5, tileops_date='2026-11-12')
+    older = dict(op=saved['op'], case=saved['case'], workload={'params': {'g': [[1, 4, 64], 'float16']}},
+                 latency_us=7, date='2026-11-11')
+    official = dict(rows=[fresh], historical_tileops_rows=[older], frozen_at='2026-11-12')
+    result = merge_latest_release(official, published, release)
+    assert result['rows'][0]['tileops_latency_us'] == 5
+    assert result['rows'][0]['measurement_id'] == saved['measurement_id']
+
+
+def test_contract_mapping_version_preserves_replay_of_old_snapshot():
+    saved = row(64)
+    saved['op'] = 'GDNFwdOp'
+    base = dict(baseline_release='release', rows=[saved], frozen_at='old')
+    measured = dict(op='GDNFwdOp', case_id='same', params={'n': 64, 'validate_inputs': False},
+                    workload={'params': {'n': 64, 'validate_inputs': False}},
+                    measurement={'latency_ms': .005})
+    old = build_cache(base, [measured], 'a' * 40, 'new', use_v010_aliases=True,
+                      alias_version='v010-reviewed-aliases-v1')
+    new = build_cache(base, [measured], 'a' * 40, 'new', use_v010_aliases=True,
+                      alias_version='v010-reviewed-aliases-v2')
+    assert old['rows'][0]['tileops_latency_us'] is None
+    assert new['rows'][0]['tileops_latency_us'] == 5

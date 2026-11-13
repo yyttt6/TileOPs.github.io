@@ -28,7 +28,16 @@ def contract_params(op, params):
     return normalized
 
 
-def build_cache(base, measured, commit, date, *, use_v010_aliases=False, fresh_protocol=PROTOCOL):
+def build_cache(
+    base,
+    measured,
+    commit,
+    date,
+    *,
+    use_v010_aliases=False,
+    fresh_protocol=PROTOCOL,
+    alias_version="v010-reviewed-aliases-v2",
+):
     if base.get("baseline_release"):
         return build_versioned_cache(
             base,
@@ -37,6 +46,7 @@ def build_cache(base, measured, commit, date, *, use_v010_aliases=False, fresh_p
             date,
             use_v010_aliases=use_v010_aliases,
             fresh_protocol=fresh_protocol,
+            alias_version=alias_version,
         )
     data = copy.deepcopy(base)
     fresh = {(r["op"], r["case_id"]): r for r in measured}
@@ -92,10 +102,21 @@ def build_cache(base, measured, commit, date, *, use_v010_aliases=False, fresh_p
 
 
 def build_versioned_cache(
-    base, measured, commit, date, *, use_v010_aliases=False, fresh_protocol=PROTOCOL
+    base,
+    measured,
+    commit,
+    date,
+    *,
+    use_v010_aliases=False,
+    fresh_protocol=PROTOCOL,
+    alias_version="v010-reviewed-aliases-v2",
 ):
     """Update each measured contract separately; changed definitions never share ratios."""
-    from baseline_contracts import comparison_identity
+    if alias_version == "v010-reviewed-aliases-v1":
+        from baseline_contracts_v1 import comparison_identity
+    else:
+        assert alias_version == "v010-reviewed-aliases-v2"
+        from baseline_contracts import comparison_identity
     from baseline_release import contract
 
     data = copy.deepcopy(base)
@@ -257,13 +278,14 @@ def validate(path):
         )
     base = json.loads((path / "baseline-before.json").read_text())
     version = meta.get("contract_identity_version")
-    assert version in (None, "v010-reviewed-aliases-v1")
+    assert version in (None, "v010-reviewed-aliases-v1", "v010-reviewed-aliases-v2")
     expected = build_cache(
         base,
         measured,
         meta["commit"],
         meta["date"],
-        use_v010_aliases=version == "v010-reviewed-aliases-v1",
+        use_v010_aliases=version is not None,
+        alias_version=version or "v010-reviewed-aliases-v1",
         fresh_protocol=meta["measurement_protocol"],
     )
     assert expected == json.loads((path / "baseline-cache.json").read_text())

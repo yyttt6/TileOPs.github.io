@@ -30,9 +30,19 @@ def render_progress(data, out):
                'Failed and unfinished operators retain historical results, where available; '
                'those results do not establish a pass in this run. '
                '[Operator status](partial-nightly.md).\n\n')
+    full = data.get('full_nightly')
+    superseded = bool(full and datetime.fromisoformat(full['date']) >
+                      datetime.fromisoformat(report['started_at']))
     index = out / 'index.md'
     text = index.read_text()
-    index.write_text(text.replace('# Benchmarks\n\n', '# Benchmarks\n\n' + summary, 1))
+    if superseded:
+        current = (f"**Latest full nightly: {full['registered_operators']} operators · "
+                   f"{full['fresh_cases']} verified workloads · passed.** "
+                   f"[Run](https://github.com/yyttt6/TileOPs.github.io/actions/runs/{full['run_id']}). "
+                   "The older partial run is retained as [historical evidence](partial-nightly.md).\n\n")
+    else:
+        current = summary
+    index.write_text(text.replace('# Benchmarks\n\n', '# Benchmarks\n\n' + current, 1))
     labels = {'passed': 'Passed', 'failed': 'Failed', 'not_completed': 'Not completed'}
     page = ['# Partial nightly results\n\n', summary,
             f'[Original nightly run]({link}) · source `{report["commit"]}`.\n\n',
@@ -46,6 +56,8 @@ def render_progress(data, out):
         fresh = row['cases'] if row['status'] == 'passed' else 0
         page.append(f"| {row['op']} | {labels[row['status']]} | {row['cases']} | {fresh} |\n")
     (out / 'partial-nightly.md').write_text(''.join(page))
+    if superseded:
+        return  # Old failures must never annotate the latest successful full run.
     for path in out.glob('*.md'):
         if path.name in ('index.md', 'partial-nightly.md', 'method.md'):
             continue

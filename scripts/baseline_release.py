@@ -30,13 +30,24 @@ def merge_latest_release(official, published, release):
         row = actual[(item['library'], item['op'], item['case'])]
         assert all(row[k] == item[k] for k in ('measurement_id', 'protocol'))
     tiles = {}
+
+    def offer(row, candidate):
+        key = identity(row)
+        previous = tiles.get(key)
+        if previous is None or candidate.get('tileops_date', '') > previous.get('tileops_date', ''):
+            tiles[key] = candidate
+        elif candidate.get('tileops_date', '') == previous.get('tileops_date', ''):
+            assert candidate['tileops_latency_us'] == previous['tileops_latency_us'], (
+                'Conflicting TileOPs timings for the same contract and date'
+            )
+
     for row in official['rows'] + official.get('historical_rows', []):
         if row.get('tileops_latency_us') is not None:
-            tiles[identity(row)] = {k: v for k, v in row.items() if k.startswith('tileops_')}
+            offer(row, {k: v for k, v in row.items() if k.startswith('tileops_')})
     for tile in official.get('tileops_rows', []) + official.get('historical_tileops_rows', []):
-        tiles[identity(tile)] = {'tileops_' + k: v for k, v in tile.items()
-                                 if k in ('latency_us', 'samples', 'verified', 'protocol',
-                                          'measurement_id', 'commit', 'date')}
+        offer(tile, {'tileops_' + k: v for k, v in tile.items()
+                     if k in ('latency_us', 'samples', 'verified', 'protocol',
+                              'measurement_id', 'commit', 'date')})
     for row in data['rows'] + data.get('historical_rows', []):
         candidate = tiles.get(identity(row))
         if candidate and (not row.get('tileops_date') or
@@ -48,7 +59,11 @@ def merge_latest_release(official, published, release):
     for row in official.get('tileops_rows', []):
         if (row['op'], row['case']) not in visible:
             extra[(row['op'], row['case'])] = row
-    data['tileops_rows'] = list(extra.values())
+    visible_contracts = {identity(row) for row in data['rows']}
+    # A renamed public op must not survive as a second baseline-less row after
+    # its measurement has been joined to the equivalent published contract.
+    data['tileops_rows'] = [row for row in extra.values()
+                           if identity(row) not in visible_contracts]
     data['historical_tileops_rows'] = official.get('historical_tileops_rows', [])
     if 'nightly' in official:
         data['nightly'] = official['nightly']
