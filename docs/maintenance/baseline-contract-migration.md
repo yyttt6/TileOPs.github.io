@@ -32,3 +32,13 @@ Only validated metadata with `status=passed` and `selection_scope=all` may mark 
 full nightly as current. An older partial run remains on its historical page;
 its failures must not annotate the latest successful operator tables. A newer
 partial run still exposes its failures.
+
+## TopKSelect follow-up (PR81)
+
+Three previously unregistered TopKSelect cases use `logits`, `indices`, and
+`top_k` where the saved baseline records use `index_score`, `indexes`, and
+`topk`. The input, per-row start/end bounds, output [B,S,G,K] layout and dtypes
+are unchanged. The v3 mapping adds only these explicit argument aliases.
+`baseline_contracts_v2.py` preserves the complete previous mapper for sealed v2
+snapshot replay; new snapshots declare v3. Existing PR measurements can be
+compared offline without restarting their device jobs.

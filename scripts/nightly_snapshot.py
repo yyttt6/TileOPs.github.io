@@ -36,7 +36,7 @@ def build_cache(
     *,
     use_v010_aliases=False,
     fresh_protocol=PROTOCOL,
-    alias_version="v010-reviewed-aliases-v2",
+    alias_version="v010-reviewed-aliases-v3",
 ):
     if base.get("baseline_release"):
         return build_versioned_cache(
@@ -109,13 +109,15 @@ def build_versioned_cache(
     *,
     use_v010_aliases=False,
     fresh_protocol=PROTOCOL,
-    alias_version="v010-reviewed-aliases-v2",
+    alias_version="v010-reviewed-aliases-v3",
 ):
     """Update each measured contract separately; changed definitions never share ratios."""
     if alias_version == "v010-reviewed-aliases-v1":
         from baseline_contracts_v1 import comparison_identity
+    elif alias_version == "v010-reviewed-aliases-v2":
+        from baseline_contracts_v2 import comparison_identity
     else:
-        assert alias_version == "v010-reviewed-aliases-v2"
+        assert alias_version == "v010-reviewed-aliases-v3"
         from baseline_contracts import comparison_identity
     from baseline_release import contract
 
@@ -278,7 +280,12 @@ def validate(path):
         )
     base = json.loads((path / "baseline-before.json").read_text())
     version = meta.get("contract_identity_version")
-    assert version in (None, "v010-reviewed-aliases-v1", "v010-reviewed-aliases-v2")
+    assert version in (
+        None,
+        "v010-reviewed-aliases-v1",
+        "v010-reviewed-aliases-v2",
+        "v010-reviewed-aliases-v3",
+    )
     expected = build_cache(
         base,
         measured,
