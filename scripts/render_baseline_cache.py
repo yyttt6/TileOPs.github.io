@@ -120,6 +120,13 @@ def render():
         if meta.get('status') == 'passed' and meta.get('selection_scope') == 'all':
             data['full_nightly'] = {key: meta[key] for key in
                                    ('run_id', 'date', 'fresh_cases', 'registered_operators')}
+    if any(row.get('requested_library') for row in data['rows']):
+        data.setdefault('publication_notes', []).append(
+            'Labels containing (via ...) identify the actual complete API provider; '
+            'they do not certify a native implementation of the requested library. '
+            'Recorded protocols and source environments are retained in the download; '
+            'these ratios are not a new paired same-environment closure.'
+        )
     rows = list(data['rows'])
     baseline_count = len(rows)
     baseline_cases = {(r['op'], r['case']) for r in rows}
