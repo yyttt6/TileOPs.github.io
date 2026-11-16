@@ -164,7 +164,18 @@ def render():
                          tileops_latency_us=tile['latency_us'], ratio=None))
     out = ROOT / 'docs/benchmarks'
     out.mkdir(parents=True, exist_ok=True)
-    (out / 'baseline-cache.json').write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n')
+    # Old official artifacts can carry infinity in workload parameters. Keep
+    # their meaning and IDs, but publish standard JSON; never normalize timing
+    # fields, whose finite-value validation above must still reject bad results.
+    for record in (data['rows'] + data.get('historical_rows', [])
+                   + data.get('tileops_rows', []) + data.get('historical_tileops_rows', [])):
+        if 'workload' in record:
+            record['workload'] = normalized_workload(record['workload'])
+        if 'baseline_evidence' in record:
+            record['baseline_evidence'] = normalized_workload(record['baseline_evidence'])
+    (out / 'baseline-cache.json').write_text(
+        json.dumps(data, ensure_ascii=False, separators=(',', ':'), allow_nan=False) + '\n'
+    )
     # This view reports cached baselines. The official matched-comparison renderer
     # retains its own admission rules; no synthetic TileOPs measurements are made.
     for path in out.glob('*.md'):
