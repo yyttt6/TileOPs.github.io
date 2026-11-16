@@ -52,3 +52,37 @@ def test_real_measurement_protocols_and_input_identity_are_retained(snapshot):
     assert sum(x["protocol"] == "ascend950-isolated-ffts-v3" for x in incoming) == 1198
     assert all(len(x["baseline_evidence"]["input_payload_sha256"]) == 64 for x in incoming)
     assert all(x["baseline_evidence"]["qualified_coverage_not_final_ratio"] for x in incoming)
+
+
+def test_renderer_normalizes_parameter_infinity_but_rejects_bad_latency(tmp_path, monkeypatch):
+    import render_baseline_cache as renderer
+
+    monkeypatch.setattr(renderer, "ROOT", tmp_path)
+    monkeypatch.delenv("ASCEND950_OFFICIAL_SNAPSHOT", raising=False)
+    folder = tmp_path / "data/baseline-cache"
+    folder.mkdir(parents=True)
+    row = dict(library="provider", op="ExampleOp", case="case", latency_us=10,
+               samples=15, ratio=None, tileops_latency_us=None,
+               workload=dict(family="mamba", params={"dt_max": float("inf")}))
+    saved = dict(frozen_at="2026-11-16", manifest_cases=1, rows=[row])
+    source = folder / "snapshot.json"
+    source.write_text(json.dumps(saved))
+    renderer.render()
+    output = tmp_path / "docs/benchmarks/baseline-cache.json"
+    text = output.read_text()
+    assert "Infinity" in text
+    assert json.loads(text, parse_constant=lambda value: pytest.fail(value))["rows"][0]["workload"]["params"]["dt_max"] == "Infinity"
+    saved["rows"][0]["latency_us"] = float("inf")
+    source.write_text(json.dumps(saved))
+    with pytest.raises(AssertionError):
+        renderer.render()
+
+
+def test_published_download_is_strict_json():
+    path = Path(__file__).parents[1] / "data/baseline-cache/snapshot.json"
+
+    def reject_non_json_constant(value):
+        raise ValueError(f"Non-JSON constant: {value}")
+
+    data = json.loads(path.read_text(), parse_constant=reject_non_json_constant)
+    assert data["baseline_release"] == "over3-refresh-20261116"
