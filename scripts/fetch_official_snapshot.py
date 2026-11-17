@@ -15,7 +15,10 @@ from ascend950_snapshot import validate
 REPO = "yyttt6/TileOPs.github.io"
 WORKFLOW = ".github/workflows/ascend950-nightly.yml"
 API = f"https://api.github.com/repos/{REPO}"
-LIMIT = 128 << 20
+DOWNLOAD_LIMIT = 128 << 20
+# Baseline history and raw samples compress well; bound their expanded size
+# separately from network traffic. The 2026-11-16 snapshot expands to 135 MiB.
+EXPANDED_LIMIT = 256 << 20
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -39,8 +42,8 @@ def request(url, binary=False):
         # The GitHub token must never accompany the signed blob URL.
         response = urllib.request.urlopen(location, timeout=60)
     with response:
-        data = response.read(LIMIT + 1)
-    if len(data) > LIMIT:
+        data = response.read(DOWNLOAD_LIMIT + 1)
+    if len(data) > DOWNLOAD_LIMIT:
         raise ValueError("Artifact exceeds the publication size limit")
     return data if binary else json.loads(data)
 
@@ -86,8 +89,9 @@ def fetch(output, run_id=None):
     archive = request(f"{API}/actions/artifacts/{selected[0]['id']}/zip", binary=True)
     output.mkdir(parents=True, exist_ok=False)
     with zipfile.ZipFile(io.BytesIO(archive)) as zipped:
-        if sum(i.file_size for i in zipped.infolist()) > LIMIT:
-            raise ValueError("Expanded snapshot exceeds size limit")
+        expanded_bytes = sum(i.file_size for i in zipped.infolist())
+        if expanded_bytes > EXPANDED_LIMIT:
+            raise ValueError(f"Expanded snapshot exceeds size limit: {expanded_bytes} > {EXPANDED_LIMIT} bytes")
         for info in zipped.infolist():
             target = output / info.filename
             if not target.resolve().is_relative_to(output.resolve()) or stat.S_ISLNK(info.external_attr >> 16):
