@@ -120,6 +120,16 @@ def render():
         if meta.get('status') == 'passed' and meta.get('selection_scope') == 'all':
             data['full_nightly'] = {key: meta[key] for key in
                                    ('run_id', 'date', 'fresh_cases', 'registered_operators')}
+            recovery = meta.get('recovery')
+            if recovery:
+                assert recovery['retained_cases'] + recovery['remeasured_cases'] == meta['fresh_cases']
+                assert str(recovery['original_run_id']) == str(meta['run_id'])
+                data['full_nightly']['recovery'] = recovery
+                data.setdefault('publication_notes', []).append(
+                    f"Recovered nightly {meta['run_id']}: {recovery['retained_cases']} results retained "
+                    f"from the original run and {recovery['remeasured_cases']} remeasured after "
+                    f"the IndexedExpert input fix. Details: {recovery['issue_url']}"
+                )
     if any(row.get('requested_library') for row in data['rows']):
         data.setdefault('publication_notes', []).append(
             'Labels containing (via ...) identify the actual complete API provider; '
