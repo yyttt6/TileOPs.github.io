@@ -99,13 +99,13 @@ def fetch(output, run_id=None):
         zipped.extractall(output)
     meta, _ = validate(output)
     if str(meta["run_id"]) != str(run_id):
-        verify_recovery_origin(meta)
+        verify_recovery_origin(meta, output)
     elif str(meta["run_attempt"]) != str(run["run_attempt"]):
         raise ValueError("Artifact run attempt mismatch")
     return True
 
 
-def verify_recovery_origin(meta):
+def verify_recovery_origin(meta, snapshot=None):
     """A recovered artifact must come from a trusted run with successful measurement."""
     original = str(meta["run_id"])
     attempt = str(meta["run_attempt"])
@@ -117,11 +117,45 @@ def verify_recovery_origin(meta):
             or run["event"] not in ("schedule", "workflow_dispatch")):
         raise ValueError("Untrusted recovery origin")
     jobs = request(f"{API}/actions/runs/{original}/attempts/{attempt}/jobs")
+    if meta.get("recovery"):
+        if snapshot is None:
+            raise ValueError("Recovery requires a validated snapshot")
+        verify_targeted_recovery(meta, snapshot, jobs["jobs"])
+        return
     if not any(j["name"] == "benchmark" and "ascend950-production" in j.get("labels", [])
                and any(s["name"] == "Prepare canonical isolated environment and measure"
                        and s["conclusion"] == "success" for s in j.get("steps", []))
                for j in jobs["jobs"]):
         raise ValueError("Recovered run did not complete device measurement")
+
+
+def verify_targeted_recovery(meta, snapshot, jobs):
+    """Verify a full recovery with separately guarded replacement measurements."""
+    recovery = meta["recovery"]
+    if (str(recovery["original_run_id"]) != str(meta["run_id"])
+            or recovery["repair_commit"] != meta["commit"]
+            or meta["selection_scope"] != "all"
+            or len(meta["operators"]) != meta["registered_operators"]):
+        raise ValueError("Targeted recovery identity mismatch")
+    if not any(job["name"] == "benchmark" and "ascend950-production" in job.get("labels", [])
+               and any(step["name"] == "Prepare canonical isolated environment and measure"
+                       and step["conclusion"] == "failure" for step in job.get("steps", []))
+               for job in jobs):
+        raise ValueError("Targeted recovery has no original measurement failure")
+    receipts = json.loads((snapshot / "receipts.json").read_text())
+    rows = json.loads((snapshot / "measurements.json").read_text())
+    op = recovery["remeasured_operator"]
+    replacement = [row for row in rows if row["op"] == op]
+    retained = [row for row in rows if row["op"] != op]
+    expected = (
+        (replacement, recovery["remeasured_cases"], recovery["repair_measurement_id"], recovery["repair_commit"]),
+        (retained, recovery["retained_cases"], str(meta["run_id"]), recovery["original_commit"]),
+    )
+    for group, count, run_id, commit in expected:
+        if (not group or len(group) != count
+                or any(row.get("measurement_origin") != {"run_id": run_id, "commit": commit}
+                       or str(receipts[row["op"]]["measurement_run_id"]) != run_id for row in group)):
+            raise ValueError("Targeted recovery has incomplete per-case provenance")
 
 
 def main():
