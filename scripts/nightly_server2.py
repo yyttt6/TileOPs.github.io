@@ -109,7 +109,7 @@ def main():
             "--wait",
             "1800",
             "--timeout",
-            "7200",
+            "14400",
             "--",
             sys.executable,
             str(HERE / "nightly_device.py"),
