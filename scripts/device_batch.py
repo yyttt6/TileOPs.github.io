@@ -47,7 +47,7 @@ def run(source, jobs, root, label, owner, *, timer="auto", case_plan=None):
         "--wait",
         "1800",
         "--timeout",
-        "7200",
+        "14400",
         "--receipt",
         str(receipt),
         "--",
