@@ -15,6 +15,7 @@ OLD_SOURCE = "f27a1471dfe7f6633f89f1eb9ebe43f9edf96f63885974f18cab3698d4173dd1"
 NEW_SOURCE = "98a9fdb9882b2ecb21ef2064b29f0158cf4cd159084f2a953d878264e2a17636"
 POST_ENGRAM_SOURCE = "7e6fb0b00fdc0b3147835492632741f59eca483aa1755dc6b165aeecc9ed7048"
 POST_FFT_SOURCE = "c35ec7df394ff20b4763908d7b5e01c0d520475ae3926f8f582492d860c60afb"
+POST_HADAMARD_SOURCE = "aa00ec1a9e506b8c1485cefe789d02eb20e36aa376697b2d4d3b44efad383723"
 UNCHANGED_OPERATORS = frozenset(
     [
         "BatchNormBwdOp",
@@ -101,16 +102,20 @@ def _with_overlay(source_digest):
 
 def reuse_unchanged_reference_identity(source, op, identity):
     """Reuse only unchanged independent references; never affected shared math."""
-    if (
-        op not in UNCHANGED_OPERATORS | PRIOR_SOURCE_OPERATORS
-        or identity.get("source_mode") != "independent-reference"
-    ):
+    if op not in UNCHANGED_OPERATORS | PRIOR_SOURCE_OPERATORS:
+        return identity
+    if identity.get("source_mode") != "independent-reference":
         return identity
     digest, mode = reference_source_digest(source)
     if mode != "independent-reference":
         return identity
     if identity.get("source") != _with_overlay(digest):
         return identity
+    # #138 only changes the measured kernel and dispatch. The CPU/NPU
+    # references, base matrices, inputs and verification contracts are identical.
+    if digest == POST_HADAMARD_SOURCE:
+        digest = POST_FFT_SOURCE
+        identity = dict(identity, source=_with_overlay(digest))
     if op in COMPATIBLE_OPERATORS.get(digest, ()):
         return dict(identity, source=_with_overlay(OLD_SOURCE))
     if digest == POST_FFT_SOURCE and op in PRIOR_SOURCE_OPERATORS:

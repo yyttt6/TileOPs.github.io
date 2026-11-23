@@ -28,3 +28,16 @@ def test_audited_post_merge_sources(monkeypatch):
         compat.reuse_unchanged_reference_identity(None, "GDNFwdOp", different_overlay)
         == different_overlay
     )
+
+
+def test_post_hadamard_reuses_each_previous_operator_identity(monkeypatch):
+    monkeypatch.setattr(compat, "_with_overlay", lambda digest: "overlay:" + digest)
+    for op in compat.UNCHANGED_OPERATORS | compat.PRIOR_SOURCE_OPERATORS:
+        identities = []
+        for digest in (compat.POST_FFT_SOURCE, compat.POST_HADAMARD_SOURCE):
+            monkeypatch.setattr(compat, "reference_source_digest",
+                                lambda _, digest=digest: (digest, "independent-reference"))
+            request = {"source": "overlay:" + digest, "source_mode": "independent-reference",
+                       "toolchain": "pinned", "adapter": "unchanged"}
+            identities.append(compat.reuse_unchanged_reference_identity(None, op, request))
+        assert identities[0] == identities[1], op
