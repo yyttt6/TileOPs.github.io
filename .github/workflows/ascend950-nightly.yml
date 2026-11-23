@@ -33,8 +33,12 @@ jobs:
   contracts:
     if: github.repository == 'yyttt6/TileOPs.github.io' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     outputs:
       source_commit: ${{ steps.source.outputs.commit }}
+      artifact_id: ${{ steps.upload-sources.outputs.artifact-id }}
       archive_digest: ${{ steps.package.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +66,11 @@ jobs:
         with:
           path: nightly-site-source
           persist-credentials: false
+      - name: Fetch the previous validated snapshot on the hosted runner
+        if: inputs.publish_snapshot_run_id == ''
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python nightly-site-source/scripts/fetch_official_snapshot.py --output "$RUNNER_TEMP/previous-snapshot"
       - name: Package the exact sources for the device runner
         id: package
         run: |
@@ -69,11 +78,17 @@ jobs:
           git archive --format=tar HEAD > "$RUNNER_TEMP/nightly-sources/tileops.tar"
           tar -rf "$RUNNER_TEMP/nightly-sources/tileops.tar" .git
           gzip "$RUNNER_TEMP/nightly-sources/tileops.tar"
-          git -C nightly-site-source archive --format=tar.gz HEAD > "$RUNNER_TEMP/nightly-sources/site.tar.gz"
+          site_tar="$RUNNER_TEMP/nightly-sources/site.tar"
+          git -C nightly-site-source archive --format=tar HEAD > "$site_tar"
+          if [[ -d "$RUNNER_TEMP/previous-snapshot" ]]; then
+            tar -rf "$site_tar" -C "$RUNNER_TEMP" previous-snapshot
+          fi
+          gzip "$site_tar"
           cd "$RUNNER_TEMP/nightly-sources"
           sha256sum tileops.tar.gz site.tar.gz > SHA256SUMS
           echo "digest=$(sha256sum SHA256SUMS | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - id: upload-sources
+        uses: actions/upload-artifact@v4
         with:
           name: nightly-sources
           path: ${{ runner.temp }}/nightly-sources
@@ -120,8 +135,27 @@ jobs:
               print(f'Nightly archive cache miss: {exc}')
           with open(os.environ['GITHUB_OUTPUT'],'a') as stream: stream.write(f'hit={str(hit).lower()}\n')
           PY
-      - uses: actions/download-artifact@v4
+      - name: Download source bundle by artifact ID with retries
+        id: download-sources
         if: steps.archive-cache.outputs.hit != 'true'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ needs.contracts.outputs.artifact_id }}
+          ARCHIVES: ${{ runner.temp }}/nightly-archives-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          [[ "$ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          mkdir -p "$ARCHIVES"
+          bundle=$(mktemp "$RUNNER_TEMP/nightly-sources.XXXXXX.zip")
+          trap 'rm -f "$bundle"' EXIT
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+            --retry 5 --retry-all-errors --retry-max-time 240 --connect-timeout 15 --max-time 120 \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" -o "$bundle"
+          unzip -oq "$bundle" SHA256SUMS site.tar.gz tileops.tar.gz -d "$ARCHIVES"
+      - uses: actions/download-artifact@v4
+        if: steps.download-sources.outcome == 'failure'
         with:
           name: nightly-sources
           path: ${{ runner.temp }}/nightly-archives-${{ github.run_id }}-${{ github.run_attempt }}
@@ -138,17 +172,20 @@ jobs:
           tar --no-same-owner -xzf tileops.tar.gz -C "$DESTINATION/measured-tileops"
           test "$(git -C "$DESTINATION/measured-tileops" rev-parse HEAD)" = '${{ needs.contracts.outputs.source_commit }}'
           test -z "$(git -C "$DESTINATION/measured-tileops" status --porcelain)"
+          if [[ -d "$DESTINATION/previous-snapshot" ]]; then
+            cd "$DESTINATION"
+            PYTHONPATH=scripts python3 - <<'PYTHON'
+          from pathlib import Path
+          from ascend950_snapshot import validate
+          meta, _ = validate(Path("previous-snapshot"))
+          print(f"Verified previous snapshot from run {meta['run_id']}")
+          PYTHON
+          fi
       - name: Cache verified nightly archives for retries
         continue-on-error: true
         working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           python3 scripts/nightly_source_cache.py --archives "$RUNNER_TEMP/nightly-archives-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" --cache-root /opt/tileops-ci/server2-20261030/cache/nightly-archives-v1 --digest '${{ needs.contracts.outputs.archive_digest }}'
-      - name: Preserve the previous validated snapshot as historical evidence
-        if: inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
-        working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: python3 scripts/fetch_official_snapshot.py --output previous-snapshot
       - name: Prepare canonical isolated environment and measure
         if: inputs.validate_sources_only != true && inputs.publish_snapshot_run_id == ''
         working-directory: ${{ runner.temp }}/nightly-v010-source-${{ github.run_id }}-${{ github.run_attempt }}

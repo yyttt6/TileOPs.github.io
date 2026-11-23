@@ -1,10 +1,13 @@
 """Fetch only the dedicated remote workflow's validated artifact for publication."""
 
 import argparse
+import http.client
 import io
 import json
 import os
+import ssl
 import stat
+import time
 import urllib.error
 import urllib.request
 import zipfile
@@ -27,6 +30,20 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def request(url, binary=False):
+    for attempt in range(6):
+        try:
+            return _request_once(url, binary)
+        except urllib.error.HTTPError as exc:
+            if exc.code not in (408, 429, 500, 502, 503, 504) or attempt == 5:
+                raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError, ssl.SSLEOFError, http.client.IncompleteRead) as exc:
+            if attempt == 5:
+                raise
+            print(f"Snapshot request interrupted ({type(exc).__name__}); retrying", flush=True)
+        time.sleep(min(2 ** attempt, 16))
+
+
+def _request_once(url, binary):
     headers = {"Accept": "application/vnd.github+json", "User-Agent": "TileOPs-official-publisher"}
     if token := os.environ.get("GITHUB_TOKEN"):
         headers["Authorization"] = f"Bearer {token}"
@@ -43,6 +60,9 @@ def request(url, binary=False):
         response = urllib.request.urlopen(location, timeout=60)
     with response:
         data = response.read(DOWNLOAD_LIMIT + 1)
+        length = response.headers.get("Content-Length") if hasattr(response, "headers") else None
+        if length and len(data) < min(int(length), DOWNLOAD_LIMIT + 1):
+            raise http.client.IncompleteRead(data, int(length) - len(data))
     if len(data) > DOWNLOAD_LIMIT:
         raise ValueError("Artifact exceeds the publication size limit")
     return data if binary else json.loads(data)
