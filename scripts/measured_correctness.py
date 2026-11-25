@@ -12,6 +12,7 @@ def measure_and_verify(
     warmup calls). Capture is just a Python reference assignment, never device work.
     The timer must synchronize before returning. Custom probes remain real executions.
     """
+    from workloads import numerics
     from workloads.numerics import (
         Custom,
         Request,
@@ -20,7 +21,6 @@ def measure_and_verify(
         _restore,
         _snapshot,
         _unique,
-        verify,
     )
 
     if impl.noncomparable_reason:
@@ -59,6 +59,8 @@ def measure_and_verify(
             produced = comparison_transform(produced)
         evidence = case.verification
         comparison = replace(evidence, probe=None) if isinstance(evidence, Custom) else evidence
+        verify = getattr(numerics, "_verify_with_input_snapshot", numerics.verify)
+        snapshot_args = {} if verify is numerics.verify else {"snapshot": (shared, pristine)}
         checks = verify(
             (
                 golden_cache.wrap(case.reference)
@@ -67,6 +69,7 @@ def measure_and_verify(
             ),
             inputs,
             evidence=comparison,
+            **snapshot_args,
             requests={"tileops": Request(lambda: produced, ())},
         )
         checked = checks["tileops"]
