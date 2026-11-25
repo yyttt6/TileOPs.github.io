@@ -15,4 +15,4 @@ def test_policy_and_identity():
     assert 'HERE / "golden_cache_policy.json"' in source
     workflow = (ROOT/'.github/workflows/ascend950-nightly.yml').read_text()
     assert 'ASCEND950_GOLDEN_CACHE_DIR=/opt/tileops-ci/golden-reference-v1' in workflow
-    assert 'ASCEND950_GOLDEN_CACHE_MAX_BYTES=274877906944' in workflow
+    assert 'ASCEND950_GOLDEN_CACHE_MAX_BYTES=292057776128' in workflow

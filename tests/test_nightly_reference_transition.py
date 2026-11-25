@@ -41,3 +41,17 @@ def test_post_hadamard_reuses_each_previous_operator_identity(monkeypatch):
                        "toolchain": "pinned", "adapter": "unchanged"}
             identities.append(compat.reuse_unchanged_reference_identity(None, op, request))
         assert identities[0] == identities[1], op
+
+
+def test_final21_reuses_only_the_audited_previous_entries(monkeypatch):
+    monkeypatch.setattr(compat, "_with_overlay", lambda digest: "overlay:" + digest)
+    def identity(op, digest):
+        monkeypatch.setattr(compat, "reference_source_digest", lambda _: (digest, "independent-reference"))
+        return compat.reuse_unchanged_reference_identity(None, op, {
+            "source_mode": "independent-reference", "source": "overlay:" + digest,
+        })["source"]
+
+    for op in compat.FINAL21_REUSE:
+        assert identity(op, compat.FINAL21_SOURCE) == identity(op, compat.POST_HADAMARD_SOURCE)
+    for op in ("GQAPagedFwdOp", "GQADenseFwdOp", "SharedExpertMLPFwdOp", "MLAPagedFwdOp"):
+        assert identity(op, compat.FINAL21_SOURCE) == "overlay:" + compat.FINAL21_SOURCE

@@ -16,6 +16,7 @@ NEW_SOURCE = "98a9fdb9882b2ecb21ef2064b29f0158cf4cd159084f2a953d878264e2a17636"
 POST_ENGRAM_SOURCE = "7e6fb0b00fdc0b3147835492632741f59eca483aa1755dc6b165aeecc9ed7048"
 POST_FFT_SOURCE = "c35ec7df394ff20b4763908d7b5e01c0d520475ae3926f8f582492d860c60afb"
 POST_HADAMARD_SOURCE = "aa00ec1a9e506b8c1485cefe789d02eb20e36aa376697b2d4d3b44efad383723"
+FINAL21_SOURCE = "3477cbacee3f1552dde479bc6e521a746a559fdf5a4480d19af8a93e0f6bd1f3"
 UNCHANGED_OPERATORS = frozenset(
     [
         "BatchNormBwdOp",
@@ -89,6 +90,43 @@ PRIOR_SOURCE_OPERATORS = frozenset(
 )
 
 
+# References already verified under the preceding release. Newly registered
+# operators and the previously registered entries retested in PR 139 have
+# current-identity caches. Only reuse the audited, unaffected remainder.
+FINAL21_REUSE = frozenset({
+    "BatchNormBwdOp",
+    "DeltaNetChunkBwdOp",
+    "DeltaNetChunkFwdOp",
+    "DeltaNetFwdOp",
+    "EngramGateConvBwdOp",
+    "EngramGateConvFwdOp",
+    "GDNFwdOp",
+    "GEMMW4A16FwdOp",
+    "GEMMW4A8FwdOp",
+    "GLAChunkBwdOp",
+    "GLAChunkFwdOp",
+    "GLAFwdOp",
+    "GroupedGEMMFwdOp",
+    "HadamardTransformFwdOp",
+    "IndexedExpertMLPFwdOp",
+    "KDAFwdOp",
+    "MHAPagedFwdOp",
+    "Mamba2FwdOp",
+    "MoEGroupedGEMMFP8FwdOp",
+    "NSACompressedVarlenFwdOp",
+    "NSATopKVarlenFwdOp",
+    "NSAVarlenFwdOp",
+    "SSDChunkScanFwdOp",
+    "SSDChunkStateFwdOp",
+    "SSDStatePassingFwdOp",
+    "SelectiveScanFwdOp",
+    "TopKMaskFwdOp",
+    "TopKTopPMaskFwdOp",
+    "TopPMaskFwdOp",
+})
+
+
+
 def _with_overlay(source_digest):
     result = hashlib.sha256(bytes.fromhex(source_digest))
     overlay = os.environ.get("ASCEND950_REFERENCE_ROOT")
@@ -113,6 +151,8 @@ def reuse_unchanged_reference_identity(source, op, identity):
         return identity
     # #138 only changes the measured kernel and dispatch. The CPU/NPU
     # references, base matrices, inputs and verification contracts are identical.
+    if digest == FINAL21_SOURCE and op in FINAL21_REUSE:
+        digest = POST_HADAMARD_SOURCE
     if digest == POST_HADAMARD_SOURCE:
         digest = POST_FFT_SOURCE
         identity = dict(identity, source=_with_overlay(digest))
