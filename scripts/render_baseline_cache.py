@@ -137,6 +137,19 @@ def render():
             'Recorded protocols and source environments are retained in the download; '
             'these ratios are not a new paired same-environment closure.'
         )
+    metadata = (json.loads(release_path.read_text()).get('workload_metadata', {})
+                if release_path.exists() else {})
+    for row in data['rows']:
+        # A released reference can precede the first published TileOPs timing.
+        row.setdefault('tileops_latency_us', None)
+        row.setdefault('ratio', None)
+        spec = metadata.get(row['op'])
+        if spec:
+            workload = row['workload']
+            workload.setdefault('family', spec['family'])
+            params = workload['params']
+            workload.setdefault('tensors', {k: params[k] for k in spec['tensor_names']
+                                            if isinstance(params.get(k), list)})
     rows = list(data['rows'])
     baseline_count = len(rows)
     baseline_cases = {(r['op'], r['case']) for r in rows}

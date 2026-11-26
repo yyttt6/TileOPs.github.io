@@ -1,5 +1,6 @@
 """Huge pristine input copies can be kept on the host for restores after timing."""
 from types import SimpleNamespace
+
 from measured_correctness import spill_control_snapshot
 
 
