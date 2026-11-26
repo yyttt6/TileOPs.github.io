@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_policy_and_identity():
     policy = json.loads((ROOT/'scripts/golden_cache_policy.json').read_text())['operators']
-    assert len(policy) == 206
+    assert len(policy) == 218
     assert sum(v == 'high' for v in policy.values()) == 2
     assert sum(v == 'medium' for v in policy.values()) == 47
     source = (ROOT/'scripts/nightly_server2.py').read_text()

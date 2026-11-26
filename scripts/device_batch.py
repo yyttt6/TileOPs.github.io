@@ -45,7 +45,7 @@ def run(source, jobs, root, label, owner, *, timer="auto", case_plan=None):
         "--owner",
         owner,
         "--wait",
-        "1800",
+        "14400",  # Keep the FIFO ticket while a preceding 4h reservation completes.
         "--timeout",
         "14400",
         "--receipt",

@@ -12,10 +12,18 @@ def snapshot():
 
 
 def test_over3_exact_release_scope_and_unchanged_measurements(snapshot):
-    assert len(snapshot["rows"]) == 7735
-    changed = [row for row in snapshot["rows"] if row.get("baseline_evidence", {}).get("campaign") == "over3-refresh-20261116"]
+    assert len(snapshot["rows"]) == 7835
+    # The separate 100-case release is appended by compose_baselines.
+    original = snapshot["rows"][:7735]
+    extra = snapshot["rows"][7735:]
+    new_ids = {r["measurement_id"] for r in extra}
+    assert len(new_ids) == len(extra) == 100
+    assert new_ids.isdisjoint(r["measurement_id"] for r in original)
+    assert len({r["op"] for r in extra}) == 12
+    assert all(r["samples"] == 15 and r["library"] == "torch-eager" for r in extra)
+    changed = [row for row in original if row.get("baseline_evidence", {}).get("campaign") == "over3-refresh-20261116"]
     assert len(changed) == 2118
-    unchanged = [row for row in snapshot["rows"] if row not in changed]
+    unchanged = [row for row in original if row not in changed]
     assert len(unchanged) == 5617
     assert hashlib.sha256(json.dumps(unchanged, sort_keys=True).encode()).hexdigest() == "6cd4251038798ba3971b1009155f566a60eebfc208fd877659466a437931cacb"
     assert all(row["samples"] == 15 for row in changed)
@@ -85,4 +93,4 @@ def test_published_download_is_strict_json():
         raise ValueError(f"Non-JSON constant: {value}")
 
     data = json.loads(path.read_text(), parse_constant=reject_non_json_constant)
-    assert data["baseline_release"] == "over3-refresh-20261116"
+    assert data["baseline_release"] == "over3-refresh-20261116+upstream12-20261125"
