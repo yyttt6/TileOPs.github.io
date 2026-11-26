@@ -3,6 +3,16 @@
 from dataclasses import asdict, replace
 
 
+def spill_control_snapshot(pristine):
+    """Move the largest multi-GiB restoration copy to host outside the device timing window."""
+    if not pristine:
+        return
+    largest = max(range(len(pristine)), key=lambda i: pristine[i].numel() * pristine[i].element_size())
+    saved = pristine[largest]
+    if saved.device.type == "npu" and saved.numel() * saved.element_size() >= 4 << 30:
+        pristine[largest] = saved.cpu()
+
+
 def measure_and_verify(
     case, impl, measure, *, expected_calls, golden_cache=None, comparison_transform=None
 ):
@@ -61,6 +71,11 @@ def measure_and_verify(
         comparison = replace(evidence, probe=None) if isinstance(evidence, Custom) else evidence
         verify = getattr(numerics, "_verify_with_input_snapshot", numerics.verify)
         snapshot_args = {} if verify is numerics.verify else {"snapshot": (shared, pristine)}
+        # Mutation checks on the final timed call have already finished. Here the
+        # verifier only copies pristine values back to the original tensors.
+        # Large expert-weight snapshots must leave room for the gate-swap control.
+        if snapshot_args and getattr(evidence, "controls", ()) and not getattr(evidence, "probe", None):
+            spill_control_snapshot(pristine)
         checks = verify(
             (
                 golden_cache.wrap(case.reference)

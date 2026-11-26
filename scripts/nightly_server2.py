@@ -107,7 +107,7 @@ def main():
             "--owner",
             f"nightly/{os.environ['GITHUB_RUN_ID']}/{op}/{attempt}",
             "--wait",
-            "1800",
+            "14400",  # Keep the FIFO ticket while a preceding 4h reservation completes.
             "--timeout",
             "14400",
             "--",

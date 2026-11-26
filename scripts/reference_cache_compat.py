@@ -93,38 +93,97 @@ PRIOR_SOURCE_OPERATORS = frozenset(
 # References already verified under the preceding release. Newly registered
 # operators and the previously registered entries retested in PR 139 have
 # current-identity caches. Only reuse the audited, unaffected remainder.
-FINAL21_REUSE = frozenset({
-    "BatchNormBwdOp",
-    "DeltaNetChunkBwdOp",
-    "DeltaNetChunkFwdOp",
-    "DeltaNetFwdOp",
-    "EngramGateConvBwdOp",
-    "EngramGateConvFwdOp",
-    "GDNFwdOp",
-    "GEMMW4A16FwdOp",
-    "GEMMW4A8FwdOp",
-    "GLAChunkBwdOp",
-    "GLAChunkFwdOp",
-    "GLAFwdOp",
-    "GroupedGEMMFwdOp",
-    "HadamardTransformFwdOp",
-    "IndexedExpertMLPFwdOp",
-    "KDAFwdOp",
-    "MHAPagedFwdOp",
-    "Mamba2FwdOp",
-    "MoEGroupedGEMMFP8FwdOp",
-    "NSACompressedVarlenFwdOp",
-    "NSATopKVarlenFwdOp",
-    "NSAVarlenFwdOp",
-    "SSDChunkScanFwdOp",
-    "SSDChunkStateFwdOp",
-    "SSDStatePassingFwdOp",
-    "SelectiveScanFwdOp",
-    "TopKMaskFwdOp",
-    "TopKTopPMaskFwdOp",
-    "TopPMaskFwdOp",
-})
+FINAL21_REUSE = frozenset(
+    {
+        "BatchNormBwdOp",
+        "DeltaNetChunkBwdOp",
+        "DeltaNetChunkFwdOp",
+        "DeltaNetFwdOp",
+        "EngramGateConvBwdOp",
+        "EngramGateConvFwdOp",
+        "GDNFwdOp",
+        "GEMMW4A16FwdOp",
+        "GEMMW4A8FwdOp",
+        "GLAChunkBwdOp",
+        "GLAChunkFwdOp",
+        "GLAFwdOp",
+        "GroupedGEMMFwdOp",
+        "HadamardTransformFwdOp",
+        "IndexedExpertMLPFwdOp",
+        "KDAFwdOp",
+        "MHAPagedFwdOp",
+        "Mamba2FwdOp",
+        "MoEGroupedGEMMFP8FwdOp",
+        "NSACompressedVarlenFwdOp",
+        "NSATopKVarlenFwdOp",
+        "NSAVarlenFwdOp",
+        "SSDChunkScanFwdOp",
+        "SSDChunkStateFwdOp",
+        "SSDStatePassingFwdOp",
+        "SelectiveScanFwdOp",
+        "TopKMaskFwdOp",
+        "TopKTopPMaskFwdOp",
+        "TopPMaskFwdOp",
+    }
+)
 
+
+# The upstream additions preserve the previously registered reference implementations.
+# Scope the transition to the 49 operators with qualified Golden data on this base.
+UPSTREAM12_SOURCE = "4b5c65373885e5b6b85186b45701a4f42290861092555969a2434876bc6fe089"
+UPSTREAM12_REUSE = frozenset(
+    {
+        "BatchNormBwdOp",
+        "DSADenseFwdOp",
+        "DSAPagedFwdOp",
+        "DeltaNetChunkBwdOp",
+        "DeltaNetChunkFwdOp",
+        "DeltaNetFwdOp",
+        "EngramGateConvBwdOp",
+        "EngramGateConvFwdOp",
+        "FP8LightningIndexerFwdOp",
+        "FusedMoEExpertsFwdOp",
+        "FusedMoEFwdOp",
+        "FusedMoESharedExpertFwdOp",
+        "GDNFwdOp",
+        "GEMMW4A16FwdOp",
+        "GEMMW4A8FwdOp",
+        "GLAChunkBwdOp",
+        "GLAChunkFwdOp",
+        "GLAFwdOp",
+        "GQADenseBwdOp",
+        "GQADenseFwdOp",
+        "GQADenseWithLSEFwdOp",
+        "GQAPagedFwdOp",
+        "GQAVarlenFwdOp",
+        "GroupedGEMMFwdOp",
+        "HadamardTransformFwdOp",
+        "IndexedExpertMLPFwdOp",
+        "KDAFwdOp",
+        "MHAPagedFwdOp",
+        "MHCPreFwdOp",
+        "MLADenseBwdOp",
+        "MLADenseDecodeFwdOp",
+        "MLAPagedFwdOp",
+        "MLAVarlenBwdOp",
+        "MLAVarlenFwdOp",
+        "Mamba2FwdOp",
+        "MoEExpertMLPFwdOp",
+        "MoEGroupedGEMMFP8FwdOp",
+        "MoEGroupedGEMMFwdOp",
+        "NSACompressedVarlenFwdOp",
+        "NSATopKVarlenFwdOp",
+        "NSAVarlenFwdOp",
+        "SSDChunkScanFwdOp",
+        "SSDChunkStateFwdOp",
+        "SSDStatePassingFwdOp",
+        "SelectiveScanFwdOp",
+        "SharedExpertMLPFwdOp",
+        "TopKMaskFwdOp",
+        "TopKTopPMaskFwdOp",
+        "TopPMaskFwdOp",
+    }
+)
 
 
 def _with_overlay(source_digest):
@@ -140,7 +199,7 @@ def _with_overlay(source_digest):
 
 def reuse_unchanged_reference_identity(source, op, identity):
     """Reuse only unchanged independent references; never affected shared math."""
-    if op not in UNCHANGED_OPERATORS | PRIOR_SOURCE_OPERATORS:
+    if op not in UNCHANGED_OPERATORS | PRIOR_SOURCE_OPERATORS | UPSTREAM12_REUSE:
         return identity
     if identity.get("source_mode") != "independent-reference":
         return identity
@@ -149,6 +208,11 @@ def reuse_unchanged_reference_identity(source, op, identity):
         return identity
     if identity.get("source") != _with_overlay(digest):
         return identity
+    if digest != UPSTREAM12_SOURCE and op not in UNCHANGED_OPERATORS | PRIOR_SOURCE_OPERATORS:
+        return identity
+    if digest == UPSTREAM12_SOURCE and op in UPSTREAM12_REUSE:
+        digest = FINAL21_SOURCE
+        identity = dict(identity, source=_with_overlay(digest))
     # #138 only changes the measured kernel and dispatch. The CPU/NPU
     # references, base matrices, inputs and verification contracts are identical.
     if digest == FINAL21_SOURCE and op in FINAL21_REUSE:
